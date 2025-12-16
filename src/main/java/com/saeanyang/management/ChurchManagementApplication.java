@@ -1,13 +1,13 @@
-package com.saeanyang.weeklybulletin;
+package com.saeanyang.management;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WeeklyBulletinApplication {
+public class ChurchManagementApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(WeeklyBulletinApplication.class, args);
+		SpringApplication.run(ChurchManagementApplication.class, args);
 	}
 
 }
