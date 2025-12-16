@@ -1,4 +1,4 @@
-package com.saeanyang.weekly_bulletin;
+package com.saeanyang.weeklybulletin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
