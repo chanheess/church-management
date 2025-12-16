@@ -23,12 +23,17 @@
 hs_err_pid*
 replay_pid*
 
-
-# etc
-.DS_Store
-.gradle/
-build/
-out/
+# IntelliJ
 .idea/
 *.iml
+
+# Gradle
+.gradle/
+build/
+
+# OS
+.DS_Store
+
+# etc
+out/
 .env
