@@ -4,11 +4,10 @@ spring:
 
 bulletin:
   excel:
-    path: /Users/chpark/Documents/church-management/2026년 카리스청년부 명단.xlsx
+    path: ${BULLETIN_EXCEL_PATH}
   logo:
-    path: /Users/chpark/Documents/church-management/logo.png
+    path: ${BULLETIN_LOGO_PATH}
   illustration:
-    folder: /Users/chpark/Documents/church-management/illustrations
+    folder: ${BULLETIN_ILLUSTRATIONS_PATH}
   text:
-    # 환경변수 BULLETIN_TEXT_PATH 로 덮어쓸 수 있음
-    path: ${BULLETIN_TEXT_PATH:/Users/chpark/Documents/church-management/bulletin-text.properties}
+    path: ${BULLETIN_TEXT_PATH}
