@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<div class="page">
+<div class="page" id="page1">
 
     <!-- ===== LEFT ===== -->
     <div class="left">
@@ -134,7 +134,104 @@
 
 </div>
 
+<!-- 페이지 2 (예시) -->
+<div class="page" id="page2" style="display: none;">
+    <div class="left">
+        <h2 class="section-title">[ 이번 주 소식 ]</h2>
+        <div class="section">
+            <strong>공지사항</strong><br>
+            여기에 주보 2페이지 내용을 추가하세요.
+        </div>
+    </div>
+
+    <div class="right">
+        <h2 class="section-title">[ 기도 제목 ]</h2>
+        <div class="section">
+            여기에 기도 제목을 추가하세요.
+        </div>
+    </div>
+</div>
+
+<!-- 페이지네이션 버튼 -->
+<div class="pagination-controls">
+    <button id="prevBtn" class="nav-btn" onclick="changePage(-1)">
+        <span>&#8249;</span>
+    </button>
+    <span id="pageIndicator" class="page-indicator">1 / 2</span>
+    <button id="nextBtn" class="nav-btn" onclick="changePage(1)">
+        <span>&#8250;</span>
+    </button>
+</div>
+
 <script>
+    // 페이지네이션 변수
+    let currentPageIndex = 1;
+    const totalPages = 2; // 페이지 수 (필요에 따라 변경)
+
+    // 페이지 전환 함수
+    function changePage(direction) {
+        const newPage = currentPageIndex + direction;
+
+        if (newPage < 1 || newPage > totalPages) {
+            return;
+        }
+
+        // 현재 페이지 숨기기
+        document.getElementById('page' + currentPageIndex).style.display = 'none';
+
+        // 새 페이지 표시
+        currentPageIndex = newPage;
+        document.getElementById('page' + currentPageIndex).style.display = 'flex';
+
+        // 페이지 인디케이터 업데이트
+        document.getElementById('pageIndicator').textContent = currentPageIndex + ' / ' + totalPages;
+
+        // 버튼 활성화/비활성화
+        document.getElementById('prevBtn').disabled = (currentPageIndex === 1);
+        document.getElementById('nextBtn').disabled = (currentPageIndex === totalPages);
+
+        // 페이지 맨 위로 스크롤
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 페이지 로드 시 초기화
+    window.addEventListener('DOMContentLoaded', function() {
+        // 첫 페이지 버튼 상태 설정
+        document.getElementById('prevBtn').disabled = true;
+        if (totalPages === 1) {
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        // 저장된 로고 설정 복원
+        try {
+            const savedLogo = localStorage.getItem('bulletinLogo');
+            const savedSize = localStorage.getItem('bulletinLogoSize');
+
+            const mainLogo = document.getElementById('mainLogo');
+
+            if (mainLogo) {
+                if (savedLogo) {
+                    mainLogo.src = savedLogo;
+                }
+
+                if (savedSize) {
+                    mainLogo.style.width = savedSize + 'px';
+                }
+            }
+        } catch (e) {
+            console.warn('저장된 로고 설정 불러오기 실패:', e);
+        }
+    });
+
+    // 키보드 화살표 키로도 페이지 전환
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'ArrowLeft') {
+            changePage(-1);
+        } else if (event.key === 'ArrowRight') {
+            changePage(1);
+        }
+    });
+
     // 로고 크기 조절을 위한 변수
     let currentLogoSize = 150;
     let uploadedImageData = null;
@@ -217,26 +314,6 @@
 
         closeLogoModal();
     }
-
-    // 페이지 로드 시 저장된 로고 설정 복원
-    window.addEventListener('DOMContentLoaded', function() {
-        try {
-            const savedLogo = localStorage.getItem('bulletinLogo');
-            const savedSize = localStorage.getItem('bulletinLogoSize');
-
-            const mainLogo = document.getElementById('mainLogo');
-
-            if (savedLogo) {
-                mainLogo.src = savedLogo;
-            }
-
-            if (savedSize) {
-                mainLogo.style.width = savedSize + 'px';
-            }
-        } catch (e) {
-            console.warn('저장된 로고 설정 불러오기 실패:', e);
-        }
-    });
 
     // 모달 외부 클릭 시 닫기
     window.onclick = function(event) {
