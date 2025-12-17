@@ -28,7 +28,6 @@ public class TextConfigService {
              Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             props.load(reader);
         } catch (IOException e) {
-            // 실패 시 기본값 그대로 사용
             e.printStackTrace();
             return config;
         }
@@ -47,6 +46,9 @@ public class TextConfigService {
 
         config.setContact1(props.getProperty("contact1", config.getContact1()));
         config.setContact2(props.getProperty("contact2", config.getContact2()));
+
+        config.setSloganLabel(props.getProperty("sloganLabel", config.getSloganLabel()));
+        config.setSloganTitle(props.getProperty("sloganTitle", config.getSloganTitle()));
 
         return config;
     }
@@ -67,6 +69,8 @@ public class TextConfigService {
             case "wayToChurch2":    config.setWayToChurch2(value); break;
             case "contact1":        config.setContact1(value); break;
             case "contact2":        config.setContact2(value); break;
+            case "sloganLabel":     config.setSloganLabel(value); break;
+            case "sloganTitle":     config.setSloganTitle(value); break;
             default:
                 // 알 수 없는 키는 무시
                 return;
@@ -88,6 +92,8 @@ public class TextConfigService {
         props.setProperty("wayToChurch2", nullToEmpty(config.getWayToChurch2()));
         props.setProperty("contact1", nullToEmpty(config.getContact1()));
         props.setProperty("contact2", nullToEmpty(config.getContact2()));
+        props.setProperty("sloganLabel", nullToEmpty(config.getSloganLabel()));
+        props.setProperty("sloganTitle", nullToEmpty(config.getSloganTitle()));
 
         File file = new File(textConfigPath);
         File parent = file.getParentFile();
@@ -120,6 +126,8 @@ public class TextConfigService {
 
         config.setContact1("교회 : 031-472-5670");
         config.setContact2("임세일 간사 : 010-3091-5659");
+        config.setSloganLabel("새안양 교회 표어");
+        config.setSloganTitle("우리가 넉넉히 이기리라");
         return config;
     }
 

@@ -25,6 +25,10 @@ public class EditableTextConfig {
     // 연락처
     private String contact1;
     private String contact2;
+
+    // 1페이지 표어
+    private String sloganLabel;    // "새안양 교회 표어"
+    private String sloganTitle;    // "우리가 넉넉히 이기리라"
 }
 
 

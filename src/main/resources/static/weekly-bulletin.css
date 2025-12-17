@@ -148,6 +148,11 @@ h2.section-title {
   line-height: 1.8;
 }
 
+.section-subtitle {
+  font-size: 16px;
+  margin: 0 0 8px 0;
+}
+
 /* ===== 오른쪽 ===== */
 .slogan {
   font-size: 13px;
@@ -160,6 +165,100 @@ h2.section-title {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 15px;
+}
+
+/* ===== PAGE 2: 예배 순서 테이블 ===== */
+.service-table {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.service-table th,
+.service-table td {
+  border: 1px solid #ddd;
+  padding: 6px 8px;
+}
+
+.service-table th {
+  width: 80px;
+  background-color: #f5f3ea;
+  text-align: center;
+  font-weight: bold;
+}
+
+.service-table td:nth-child(2) {
+  width: 55%;
+}
+
+.service-table td:nth-child(3) {
+  width: 25%;
+  text-align: center;
+}
+
+.service-subsection {
+  margin-top: 22px;
+}
+
+.offering-table {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.offering-table th,
+.offering-table td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: center;
+}
+
+.offering-table th {
+  background-color: #f5f3ea;
+}
+
+.month-cell {
+  width: 50px;
+  background-color: #e4dfcf !important;
+  font-weight: bold;
+}
+
+/* ===== PAGE 2: 오른쪽 광고/축복 ===== */
+.notice-list {
+  margin: 10px 0 0 18px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.notice-list li {
+  margin-bottom: 6px;
+}
+
+.blessing-section {
+  margin-top: 24px;
+}
+
+.blessing-box {
+  background-color: #f5f3ea;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.blessing-box ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.blessing-box li {
+  margin: 4px 0;
 }
 
 .blessing {
