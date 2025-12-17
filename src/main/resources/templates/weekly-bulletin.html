@@ -23,12 +23,14 @@
                             ♥ 담당목사 :
                             <span class="editable-text"
                                   contenteditable="true"
+                                  data-text-key="headPastor"
                                   th:text="${bulletin.headPastor}">김한욱 목사</span>
                         </div>
                         <div class="org-header-right">
                             ♥ 디렉터 :
                             <span class="editable-text"
                                   contenteditable="true"
+                                  data-text-key="director"
                                   th:text="${bulletin.director}">고은옥 사모</span>
                         </div>
                     </div>
@@ -36,6 +38,7 @@
                         ♥ 고문 :
                         <span class="editable-text"
                               contenteditable="true"
+                              data-text-key="advisors"
                               th:text="${bulletin.advisors}">김기현 장로, 황윤식 장로</span>
                     </div>
 
@@ -86,41 +89,61 @@
                         새청년 담당 :
                         <span class="editable-text"
                               contenteditable="true"
+                              data-text-key="newYouthLeader"
                               th:text="${bulletin.newYouthLeader}">임유빈, 신영찬</span>
                         /
                         찬양팀 리더 :
                         <span class="editable-text"
                               contenteditable="true"
+                              data-text-key="worshipLeader"
                               th:text="${bulletin.worshipLeader}">임유빈 간사</span>
                     </div>
                 </div>
 
                 <div class="section">
                     <strong>[ 예배 안내 ]</strong><br>
-                    <span class="editable-text" contenteditable="true">
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="worshipInfo1"
+                          th:text="${textConfig.worshipInfo1}">
                         카리스 청년 예배 : 주일 낮 12:30 3층 본당
                     </span><br>
-                    <span class="editable-text" contenteditable="true">
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="worshipInfo2"
+                          th:text="${textConfig.worshipInfo2}">
                         청년 금요 회복 예배 : 금요일 저녁 8:30 3층 본당
                     </span>
                 </div>
 
                 <div class="section">
                     <strong>[ 오시는 길 ]</strong><br>
-                    <span class="editable-text" contenteditable="true">
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="wayToChurch1"
+                          th:text="${textConfig.wayToChurch1}">
                         1호선 관악역 하차 후 예술공원 방면 도보 10분
                     </span><br>
-                    <span class="editable-text" contenteditable="true">
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="wayToChurch2"
+                          th:text="${textConfig.wayToChurch2}">
                         버스 : 1, 20, 51, 5530, 5713, 5625, 5626
                     </span>
                 </div>
 
                 <div class="section">
                     <strong>[ 연락처 ]</strong><br>
-                    <span class="editable-text" contenteditable="true">
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="contact1"
+                          th:text="${textConfig.contact1}">
                         교회 : 031-472-5670
                     </span><br>
-                    <span class="editable-text" contenteditable="true">
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="contact2"
+                          th:text="${textConfig.contact2}">
                         임세일 간사 : 010-3091-5659
                     </span>
                 </div>
@@ -465,6 +488,38 @@
             el.addEventListener('mouseleave', () => {
                 hoverCount -= 1;
                 scheduleHide();
+            });
+        });
+    })();
+
+    // ===== 인라인 텍스트 편집 자동 저장 (서버 파일에) =====
+    (function initEditableTextAutoSave() {
+        const elements = document.querySelectorAll('.editable-text[data-text-key]');
+        if (!elements.length) return;
+
+        const saveField = (key, value) => {
+            fetch('/api/bulletin/text-config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key, value })
+            }).catch(err => console.error('텍스트 저장 실패:', err));
+        };
+
+        elements.forEach(el => {
+            const key = el.dataset.textKey;
+            if (!key) return;
+
+            el.addEventListener('blur', () => {
+                const value = el.innerText.trim();
+                saveField(key, value);
+            });
+
+            // 엔터 입력 시 줄바꿈 대신 저장 + 포커스 아웃
+            el.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    el.blur();
+                }
             });
         });
     })();

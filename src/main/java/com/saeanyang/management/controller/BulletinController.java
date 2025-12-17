@@ -1,7 +1,9 @@
 package com.saeanyang.management.controller;
 
 import com.saeanyang.management.model.BulletinData;
+import com.saeanyang.management.model.EditableTextConfig;
 import com.saeanyang.management.service.ExcelReaderService;
+import com.saeanyang.management.service.TextConfigService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -11,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.File;
@@ -26,6 +30,7 @@ import java.util.List;
 public class BulletinController {
 
     private final ExcelReaderService excelReaderService;
+    private final TextConfigService textConfigService;
 
     @Value("${bulletin.excel.path}")
     private String excelFilePath;
@@ -36,9 +41,24 @@ public class BulletinController {
     @Value("${bulletin.illustration.folder}")
     private String illustrationFolder;
 
-    public BulletinController(ExcelReaderService excelReaderService) {
+    public BulletinController(ExcelReaderService excelReaderService,
+                              TextConfigService textConfigService) {
         this.excelReaderService = excelReaderService;
+        this.textConfigService = textConfigService;
     }
+
+    /** 텍스트 한 항목을 서버 쪽 설정 파일에 저장 */
+    @PostMapping("/api/bulletin/text-config")
+    public ResponseEntity<Void> updateText(@RequestBody TextUpdateRequest request) {
+        if (request == null || request.key() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        textConfigService.updateField(request.key(), request.value());
+        return ResponseEntity.ok().build();
+    }
+
+    /** 텍스트 단일 항목 업데이트용 요청 바디 */
+    public record TextUpdateRequest(String key, String value) {}
 
     @GetMapping({"/", "/bulletin"})
     public String redirectRoot() {
@@ -49,7 +69,16 @@ public class BulletinController {
     public String showBulletin(Model model) {
         try {
             BulletinData bulletinData = excelReaderService.readBulletinData(excelFilePath);
+            // 서버에 저장된 텍스트 설정 반영
+            EditableTextConfig textConfig = textConfigService.loadConfig();
+            bulletinData.setHeadPastor(textConfig.getHeadPastor());
+            bulletinData.setDirector(textConfig.getDirector());
+            bulletinData.setAdvisors(textConfig.getAdvisors());
+            bulletinData.setNewYouthLeader(textConfig.getNewYouthLeader());
+            bulletinData.setWorshipLeader(textConfig.getWorshipLeader());
+
             model.addAttribute("bulletin", bulletinData);
+            model.addAttribute("textConfig", textConfig);
         } catch (IOException e) {
             model.addAttribute("error", "엑셀 파일을 읽을 수 없습니다: " + e.getMessage());
         }

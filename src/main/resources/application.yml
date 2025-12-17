@@ -9,3 +9,6 @@ bulletin:
     path: /Users/chpark/Documents/church-management/logo.png
   illustration:
     folder: /Users/chpark/Documents/church-management/illustrations
+  text:
+    # 환경변수 BULLETIN_TEXT_PATH 로 덮어쓸 수 있음
+    path: ${BULLETIN_TEXT_PATH:/Users/chpark/Documents/church-management/bulletin-text.properties}
