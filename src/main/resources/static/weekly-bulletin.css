@@ -1,0 +1,312 @@
+/* ===== A4 가로 기본 설정 ===== */
+@page {
+  size: A4 landscape;   /* 핵심 */
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #eaeaea;
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+/* A4 가로: 297mm x 210mm */
+.page {
+  width: 297mm;
+  height: 210mm;
+  background: #ffffff;
+  margin: auto;
+  display: flex;
+  box-sizing: border-box;
+  padding: 15mm; /* 가로니까 여백 조금 줄이는 걸 추천 */
+}
+
+/* ===== 좌/우 레이아웃 ===== */
+.left {
+  width: 50%;
+  padding-right: 5mm;
+  box-sizing: border-box;
+}
+
+.right {
+  width: 50%;
+  padding-left: 5mm;
+  text-align: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* ===== 제목 ===== */
+h2.section-title {
+  font-size: 20px;
+  margin: 0 0 12px 0;
+}
+
+/* ===== 조직도 박스 ===== */
+.org-box {
+  background: #f1efe6;
+  border-radius: 20px;
+  padding: 18px;
+  font-size: 15px;
+}
+
+.org-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.org-header-left,
+.org-header-right {
+  flex: 1;
+}
+
+.org-advisor {
+  margin-bottom: 8px;
+}
+
+.org-box table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  table-layout: fixed;
+}
+
+.org-box th,
+.org-box td {
+  border: 1px solid #ffffff;
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.org-box th:nth-child(1),
+.org-box td:nth-child(1) {
+  width: 15%;
+}
+
+.org-box th:nth-child(2),
+.org-box td:nth-child(2) {
+  width: 15%;
+}
+
+.org-box th:nth-child(3),
+.org-box td:nth-child(3) {
+  width: 35%;
+  word-wrap: break-word;
+  word-break: keep-all;
+  white-space: normal;
+}
+
+.org-box th:nth-child(4),
+.org-box td:nth-child(4) {
+  width: 35%;
+  word-wrap: break-word;
+  word-break: keep-all;
+  white-space: normal;
+}
+
+.org-footer {
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+/* ===== 섹션 ===== */
+.section {
+  margin-top: 18px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* ===== 오른쪽 ===== */
+.slogan {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 8px;
+  margin-top: 5px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.blessing {
+  font-style: italic;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.logo {
+  font-size: 42px;
+  letter-spacing: 10px;
+  margin: 15px 0;
+}
+
+.since {
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+}
+
+.illustration {
+  margin-top: 25px;
+}
+
+.illustration img {
+  width: 95%;
+  height: auto;
+}
+
+.date {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  font-size: 12px;
+  padding-bottom: 2mm;
+}
+
+/* ===== 로고 컨테이너 ===== */
+.logo-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-logo {
+  width: 150px;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.main-logo:hover {
+  transform: scale(1.05);
+}
+
+/* ===== 로고 편집 모달 ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #ffffff;
+  margin: 10% auto;
+  padding: 30px;
+  border: 1px solid #888;
+  border-radius: 10px;
+  width: 450px;
+  max-width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 20px;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.logo-preview {
+  text-align: center;
+  margin: 20px 0;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  min-height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-preview img {
+  max-width: 100%;
+  height: auto;
+}
+
+.control-group {
+  margin: 20px 0;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  margin-right: 10px;
+}
+
+.control-group input[type="file"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#sizeValue {
+  display: inline-block;
+  margin-left: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.modal-content button:hover {
+  background-color: #45a049;
+}
+
+/* ===== 프린트 ===== */
+@media print {
+  body { background: none; }
+  .page {
+    box-shadow: none;
+    margin: 0;
+    padding: 15mm;
+  }
+  .modal {
+    display: none !important;
+  }
+}

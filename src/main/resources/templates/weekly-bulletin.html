@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>청년부 주보</title>
+    <link rel="stylesheet" th:href="@{/weekly-bulletin.css}" />
+</head>
+
+<body>
+<div class="page">
+
+    <!-- ===== LEFT ===== -->
+    <div class="left">
+        <h2 class="section-title">[ 청년부 조직도 ]</h2>
+
+        <div class="org-box">
+            <div class="org-header">
+                <div class="org-header-left">
+                    ♥ 담당목사 : <span th:text="${bulletin.headPastor}">김한욱 목사</span>
+                </div>
+                <div class="org-header-right">
+                    ♥ 디렉터 : <span th:text="${bulletin.director}">고은옥 사모</span>
+                </div>
+            </div>
+            <div class="org-advisor">
+                ♥ 고문 : <span th:text="${bulletin.advisors}">김기현 장로, 황윤식 장로</span>
+            </div>
+
+            <table>
+                <tr>
+                    <th>간사</th>
+                    <th>목자</th>
+                    <th>셀리더</th>
+                    <th>인턴</th>
+                </tr>
+                <tr th:each="team : ${bulletin.teams}">
+                    <td>
+                        <span th:text="${team.division}">1목장</span><br>
+                        <span th:if="${team.secretaries.isEmpty()}">-</span>
+                        <span th:unless="${team.secretaries.isEmpty()}">
+                            <span th:each="secretary, iterStat : ${team.secretaries}">
+                                <span th:text="${secretary}"></span>
+                                <br th:if="${!iterStat.last}" />
+                            </span>
+                        </span>
+                    </td>
+                    <td>
+                        <span th:if="${team.pastors.isEmpty()}">-</span>
+                        <span th:unless="${team.pastors.isEmpty()}">
+                            <span th:each="pastor, iterStat : ${team.pastors}">
+                                <span th:text="${pastor}"></span>
+                                <br th:if="${!iterStat.last}" />
+                            </span>
+                        </span>
+                    </td>
+                    <td>
+                        <span th:if="${team.leaders.isEmpty()}">-</span>
+                        <span th:unless="${team.leaders.isEmpty()}"
+                              th:text="${#strings.listJoin(team.leaders, ' / ')}"></span>
+                    </td>
+                    <td>
+                        <span th:if="${team.interns.isEmpty()}">-</span>
+                        <span th:unless="${team.interns.isEmpty()}"
+                              th:text="${#strings.listJoin(team.interns, ' / ')}"></span>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="org-footer">
+                새청년 담당 : <span th:text="${bulletin.newYouthLeader}">임유빈, 신영찬</span> /
+                찬양팀 리더 : <span th:text="${bulletin.worshipLeader}">임유빈 간사</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <strong>[ 예배 안내 ]</strong><br>
+            카리스 청년 예배 : 주일 낮 12:30 3층 본당<br>
+            청년 금요 회복 예배 : 금요일 저녁 8:30 3층 본당
+        </div>
+
+        <div class="section">
+            <strong>[ 오시는 길 & 연락처 ]</strong><br>
+            1호선 관악역 하차 후 예술공원 방면 도보 10분<br>
+            버스 : 1, 20, 51, 5530, 5713, 5625, 5626
+        </div>
+
+        <div class="section">
+            <strong>[ 연락처 ]</strong><br>
+            교회 : 031-472-5670<br>
+            임세일 간사 : 010-3091-5659
+        </div>
+    </div>
+
+    <!-- ===== RIGHT ===== -->
+    <div class="right">
+        <div class="slogan">2025 새해와 교회 표어</div>
+        <div class="title">우리가 넉넉히 이기리라</div>
+
+        <div class="logo-container">
+            <img id="mainLogo" th:src="@{/logo.png}" alt="로고" class="main-logo" onclick="openLogoModal()">
+        </div>
+
+        <div class="illustration">
+            <img th:src="@{/illustration.png}" alt="일러스트">
+        </div>
+
+        <div class="date" th:text="${bulletin.date}">2025-12-14</div>
+    </div>
+
+    <!-- 로고 편집 모달 -->
+    <div id="logoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLogoModal()">&times;</span>
+            <h3>로고 편집</h3>
+
+            <div class="logo-preview">
+                <img id="previewLogo" th:src="@{/logo.png}" alt="로고 미리보기">
+            </div>
+
+            <div class="control-group">
+                <label for="logoSize">로고 크기:</label>
+                <input type="range" id="logoSize" min="50" max="300" value="150" oninput="updateLogoSize(this.value)">
+                <span id="sizeValue">150px</span>
+            </div>
+
+            <div class="control-group">
+                <label for="logoUpload">로고 파일 선택:</label>
+                <input type="file" id="logoUpload" accept="image/*" onchange="uploadLogo(event)">
+            </div>
+
+            <button onclick="applyLogoChanges()">적용</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // 로고 크기 조절을 위한 변수
+    let currentLogoSize = 150;
+    let uploadedImageData = null;
+
+    // 모달 열기
+    function openLogoModal() {
+        document.getElementById('logoModal').style.display = 'block';
+
+        // 현재 로고 크기 가져오기
+        const mainLogo = document.getElementById('mainLogo');
+        currentLogoSize = mainLogo.width || 150;
+        document.getElementById('logoSize').value = currentLogoSize;
+        document.getElementById('sizeValue').textContent = currentLogoSize + 'px';
+
+        // 미리보기에 현재 로고 표시
+        const previewLogo = document.getElementById('previewLogo');
+        previewLogo.src = mainLogo.src;
+        previewLogo.style.width = currentLogoSize + 'px';
+    }
+
+    // 모달 닫기
+    function closeLogoModal() {
+        document.getElementById('logoModal').style.display = 'none';
+        uploadedImageData = null;
+    }
+
+    // 로고 크기 업데이트
+    function updateLogoSize(value) {
+        currentLogoSize = value;
+        document.getElementById('sizeValue').textContent = value + 'px';
+
+        // 미리보기 로고 크기 업데이트
+        const previewLogo = document.getElementById('previewLogo');
+        previewLogo.style.width = value + 'px';
+    }
+
+    // 로고 파일 업로드
+    function uploadLogo(event) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedImageData = e.target.result;
+                const previewLogo = document.getElementById('previewLogo');
+                previewLogo.src = uploadedImageData;
+                previewLogo.style.width = currentLogoSize + 'px';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('이미지 파일만 업로드할 수 있습니다.');
+        }
+    }
+
+    // 변경사항 적용
+    function applyLogoChanges() {
+        const mainLogo = document.getElementById('mainLogo');
+
+        // 크기 적용
+        mainLogo.style.width = currentLogoSize + 'px';
+
+        // 업로드된 이미지가 있으면 적용
+        if (uploadedImageData) {
+            mainLogo.src = uploadedImageData;
+
+            // localStorage에 저장 (브라우저 세션 유지용)
+            try {
+                localStorage.setItem('bulletinLogo', uploadedImageData);
+                localStorage.setItem('bulletinLogoSize', currentLogoSize);
+            } catch (e) {
+                console.warn('로고 저장 실패:', e);
+            }
+        } else {
+            // 크기만 변경된 경우
+            try {
+                localStorage.setItem('bulletinLogoSize', currentLogoSize);
+            } catch (e) {
+                console.warn('로고 크기 저장 실패:', e);
+            }
+        }
+
+        closeLogoModal();
+    }
+
+    // 페이지 로드 시 저장된 로고 설정 복원
+    window.addEventListener('DOMContentLoaded', function() {
+        try {
+            const savedLogo = localStorage.getItem('bulletinLogo');
+            const savedSize = localStorage.getItem('bulletinLogoSize');
+
+            const mainLogo = document.getElementById('mainLogo');
+
+            if (savedLogo) {
+                mainLogo.src = savedLogo;
+            }
+
+            if (savedSize) {
+                mainLogo.style.width = savedSize + 'px';
+            }
+        } catch (e) {
+            console.warn('저장된 로고 설정 불러오기 실패:', e);
+        }
+    });
+
+    // 모달 외부 클릭 시 닫기
+    window.onclick = function(event) {
+        const modal = document.getElementById('logoModal');
+        if (event.target === modal) {
+            closeLogoModal();
+        }
+    };
+</script>
+
+</body>
+</html>

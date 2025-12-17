@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: weekly-bulletin
+
+bulletin:
+  excel:
+    path: /Users/chpark/Documents/church-management/2026년 카리스청년부 명단.xlsx
+  logo:
+    path: /Users/chpark/Documents/church-management/logo.png
+
