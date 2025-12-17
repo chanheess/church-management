@@ -72,6 +72,13 @@ h2.section-title {
   border-collapse: collapse;
   margin-top: 10px;
   table-layout: fixed;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transform-origin: center;
+}
+
+.org-box table:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .org-box th,
@@ -159,6 +166,12 @@ h2.section-title {
 .illustration img {
   width: 95%;
   height: auto;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.illustration img:hover {
+  transform: scale(1.02);
 }
 
 .date {
@@ -189,113 +202,101 @@ h2.section-title {
   transform: scale(1.05);
 }
 
-/* ===== 로고 편집 모달 ===== */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.5);
+
+.control-section {
+  margin-bottom: 30px;
 }
 
-.modal-content {
-  background-color: #ffffff;
-  margin: 10% auto;
-  padding: 30px;
-  border: 1px solid #888;
-  border-radius: 10px;
-  width: 450px;
-  max-width: 90%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-  line-height: 20px;
-}
-
-.close:hover,
-.close:focus {
-  color: #000;
-}
-
-.modal-content h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #333;
-}
-
-.logo-preview {
-  text-align: center;
-  margin: 20px 0;
-  padding: 20px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  min-height: 150px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.logo-preview img {
-  max-width: 100%;
-  height: auto;
+.control-section h4 {
+  margin: 0 0 20px 0;
+  color: #444;
+  font-size: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .control-group {
+  width: 100%;
   margin: 20px 0;
+  box-sizing: border-box;
 }
 
 .control-group label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-weight: bold;
   color: #555;
+  font-size: 14px;
 }
 
 .control-group input[type="range"] {
   width: 100%;
-  margin-right: 10px;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.control-group input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+  border: none;
 }
 
 .control-group input[type="file"] {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #fafafa;
+  transition: border-color 0.2s;
 }
 
-#sizeValue {
-  display: inline-block;
-  margin-left: 10px;
+.control-group input[type="file"]:hover {
+  border-color: #4CAF50;
+}
+
+#logoSizeValue,
+#illustrationSizeValue {
+  float: right;
+  color: #4CAF50;
   font-weight: bold;
-  color: #333;
 }
 
-.modal-content button {
+.reset-btn {
   width: 100%;
   padding: 12px;
-  background-color: #4CAF50;
+  background-color: #ff5252;
   color: white;
   border: none;
-  border-radius: 5px;
-  font-size: 16px;
+  border-radius: 6px;
+  font-size: 15px;
   font-weight: bold;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 15px;
+  transition: background-color 0.2s;
 }
 
-.modal-content button:hover {
-  background-color: #45a049;
+.reset-btn:hover {
+  background-color: #e74444;
 }
 
 /* ===== 페이지네이션 ===== */
@@ -350,18 +351,125 @@ h2.section-title {
   text-align: center;
 }
 
-/* ===== 프린트 ===== */
+.page-stack {
+  width: 297mm;      /* page와 동일 폭 */
+  flex: 0 0 297mm;   /* 고정 폭으로 가운데 정렬 */
+}
+
+/* ===== 전체 작업 캔버스: 페이지 + 우측 패널 영역 ===== */
+.workspace {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 24px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: calc(297mm + 320px + 96px); /* 본문+패널+여백 */
+  box-sizing: border-box;
+}
+
+/* 우측 패널 자리(메인 컨텐츠 안 가리게 하는 핵심) */
+.panel-dock {
+  width: 300px;
+  min-height: 210mm;
+  flex: 0 0 300px;
+  position: relative;
+}
+
+.hover-popup {
+  position: sticky;
+  top: 0;
+  right: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 14px;
+  margin-top: 20px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  z-index: 0; /* 편집 패널보다 아래 */
+}
+
+.hover-popup strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #2b2b2b;
+}
+
+.hover-popup p {
+  margin: 0;
+  color: #4a4a4a;
+}
+
+/* ===== Figma-like Floating Panel ===== */
+.edit-panel {
+  position: sticky;
+  top: 20px;
+  width: 300px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  overflow: hidden;
+  z-index: 2; /* 안내 팝업보다 위에 위치 */
+  margin-bottom: 28px; /* 아래 안내창이 그림자에 묻히지 않도록 간격 확보 */
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.panel-close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.panel-body {
+  padding: 12px;
+}
+
 @media print {
   body { background: none; }
-  .page {
-    box-shadow: none;
-    margin: 0;
-    padding: 15mm;
-  }
-  .modal {
-    display: none !important;
-  }
+
+  /* 프린트 시: 편집 패널/페이지네이션 숨김 */
+  .panel-dock,
+  .edit-panel,
   .pagination-controls {
     display: none !important;
+  }
+
+  /* 프린트 시 페이지는 딱 맞게 */
+  .workspace { padding: 0; gap: 0; }
+  .page {
+    margin: 0;
+    padding: 15mm;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 1400px) {
+  .workspace {
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+  }
+
+  .panel-dock,
+  .edit-panel {
+    width: 320px;
+    flex: 0 0 auto;
   }
 }

@@ -7,4 +7,5 @@ bulletin:
     path: /Users/chpark/Documents/church-management/2026년 카리스청년부 명단.xlsx
   logo:
     path: /Users/chpark/Documents/church-management/logo.png
-
+  illustration:
+    folder: /Users/chpark/Documents/church-management/illustrations
