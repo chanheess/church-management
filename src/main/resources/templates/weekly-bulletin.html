@@ -20,14 +20,23 @@
                 <div class="org-box">
                     <div class="org-header">
                         <div class="org-header-left">
-                            ♥ 담당목사 : <span th:text="${bulletin.headPastor}">김한욱 목사</span>
+                            ♥ 담당목사 :
+                            <span class="editable-text"
+                                  contenteditable="true"
+                                  th:text="${bulletin.headPastor}">김한욱 목사</span>
                         </div>
                         <div class="org-header-right">
-                            ♥ 디렉터 : <span th:text="${bulletin.director}">고은옥 사모</span>
+                            ♥ 디렉터 :
+                            <span class="editable-text"
+                                  contenteditable="true"
+                                  th:text="${bulletin.director}">고은옥 사모</span>
                         </div>
                     </div>
                     <div class="org-advisor">
-                        ♥ 고문 : <span th:text="${bulletin.advisors}">김기현 장로, 황윤식 장로</span>
+                        ♥ 고문 :
+                        <span class="editable-text"
+                              contenteditable="true"
+                              th:text="${bulletin.advisors}">김기현 장로, 황윤식 장로</span>
                     </div>
 
                     <table class="excel-hover-area">
@@ -74,33 +83,50 @@
                     </table>
 
                     <div class="org-footer">
-                        새청년 담당 : <span th:text="${bulletin.newYouthLeader}">임유빈, 신영찬</span> /
-                        찬양팀 리더 : <span th:text="${bulletin.worshipLeader}">임유빈 간사</span>
+                        새청년 담당 :
+                        <span class="editable-text"
+                              contenteditable="true"
+                              th:text="${bulletin.newYouthLeader}">임유빈, 신영찬</span>
+                        /
+                        찬양팀 리더 :
+                        <span class="editable-text"
+                              contenteditable="true"
+                              th:text="${bulletin.worshipLeader}">임유빈 간사</span>
                     </div>
                 </div>
 
                 <div class="section">
                     <strong>[ 예배 안내 ]</strong><br>
-                    카리스 청년 예배 : 주일 낮 12:30 3층 본당<br>
-                    청년 금요 회복 예배 : 금요일 저녁 8:30 3층 본당
+                    카리스 청년 예배 :
+                    <span class="editable-text" contenteditable="true">주일 낮 12:30 3층 본당</span><br>
+                    청년 금요 회복 예배 :
+                    <span class="editable-text" contenteditable="true">금요일 저녁 8:30 3층 본당</span>
                 </div>
 
                 <div class="section">
-                    <strong>[ 오시는 길 & 연락처 ]</strong><br>
-                    1호선 관악역 하차 후 예술공원 방면 도보 10분<br>
-                    버스 : 1, 20, 51, 5530, 5713, 5625, 5626
+                    <strong>[ 오시는 길 ]</strong><br>
+                    <span class="editable-text" contenteditable="true">
+                        1호선 관악역 하차 후 예술공원 방면 도보 10분
+                    </span><br>
+                    <span class="editable-text" contenteditable="true">
+                        버스 : 1, 20, 51, 5530, 5713, 5625, 5626
+                    </span>
                 </div>
 
                 <div class="section">
                     <strong>[ 연락처 ]</strong><br>
-                    교회 : 031-472-5670<br>
-                    임세일 간사 : 010-3091-5659
+                    <span class="editable-text" contenteditable="true">
+                        교회 : 031-472-5670
+                    </span><br>
+                    <span class="editable-text" contenteditable="true">
+                        임세일 간사 : 010-3091-5659
+                    </span>
                 </div>
             </div>
 
             <!-- ===== RIGHT ===== -->
             <div class="right">
-                <div class="slogan">2025 새해와 교회 표어</div>
+                <div class="slogan">2025 새안양 교회 표어</div>
                 <div class="title">우리가 넉넉히 이기리라</div>
 
                 <div class="logo-container">
@@ -387,8 +413,12 @@
     // ===== 간사/목자 호버 안내 (표 전체 영역) =====
     (function initExcelHoverHint() {
         const popup = document.getElementById('excelPopup');
-        const targets = document.querySelectorAll('.org-box, .excel-hover-area, .excel-edit-target, #excelPopup');
-        if (!popup || !targets.length) return;
+        const table = document.querySelector('.excel-hover-area');
+        if (!popup || !table) return;
+
+        // 표 내부 셀(td/th)만 대상으로 지정 (헤더/푸터 텍스트 영역 제외)
+        const cells = table.querySelectorAll('th, td');
+        const extraTargets = [popup]; // 팝업 위로 이동 시에도 유지
 
         let hoverCount = 0;
         let hideTimer = null;
@@ -408,7 +438,18 @@
             }, 120);
         };
 
-        targets.forEach(el => {
+        cells.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                hoverCount += 1;
+                show();
+            });
+            el.addEventListener('mouseleave', () => {
+                hoverCount -= 1;
+                scheduleHide();
+            });
+        });
+
+        extraTargets.forEach(el => {
             el.addEventListener('mouseenter', () => {
                 hoverCount += 1;
                 show();
