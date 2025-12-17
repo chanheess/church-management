@@ -16,5 +16,6 @@ public class BulletinData {
     private List<TeamMember> teams; // 목장별 팀원
     private String newYouthLeader;  // 새청년 담당
     private String worshipLeader;   // 찬양팀 리더
-    private String date;            // 날짜
+    private String date;            // 날짜 (해당 주 주일)
+    private String year;            // 연도 (표어에 사용)
 }

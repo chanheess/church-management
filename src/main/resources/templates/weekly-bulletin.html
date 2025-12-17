@@ -97,10 +97,12 @@
 
                 <div class="section">
                     <strong>[ 예배 안내 ]</strong><br>
-                    카리스 청년 예배 :
-                    <span class="editable-text" contenteditable="true">주일 낮 12:30 3층 본당</span><br>
-                    청년 금요 회복 예배 :
-                    <span class="editable-text" contenteditable="true">금요일 저녁 8:30 3층 본당</span>
+                    <span class="editable-text" contenteditable="true">
+                        카리스 청년 예배 : 주일 낮 12:30 3층 본당
+                    </span><br>
+                    <span class="editable-text" contenteditable="true">
+                        청년 금요 회복 예배 : 금요일 저녁 8:30 3층 본당
+                    </span>
                 </div>
 
                 <div class="section">
@@ -126,7 +128,10 @@
 
             <!-- ===== RIGHT ===== -->
             <div class="right">
-                <div class="slogan">2025 새안양 교회 표어</div>
+                <div class="slogan">
+                    <span th:text="${bulletin.year}">2025</span>
+                    새안양 교회 표어
+                </div>
                 <div class="title">우리가 넉넉히 이기리라</div>
 
                 <div class="logo-container">
@@ -210,7 +215,10 @@
             </div>
         </div>
         <div id="excelPopup" class="hover-popup" hidden>
-            <strong>엑셀에서 수정</strong>
+            <div class="hover-popup-header">
+                <span class="hover-popup-dot"></span>
+                <strong>엑셀에서 수정</strong>
+            </div>
             <p>간사·목자 정보는 엑셀 파일을 수정한 뒤 페이지를 새로고침하세요.</p>
         </div>
     </div>

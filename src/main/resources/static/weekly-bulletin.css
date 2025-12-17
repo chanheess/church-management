@@ -428,6 +428,29 @@ h2.section-title {
   color: #4a4a4a;
 }
 
+.hover-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.hover-popup-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff9800;
+  box-shadow: 0 0 4px rgba(255, 152, 0, 0.8);
+  flex-shrink: 0;
+}
+
+/* 헤더 안에서는 strong을 한 줄에 나란히 정렬 */
+.hover-popup-header strong {
+  display: inline-block;
+  margin-bottom: 0;
+  line-height: 1.1;
+}
+
 /* ===== Figma-like Floating Panel ===== */
 .edit-panel {
   position: sticky;

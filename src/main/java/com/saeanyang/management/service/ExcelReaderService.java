@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,11 +56,23 @@ public class ExcelReaderService {
             bulletinData.setNewYouthLeader("임유빈, 신영찬");
             bulletinData.setWorshipLeader("임유빈 간사");
 
-            // 현재 날짜
-            bulletinData.setDate(java.time.LocalDate.now().toString());
+            // 이번 주(오늘을 포함해 다음 일요일까지)를 기준으로 하는 주일 날짜 및 연도 계산
+            LocalDate sunday = getCurrentWeekSunday();
+            bulletinData.setDate(sunday.toString());
+            bulletinData.setYear(String.valueOf(sunday.getYear()));
         }
 
         return bulletinData;
+    }
+
+    /**
+     * 오늘을 기준으로 "이번 주의 주일(일요일)" 날짜를 계산한다.
+     * - 오늘이 일요일이면 오늘 날짜
+     * - 그 외 요일이면, 이번 주의 다가오는 일요일 날짜
+     */
+    private LocalDate getCurrentWeekSunday() {
+        LocalDate today = LocalDate.now();
+        return today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
 
     private List<Person> readPeopleFromExcel(Sheet sheet) {
