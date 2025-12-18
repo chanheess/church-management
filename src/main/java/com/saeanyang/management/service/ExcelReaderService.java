@@ -60,6 +60,10 @@ public class ExcelReaderService {
             LocalDate sunday = getCurrentWeekSunday();
             bulletinData.setDate(sunday.toString());
             bulletinData.setYear(String.valueOf(sunday.getYear()));
+
+            // 헌금위원 월 및 날짜 계산
+            bulletinData.setOfferingMonth(sunday.getMonthValue() + "월");
+            bulletinData.setOfferingDates(calculateSundaysInMonth(sunday));
         }
 
         return bulletinData;
@@ -73,6 +77,33 @@ public class ExcelReaderService {
     private LocalDate getCurrentWeekSunday() {
         LocalDate today = LocalDate.now();
         return today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+    }
+
+    /**
+     * 주어진 날짜가 속한 월의 모든 주일(일요일) 날짜를 계산한다.
+     * @param referenceDate 기준 날짜
+     * @return 해당 월의 모든 주일 날짜 리스트 (예: ["7일", "14일", "21일", "28일"])
+     */
+    private List<String> calculateSundaysInMonth(LocalDate referenceDate) {
+        List<String> sundays = new ArrayList<>();
+
+        // 해당 월의 첫 번째 날
+        LocalDate firstDayOfMonth = referenceDate.withDayOfMonth(1);
+
+        // 해당 월의 첫 번째 일요일 찾기
+        LocalDate firstSunday = firstDayOfMonth.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+
+        // 해당 월의 마지막 날
+        LocalDate lastDayOfMonth = referenceDate.with(TemporalAdjusters.lastDayOfMonth());
+
+        // 첫 번째 일요일부터 시작해서 해당 월의 모든 일요일 수집
+        LocalDate currentSunday = firstSunday;
+        while (!currentSunday.isAfter(lastDayOfMonth)) {
+            sundays.add(currentSunday.getDayOfMonth() + "일");
+            currentSunday = currentSunday.plusWeeks(1);
+        }
+
+        return sundays;
     }
 
     private List<Person> readPeopleFromExcel(Sheet sheet) {

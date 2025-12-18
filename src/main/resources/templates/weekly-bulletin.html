@@ -24,14 +24,14 @@
                             <span class="editable-text"
                                   contenteditable="true"
                                   data-text-key="headPastor"
-                                  th:text="${bulletin.headPastor}">김한욱 목사</span>
+                                  th:utext="${bulletin.headPastor}">김한욱 목사</span>
                         </div>
                         <div class="org-header-right">
                             ♥ 디렉터 :
                             <span class="editable-text"
                                   contenteditable="true"
                                   data-text-key="director"
-                                  th:text="${bulletin.director}">고은옥 사모</span>
+                                  th:utext="${bulletin.director}">고은옥 사모</span>
                         </div>
                     </div>
                     <div class="org-advisor">
@@ -39,7 +39,7 @@
                         <span class="editable-text"
                               contenteditable="true"
                               data-text-key="advisors"
-                              th:text="${bulletin.advisors}">김기현 장로, 황윤식 장로</span>
+                              th:utext="${bulletin.advisors}">김기현 장로, 황윤식 장로</span>
                     </div>
 
                     <table class="excel-hover-area">
@@ -90,13 +90,13 @@
                         <span class="editable-text"
                               contenteditable="true"
                               data-text-key="newYouthLeader"
-                              th:text="${bulletin.newYouthLeader}">임유빈, 신영찬</span>
+                              th:utext="${bulletin.newYouthLeader}">임유빈, 신영찬</span>
                         /
                         찬양팀 리더 :
                         <span class="editable-text"
                               contenteditable="true"
                               data-text-key="worshipLeader"
-                              th:text="${bulletin.worshipLeader}">임유빈 간사</span>
+                              th:utext="${bulletin.worshipLeader}">임유빈 간사</span>
                     </div>
                 </div>
 
@@ -105,13 +105,13 @@
                     <span class="editable-text"
                           contenteditable="true"
                           data-text-key="worshipInfo1"
-                          th:text="${textConfig.worshipInfo1}">
+                          th:utext="${textConfig.worshipInfo1}">
                         카리스 청년 예배 : 주일 낮 12:30 3층 본당
                     </span><br>
                     <span class="editable-text"
                           contenteditable="true"
                           data-text-key="worshipInfo2"
-                          th:text="${textConfig.worshipInfo2}">
+                          th:utext="${textConfig.worshipInfo2}">
                         청년 금요 회복 예배 : 금요일 저녁 8:30 3층 본당
                     </span>
                 </div>
@@ -121,13 +121,13 @@
                     <span class="editable-text"
                           contenteditable="true"
                           data-text-key="wayToChurch1"
-                          th:text="${textConfig.wayToChurch1}">
+                          th:utext="${textConfig.wayToChurch1}">
                         1호선 관악역 하차 후 예술공원 방면 도보 10분
                     </span><br>
                     <span class="editable-text"
                           contenteditable="true"
                           data-text-key="wayToChurch2"
-                          th:text="${textConfig.wayToChurch2}">
+                          th:utext="${textConfig.wayToChurch2}">
                         버스 : 1, 20, 51, 5530, 5713, 5625, 5626
                     </span>
                 </div>
@@ -137,13 +137,13 @@
                     <span class="editable-text"
                           contenteditable="true"
                           data-text-key="contact1"
-                          th:text="${textConfig.contact1}">
+                          th:utext="${textConfig.contact1}">
                         교회 : 031-472-5670
                     </span><br>
                     <span class="editable-text"
                           contenteditable="true"
                           data-text-key="contact2"
-                          th:text="${textConfig.contact2}">
+                          th:utext="${textConfig.contact2}">
                         임세일 간사 : 010-3091-5659
                     </span>
                 </div>
@@ -158,7 +158,7 @@
                 <div class="title editable-text"
                      contenteditable="true"
                      data-text-key="sloganTitle"
-                     th:text="${textConfig.sloganTitle}">
+                     th:utext="${textConfig.sloganTitle}">
                     우리가 넉넉히 이기리라
                 </div>
 
@@ -183,7 +183,8 @@
                     <tr>
                         <th>찬양</th>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="worship_songs">
+                            <span class="editable-text" contenteditable="true" data-text-key="worship_songs"
+                                  th:utext="${textConfig.additionalFields.get('worship_songs') ?: '나의 피난처 예수<br>왕이신 하나님<br>높으신 주<br>성령의 불타는 교회<br>다시한번'}">
                                 나의 피난처 예수<br>
                                 왕이신 하나님<br>
                                 높으신 주<br>
@@ -192,70 +193,85 @@
                             </span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="worship_team">Mountain movers</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="worship_team"
+                                  th:utext="${textConfig.additionalFields.get('worship_team') ?: 'Mountain movers'}">Mountain movers</span>
                         </td>
                     </tr>
                     <tr>
                         <th>대표기도</th>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="prayer_topic"></span>
+                            <span class="editable-text" contenteditable="true" data-text-key="prayer_topic"
+                                  th:utext="${textConfig.additionalFields.get('prayer_topic') ?: ''}"></span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="prayer_leader">김태관 인턴</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="prayer_leader"
+                                  th:utext="${textConfig.additionalFields.get('prayer_leader') ?: '김태관 인턴'}">김태관 인턴</span>
                         </td>
                     </tr>
                     <tr>
                         <th>성경 봉독</th>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="scripture_reading">마태복음 6장 27~34절</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="scripture_reading"
+                                  th:utext="${textConfig.additionalFields.get('scripture_reading') ?: '마태복음 6장 27~34절'}">마태복음 6장 27~34절</span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="scripture_reader">다함께</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="scripture_reader"
+                                  th:utext="${textConfig.additionalFields.get('scripture_reader') ?: '다함께'}">다함께</span>
                         </td>
                     </tr>
                     <tr>
                         <th>말씀선포</th>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="sermon_title">염려를 이기는 믿음</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="sermon_title"
+                                  th:utext="${textConfig.additionalFields.get('sermon_title') ?: '염려를 이기는 믿음'}">염려를 이기는 믿음</span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="sermon_pastor">김한욱 목사</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="sermon_pastor"
+                                  th:utext="${textConfig.additionalFields.get('sermon_pastor') ?: '김한욱 목사'}">김한욱 목사</span>
                         </td>
                     </tr>
                     <tr>
                         <th>헌금</th>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="offering_song">-</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="offering_song"
+                                  th:utext="${textConfig.additionalFields.get('offering_song') ?: '-'}">-</span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="offering_team">Mountain movers</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="offering_team"
+                                  th:utext="${textConfig.additionalFields.get('offering_team') ?: 'Mountain movers'}">Mountain movers</span>
                         </td>
                     </tr>
                     <tr>
                         <th>환영 및 광고</th>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="announcement_content"></span>
+                            <span class="editable-text" contenteditable="true" data-text-key="announcement_content"
+                                  th:utext="${textConfig.additionalFields.get('announcement_content') ?: ''}"></span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="announcement_leader">임유빈 간사</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="announcement_leader"
+                                  th:utext="${textConfig.additionalFields.get('announcement_leader') ?: '임유빈 간사'}">임유빈 간사</span>
                         </td>
                     </tr>
                     <tr>
                         <th>마침기도</th>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="closing_prayer_content"></span>
+                            <span class="editable-text" contenteditable="true" data-text-key="closing_prayer_content"
+                                  th:utext="${textConfig.additionalFields.get('closing_prayer_content') ?: ''}"></span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="closing_prayer_leader">고은옥 사모</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="closing_prayer_leader"
+                                  th:utext="${textConfig.additionalFields.get('closing_prayer_leader') ?: '고은옥 사모'}">고은옥 사모</span>
                         </td>
                     </tr>
                     <tr>
                         <th>셀 모임</th>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_content"></span>
+                            <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_content"
+                                  th:utext="${textConfig.additionalFields.get('cell_meeting_content') ?: ''}"></span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_participants">다함께</span>
+                            <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_participants"
+                                  th:utext="${textConfig.additionalFields.get('cell_meeting_participants') ?: '다함께'}">다함께</span>
                         </td>
                     </tr>
                 </table>
@@ -264,64 +280,31 @@
                     <h3 class="section-subtitle">[ 대표기도 헌금위원 ]</h3>
                     <table class="offering-table">
                         <tr>
-                            <th rowspan="4" class="month-cell">
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_month">12월</span>
+                            <th colspan="2">
+                                <span contenteditable="false">날짜</span>
                             </th>
                             <th>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_date_header">날짜</span>
+                                <span contenteditable="false">대표기도</span>
                             </th>
                             <th>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_prayer_header">대표기도</span>
-                            </th>
-                            <th>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_member_header">헌금위원</span>
+                                <span contenteditable="false">헌금위원</span>
                             </th>
                         </tr>
-                        <tr>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_date_1">7일</span>
+                        <tr th:each="date, iterStat : ${bulletin.offeringDates}">
+                            <td th:if="${iterStat.first}" th:attr="rowspan=${#lists.size(bulletin.offeringDates)}" class="month-cell">
+                                <span contenteditable="false" th:text="${bulletin.offeringMonth}">12월</span>
                             </td>
                             <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_prayer_1">박찬희 리더</span>
+                                <span contenteditable="false" th:text="${date}">7일</span>
                             </td>
                             <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_member_1">-</span>
+                                <span class="editable-text" contenteditable="true"
+                                      th:attr="data-text-key='offering_prayer_' + ${iterStat.index + 1}"
+                                      th:utext="${textConfig.additionalFields.get('offering_prayer_' + (iterStat.index + 1)) ?: (iterStat.index == 0 ? '박찬희 리더' : (iterStat.index == 1 ? '김태관 인턴' : (iterStat.index == 2 ? '김소원 인턴' : (iterStat.index == 3 ? '황소연 인턴' : '-'))))}">박찬희 리더</span>
                             </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_date_2">14일</span>
-                            </td>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_prayer_2">김태관 인턴</span>
-                            </td>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_member_2">박찬희 셀</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_date_3">21일</span>
-                            </td>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_prayer_3">김소원 인턴</span>
-                            </td>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_member_3">-</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="1">
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_month_2"></span>
-                            </td>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_date_4">28일</span>
-                            </td>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_prayer_4">황소연 인턴</span>
-                            </td>
-                            <td>
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_member_4">-</span>
+                            <td th:if="${iterStat.first}" th:attr="rowspan=${#lists.size(bulletin.offeringDates)}" class="offering-member-cell">
+                                <span class="editable-text" contenteditable="true" data-text-key="offering_member_all"
+                                      th:utext="${textConfig.additionalFields.get('offering_member_all') ?: '-'}">-</span>
                             </td>
                         </tr>
                     </table>
@@ -332,23 +315,27 @@
                 <h2 class="section-title">[ 광고 ]</h2>
                 <ol class="notice-list">
                     <li>
-                        <span class="editable-text" contenteditable="true" data-text-key="notice_1">
+                        <span class="editable-text" contenteditable="true" data-text-key="notice_1"
+                              th:utext="${textConfig.additionalFields.get('notice_1') ?: '카리스 청년 예배에 오신 여러분을 진심으로 환영합니다. 예배는 신앙의 생명입니다. 예배 3분 전 기도로 준비하시기 바랍니다.'}">
                             카리스 청년 예배에 오신 여러분을 진심으로 환영합니다. 예배는 신앙의 생명입니다. 예배 3분 전 기도로 준비하시기 바랍니다.
                         </span>
                     </li>
                     <li>
-                        <span class="editable-text" contenteditable="true" data-text-key="notice_2">
+                        <span class="editable-text" contenteditable="true" data-text-key="notice_2"
+                              th:utext="${textConfig.additionalFields.get('notice_2') ?: '예배의 자리가 축복의 자리입니다. 예배하는 자를 찾으시는 하나님 앞에 공적 예배(새벽, 수요, 주일, 주일 오후)에 참여하셔서 큰 은혜를 체험하시기 바랍니다.'}">
                             예배의 자리가 축복의 자리입니다. 예배하는 자를 찾으시는 하나님 앞에 공적 예배(새벽, 수요, 주일, 주일 오후)에 참여하셔서
                             큰 은혜를 체험하시기 바랍니다.
                         </span>
                     </li>
                     <li>
-                        <span class="editable-text" contenteditable="true" data-text-key="notice_3">
+                        <span class="editable-text" contenteditable="true" data-text-key="notice_3"
+                              th:utext="${textConfig.additionalFields.get('notice_3') ?: '매주 금요일 11시에 청년부 전도를 진행하고 있습니다. 많은 참여 부탁드립니다.'}">
                             매주 금요일 11시에 청년부 전도를 진행하고 있습니다. 많은 참여 부탁드립니다.
                         </span>
                     </li>
                     <li>
-                        <span class="editable-text" contenteditable="true" data-text-key="notice_4">
+                        <span class="editable-text" contenteditable="true" data-text-key="notice_4"
+                              th:utext="${textConfig.additionalFields.get('notice_4') ?: '성탄발표 준비 안내: 성탄 전야제(12월 24일 저녁 7시)에 청년부 성탄발표가 있습니다. 연습은 12월 7일, 12일, 14일, 19일에 진행됩니다.'}">
                             성탄발표 준비 안내: 성탄 전야제(12월 24일 저녁 7시)에 청년부 성탄발표가 있습니다. 연습은 12월 7일, 12일, 14일, 19일에 진행됩니다.
                         </span>
                     </li>
@@ -357,13 +344,15 @@
                 <div class="section">
                     <h3 class="section-subtitle">[ 헌금 ]</h3>
                     <p>
-                        <span class="editable-text" contenteditable="true" data-text-key="offering_account">
+                        <span class="editable-text" contenteditable="true" data-text-key="offering_account"
+                              th:utext="${textConfig.additionalFields.get('offering_account') ?: '청년부 회비 계좌 안내 (회비 매월 5천원)<br>1000-5013-3340 토스 박원진'}">
                             청년부 회비 계좌 안내 (회비 매월 5천원)<br>
                             1000-5013-3340 토스 박원진
                         </span>
                     </p>
                     <p>
-                        <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_schedule">
+                        <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_schedule"
+                              th:utext="${textConfig.additionalFields.get('cell_meeting_schedule') ?: '청년부 목장모임 및 금요 예배<br>1목장: 월요일 저녁 8시 / 2목장: 목요일 저녁 8시 40분<br>3목장: 화요일 저녁 8시 / 금요 예배: 금요일 저녁 8시 30분 본당 3층'}">
                             청년부 목장모임 및 금요 예배<br>
                             1목장: 월요일 저녁 8시 / 2목장: 목요일 저녁 8시 40분<br>
                             3목장: 화요일 저녁 8시 / 금요 예배: 금요일 저녁 8시 30분 본당 3층
@@ -376,10 +365,12 @@
                     <div class="blessing-box">
                         <ul>
                             <li>
-                                <span class="editable-text" contenteditable="true" data-text-key="blessing_1">새청년 축복</span>
+                                <span class="editable-text" contenteditable="true" data-text-key="blessing_1"
+                                      th:utext="${textConfig.additionalFields.get('blessing_1') ?: '새청년 축복'}">새청년 축복</span>
                             </li>
                             <li>
-                                <span class="editable-text" contenteditable="true" data-text-key="blessing_2">생일자 축복 이상민(14일) 문다비(16일)</span>
+                                <span class="editable-text" contenteditable="true" data-text-key="blessing_2"
+                                      th:utext="${textConfig.additionalFields.get('blessing_2') ?: '생일자 축복 이상민(14일) 문다비(16일)'}">생일자 축복 이상민(14일) 문다비(16일)</span>
                             </li>
                         </ul>
                     </div>
@@ -723,13 +714,22 @@
             const key = el.dataset.textKey;
             if (!key) return;
 
+            // contenteditable이 false인 요소는 편집 이벤트 추가하지 않음
+            if (el.getAttribute('contenteditable') === 'false') return;
+
             el.addEventListener('blur', () => {
-                const value = el.innerText.trim();
+                // innerText로 가져온 후 줄바꿈을 <br> 태그로 변환
+                const value = el.innerText.trim().replace(/\n/g, '<br>');
                 saveField(key, value);
             });
 
             // 키보드 이벤트 처리
             el.addEventListener('keydown', (event) => {
+                // IME 조합 중일 때는 처리하지 않음 (한글 입력 중 엔터 문제 방지)
+                if (event.isComposing || event.keyCode === 229) {
+                    return;
+                }
+
                 // Shift + Enter: 줄바꿈 허용
                 if (event.key === 'Enter' && event.shiftKey) {
                     // 줄바꿈은 기본 동작으로 허용

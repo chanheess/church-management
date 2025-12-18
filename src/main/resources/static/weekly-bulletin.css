@@ -51,13 +51,14 @@ body {
 /* ===== 제목 ===== */
 h2.section-title {
   font-size: 20px;
-  margin: 0 0 12px 0;
+  margin: 0 0 6px 0;
   width: 100%;
+  text-align: left;
 }
 
 /* ===== 조직도 박스 ===== */
 .org-box {
-  background: #f1efe6;
+  background: #f5f3ea;
   border-radius: 20px;
   padding: 18px;
   font-size: 15px;
@@ -164,9 +165,10 @@ h2.section-title {
 }
 
 .section-subtitle {
-  font-size: 16px;
-  margin: 0 0 8px 0;
+  font-size: 20px;
+  margin: 0 0 6px 0;
   width: 100%;
+  text-align: left;
 }
 
 /* ===== 오른쪽 ===== */
@@ -258,21 +260,45 @@ h2.section-title {
 }
 
 .month-cell {
-  width: 15%;
-  background-color: #e4dfcf !important;
+  width: 10%;
+  background-color: #ffffff !important;
   font-weight: bold;
 }
 
-.offering-table th:nth-child(2),
-.offering-table td:nth-child(2) {
+/* 수정 불가능한 텍스트 (날짜, 월, 헤더) */
+span[contenteditable="false"] {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* 헌금위원 셀 (셀 통합) */
+.offering-member-cell {
+  vertical-align: middle;
+}
+
+/* 첫 번째 행의 날짜 헤더 (colspan=2) */
+.offering-table tr:first-child th:first-child {
   width: 20%;
 }
 
+/* 날짜 데이터 열 (첫 행은 month-cell이 있어서 nth-child(2), 나머지는 nth-child(1)) */
+.offering-table tr:nth-child(2) td:nth-child(2),
+.offering-table tr:nth-child(n+3) td:nth-child(1) {
+  width: 10%;
+}
+
+/* 대표기도 열 */
+.offering-table th:nth-child(2),
+.offering-table tr:nth-child(2) td:nth-child(3),
+.offering-table tr:nth-child(n+3) td:nth-child(2) {
+  width: 35%;
+}
+
+/* 헌금위원 열 */
 .offering-table th:nth-child(3),
-.offering-table td:nth-child(3),
-.offering-table th:nth-child(4),
-.offering-table td:nth-child(4) {
-  width: 32.5%;
+.offering-table tr:nth-child(2) td:nth-child(4),
+.offering-table tr:nth-child(n+3) td:nth-child(3) {
+  width: 35%;
 }
 
 /* ===== PAGE 2: 오른쪽 광고/축복 ===== */

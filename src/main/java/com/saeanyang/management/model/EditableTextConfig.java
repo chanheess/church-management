@@ -2,6 +2,9 @@ package com.saeanyang.management.model;
 
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 페이지 내에서 사용자가 편집 가능한 텍스트들을 서버 측에 저장/복원하기 위한 설정 객체.
  */
@@ -29,6 +32,9 @@ public class EditableTextConfig {
     // 1페이지 표어
     private String sloganLabel;    // "새안양 교회 표어"
     private String sloganTitle;    // "우리가 넉넉히 이기리라"
+
+    // 동적 필드 (2장의 모든 텍스트 필드)
+    private Map<String, String> additionalFields = new HashMap<>();
 }
 
 

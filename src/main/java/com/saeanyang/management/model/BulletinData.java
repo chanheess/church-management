@@ -18,4 +18,6 @@ public class BulletinData {
     private String worshipLeader;   // 찬양팀 리더
     private String date;            // 날짜 (해당 주 주일)
     private String year;            // 연도 (표어에 사용)
+    private String offeringMonth;   // 헌금위원 월
+    private List<String> offeringDates; // 헌금위원 날짜 리스트 (해당 월의 모든 주일)
 }

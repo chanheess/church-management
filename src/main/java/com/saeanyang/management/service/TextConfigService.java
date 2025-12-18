@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+import java.util.Map;
 
 @Service
 public class TextConfigService {
@@ -50,6 +51,30 @@ public class TextConfigService {
         config.setSloganLabel(props.getProperty("sloganLabel", config.getSloganLabel()));
         config.setSloganTitle(props.getProperty("sloganTitle", config.getSloganTitle()));
 
+        // 2페이지 필드들도 additionalFields에 로드
+        String[] page2Keys = {
+            "worship_songs", "worship_team", "prayer_topic", "prayer_leader",
+            "scripture_reading", "scripture_reader", "sermon_title", "sermon_pastor",
+            "offering_song", "offering_team", "announcement_content", "announcement_leader",
+            "closing_prayer_content", "closing_prayer_leader", "cell_meeting_content", "cell_meeting_participants",
+            "offering_prayer_1", "offering_prayer_2", "offering_prayer_3", "offering_prayer_4",
+            "offering_member_all", "notice_1", "notice_2", "notice_3", "notice_4",
+            "offering_account", "cell_meeting_schedule", "blessing_1", "blessing_2"
+        };
+        for (String key : page2Keys) {
+            String value = props.getProperty(key);
+            if (value != null) {
+                config.getAdditionalFields().put(key, value);
+            }
+        }
+
+        // Properties에 있는 모든 키를 확인해서 추가 필드로 저장 (동적 키 지원)
+        for (String propKey : props.stringPropertyNames()) {
+            if (!isPage1Field(propKey) && !config.getAdditionalFields().containsKey(propKey)) {
+                config.getAdditionalFields().put(propKey, props.getProperty(propKey));
+            }
+        }
+
         return config;
     }
 
@@ -72,8 +97,9 @@ public class TextConfigService {
             case "sloganLabel":     config.setSloganLabel(value); break;
             case "sloganTitle":     config.setSloganTitle(value); break;
             default:
-                // 알 수 없는 키는 무시
-                return;
+                // 2페이지 필드 또는 동적 필드는 additionalFields에 저장
+                config.getAdditionalFields().put(key, value);
+                break;
         }
 
         saveConfig(config);
@@ -94,6 +120,11 @@ public class TextConfigService {
         props.setProperty("contact2", nullToEmpty(config.getContact2()));
         props.setProperty("sloganLabel", nullToEmpty(config.getSloganLabel()));
         props.setProperty("sloganTitle", nullToEmpty(config.getSloganTitle()));
+
+        // 2페이지 필드들도 저장
+        for (Map.Entry<String, String> entry : config.getAdditionalFields().entrySet()) {
+            props.setProperty(entry.getKey(), nullToEmpty(entry.getValue()));
+        }
 
         File file = new File(textConfigPath);
         File parent = file.getParentFile();
@@ -133,6 +164,22 @@ public class TextConfigService {
 
     private String nullToEmpty(String v) {
         return v == null ? "" : v;
+    }
+
+    /** 1페이지 필드인지 확인 */
+    private boolean isPage1Field(String key) {
+        return key.equals("headPastor") || key.equals("director") || key.equals("advisors") ||
+               key.equals("newYouthLeader") || key.equals("worshipLeader") ||
+               key.equals("worshipInfo1") || key.equals("worshipInfo2") ||
+               key.equals("wayToChurch1") || key.equals("wayToChurch2") ||
+               key.equals("contact1") || key.equals("contact2") ||
+               key.equals("sloganLabel") || key.equals("sloganTitle");
+    }
+
+    /** 추가 필드 값 가져오기 (템플릿에서 사용) */
+    public String getAdditionalField(String key, String defaultValue) {
+        EditableTextConfig config = loadConfig();
+        return config.getAdditionalFields().getOrDefault(key, defaultValue);
     }
 }
 
