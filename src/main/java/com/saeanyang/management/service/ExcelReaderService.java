@@ -82,7 +82,7 @@ public class ExcelReaderService {
     /**
      * 주어진 날짜가 속한 월의 모든 주일(일요일) 날짜를 계산한다.
      * @param referenceDate 기준 날짜
-     * @return 해당 월의 모든 주일 날짜 리스트 (예: ["7일", "14일", "21일", "28일"])
+     * @return 해당 월의 모든 주일 날짜 리스트 (예: ["7일", "14일", "21일", "28일"] 또는 5주가 있으면 5개)
      */
     private List<String> calculateSundaysInMonth(LocalDate referenceDate) {
         List<String> sundays = new ArrayList<>();
