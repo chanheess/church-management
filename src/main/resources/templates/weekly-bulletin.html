@@ -313,7 +313,7 @@
 
             <div class="right">
                 <h2 class="section-title">[ 광고 ]</h2>
-                <ol class="notice-list">
+                <ol class="notice-list" id="noticeList">
                     <li>
                         <span class="editable-text" contenteditable="true" data-text-key="notice_1"
                               th:utext="${textConfig.additionalFields.get('notice_1') ?: '카리스 청년 예배에 오신 여러분을 진심으로 환영합니다. 예배는 신앙의 생명입니다. 예배 3분 전 기도로 준비하시기 바랍니다.'}">
@@ -440,7 +440,7 @@
                 <span class="hover-popup-dot"></span>
                 <strong>편집 도움말</strong>
             </div>
-            <p style="margin: 8px 0;">
+            <p id="tooltipContent" style="margin: 8px 0;">
                 <kbd>Shift</kbd> + <kbd>Enter</kbd> : 줄바꿈<br>
                 <kbd>Enter</kbd> : 저장 및 편집 종료<br>
                 <kbd>Esc</kbd> : 편집 취소
@@ -697,42 +697,100 @@
         });
     })();
 
-    // ===== 인라인 텍스트 편집 자동 저장 (서버 파일에) =====
-    (function initEditableTextAutoSave() {
-        const elements = document.querySelectorAll('.editable-text[data-text-key]');
-        if (!elements.length) return;
+    // ===== 편집 가능한 텍스트 요소에 이벤트 리스너 추가 =====
+    function attachEditableTextEvents(el) {
+        const key = el.dataset.textKey;
+        if (!key) return;
 
-        const saveField = (key, value) => {
+        // contenteditable이 false인 요소는 편집 이벤트 추가하지 않음
+        if (el.getAttribute('contenteditable') === 'false') return;
+
+        // 광고 항목인지 확인
+        const isNoticeItem = key.startsWith('notice_');
+
+        el.addEventListener('blur', () => {
+            // innerText로 가져온 후 줄바꿈을 <br> 태그로 변환
+            const value = el.innerText.trim().replace(/\n/g, '<br>');
             fetch('/api/bulletin/text-config', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key, value })
             }).catch(err => console.error('텍스트 저장 실패:', err));
-        };
 
-        elements.forEach(el => {
-            const key = el.dataset.textKey;
-            if (!key) return;
+            // 광고 항목이고 내용이 비어있으면 삭제
+            if (isNoticeItem && value === '') {
+                const li = el.closest('li');
+                const noticeList = document.getElementById('noticeList');
+                if (noticeList && noticeList.children.length > 1) {
+                    li.remove();
+                    reindexNotices();
+                }
+            }
+        });
 
-            // contenteditable이 false인 요소는 편집 이벤트 추가하지 않음
-            if (el.getAttribute('contenteditable') === 'false') return;
+        // 키보드 이벤트 처리
+        el.addEventListener('keydown', (event) => {
+            // IME 조합 중일 때는 처리하지 않음 (한글 입력 중 엔터 문제 방지)
+            if (event.isComposing || event.keyCode === 229) {
+                return;
+            }
 
-            el.addEventListener('blur', () => {
-                // innerText로 가져온 후 줄바꿈을 <br> 태그로 변환
-                const value = el.innerText.trim().replace(/\n/g, '<br>');
-                saveField(key, value);
-            });
-
-            // 키보드 이벤트 처리
-            el.addEventListener('keydown', (event) => {
-                // IME 조합 중일 때는 처리하지 않음 (한글 입력 중 엔터 문제 방지)
-                if (event.isComposing || event.keyCode === 229) {
+            // 광고 항목에서만 특수 처리
+            if (isNoticeItem) {
+                // Shift + Enter: 줄바꿈 허용
+                if (event.key === 'Enter' && event.shiftKey) {
                     return;
                 }
 
+                // Enter만 누르면: 새 항목 추가
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+
+                    // 현재 내용 저장
+                    const value = el.innerText.trim().replace(/\n/g, '<br>');
+                    fetch('/api/bulletin/text-config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key, value })
+                    }).catch(err => console.error('텍스트 저장 실패:', err));
+
+                    // 새 항목 추가
+                    addNoticeAfter(el.closest('li'));
+                    return;
+                }
+
+                // Backspace: 빈 항목이면 삭제하고 이전 항목으로 이동
+                if (event.key === 'Backspace' && el.innerText.trim() === '') {
+                    event.preventDefault();
+                    const li = el.closest('li');
+                    const noticeList = document.getElementById('noticeList');
+
+                    if (noticeList.children.length > 1) {
+                        const prevLi = li.previousElementSibling;
+                        li.remove();
+                        reindexNotices();
+
+                        // 이전 항목의 끝으로 포커스 이동
+                        if (prevLi) {
+                            const prevSpan = prevLi.querySelector('.editable-text');
+                            if (prevSpan) {
+                                prevSpan.focus();
+                                // 커서를 끝으로 이동
+                                const range = document.createRange();
+                                const sel = window.getSelection();
+                                range.selectNodeContents(prevSpan);
+                                range.collapse(false);
+                                sel.removeAllRanges();
+                                sel.addRange(range);
+                            }
+                        }
+                    }
+                    return;
+                }
+            } else {
+                // 광고 항목이 아닌 경우 기존 로직
                 // Shift + Enter: 줄바꿈 허용
                 if (event.key === 'Enter' && event.shiftKey) {
-                    // 줄바꿈은 기본 동작으로 허용
                     return;
                 }
 
@@ -741,28 +799,65 @@
                     event.preventDefault();
                     el.blur();
                 }
+            }
 
-                // Esc: 편집 취소
-                if (event.key === 'Escape') {
-                    event.preventDefault();
-                    el.blur();
+            // Esc: 편집 취소
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                el.blur();
+            }
+        });
+
+        // 포커스 시 툴팁 표시
+        el.addEventListener('focus', (event) => {
+            showEditTooltip(event.target);
+        });
+
+        // 포커스 아웃 시 툴팁 숨김
+        el.addEventListener('blur', () => {
+            setTimeout(() => {
+                // 다른 편집 가능한 요소에 포커스가 없으면 툴팁 숨김
+                if (!document.activeElement.classList.contains('editable-text')) {
+                    hideEditTooltip();
                 }
-            });
+            }, 100);
+        });
+    }
 
-            // 포커스 시 툴팁 표시
-            el.addEventListener('focus', (event) => {
-                showEditTooltip(event.target);
-            });
+    function addNoticeAfter(currentLi) {
+        const noticeList = document.getElementById('noticeList');
+        const currentIndex = Array.from(noticeList.children).indexOf(currentLi);
+        const newIndex = currentIndex + 2; // 다음 인덱스
 
-            // 포커스 아웃 시 툴팁 숨김
-            el.addEventListener('blur', () => {
-                setTimeout(() => {
-                    // 다른 편집 가능한 요소에 포커스가 없으면 툴팁 숨김
-                    if (!document.activeElement.classList.contains('editable-text')) {
-                        hideEditTooltip();
-                    }
-                }, 100);
-            });
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="editable-text" contenteditable="true" data-text-key="notice_${newIndex}"></span>`;
+
+        // 현재 항목 다음에 삽입
+        if (currentLi.nextElementSibling) {
+            noticeList.insertBefore(li, currentLi.nextElementSibling);
+        } else {
+            noticeList.appendChild(li);
+        }
+
+        // 재색인
+        reindexNotices();
+
+        // 새로 추가된 editable-text에 이벤트 리스너 추가
+        const newSpan = li.querySelector('.editable-text');
+        attachEditableTextEvents(newSpan);
+
+        // 자동 포커스
+        newSpan.focus();
+    }
+
+    // ===== 인라인 텍스트 편집 자동 저장 (서버 파일에) =====
+    (function initEditableTextAutoSave() {
+        const elements = document.querySelectorAll('.editable-text[data-text-key]');
+        if (!elements.length) return;
+
+        // 모든 editable-text 요소에 통합된 이벤트 리스너 추가
+        elements.forEach(el => {
+            attachEditableTextEvents(el);
         });
     })();
 
@@ -772,12 +867,60 @@
         closePanel();
 
         const tooltip = document.getElementById('editTooltip');
+        const tooltipContent = document.getElementById('tooltipContent');
+
+        // 광고 항목인지 확인
+        const key = element.dataset.textKey;
+        const isNoticeItem = key && key.startsWith('notice_');
+
+        if (isNoticeItem) {
+            // 광고 항목용 도움말
+            tooltipContent.innerHTML = `
+                <kbd>Shift</kbd> + <kbd>Enter</kbd> : 줄바꿈<br>
+                <kbd>Enter</kbd> : 새 광고 항목 추가<br>
+                <kbd>Backspace</kbd> (빈 항목) : 항목 삭제<br>
+                <kbd>Esc</kbd> : 편집 취소
+            `;
+        } else {
+            // 일반 텍스트용 도움말
+            tooltipContent.innerHTML = `
+                <kbd>Shift</kbd> + <kbd>Enter</kbd> : 줄바꿈<br>
+                <kbd>Enter</kbd> : 저장 및 편집 종료<br>
+                <kbd>Esc</kbd> : 편집 취소
+            `;
+        }
+
         tooltip.hidden = false;
     }
 
     function hideEditTooltip() {
         const tooltip = document.getElementById('editTooltip');
         tooltip.hidden = true;
+    }
+
+    // ===== 광고 항목 재색인 =====
+    function reindexNotices() {
+        const noticeList = document.getElementById('noticeList');
+        const items = noticeList.querySelectorAll('li');
+
+        items.forEach((li, index) => {
+            const span = li.querySelector('.editable-text');
+            const newKey = `notice_${index + 1}`;
+
+            // data-text-key 업데이트
+            const oldKey = span.dataset.textKey;
+            span.dataset.textKey = newKey;
+
+            // 서버에 키 변경 반영 (이전 키의 값을 새 키로 복사)
+            if (oldKey !== newKey) {
+                const value = span.innerText.trim().replace(/\n/g, '<br>');
+                fetch('/api/bulletin/text-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: newKey, value })
+                }).catch(err => console.error('텍스트 재색인 실패:', err));
+            }
+        });
     }
 </script>
 

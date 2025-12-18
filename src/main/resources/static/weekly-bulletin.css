@@ -309,10 +309,18 @@ span[contenteditable="false"] {
   line-height: 1.6;
   width: 100%;
   text-align: left;
+  list-style-position: outside;
+  padding-left: 20px;
 }
 
 .notice-list li {
   margin-bottom: 6px;
+  position: relative;
+}
+
+.notice-list li .editable-text {
+  display: inline;
+  vertical-align: top;
 }
 
 .blessing-section {
@@ -707,7 +715,7 @@ span[contenteditable="false"] {
 @media print {
   body { background: none; }
 
-  /* 프린트 시: 편집 패널/페이지네이션/툴팁 숨김 */
+  /* 프린트 시: 편집 패널/페이지네이션/툴팁/버튼 숨김 */
   .panel-dock,
   .edit-panel,
   .pagination-controls,
