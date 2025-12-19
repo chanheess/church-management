@@ -403,74 +403,74 @@
 
     </div>
 
-    <!-- ✅ 우측 편집 패널 도크 (페이지와 같은 줄에 고정) -->
-    <div class="panel-dock">
-        <div id="editPanel" class="edit-panel" hidden>
-            <div class="panel-header">
-                <strong id="panelTitle">편집</strong>
-                <button class="panel-close" type="button" onclick="closePanel()">×</button>
-            </div>
+</div>
 
-            <div class="panel-body">
+<!-- ✅ 우측 편집 패널 도크 (workspace 외부에 배치하여 줌 영향 없음) -->
+<div class="panel-dock">
+    <div id="editPanel" class="edit-panel" hidden>
+        <div class="panel-header">
+            <strong id="panelTitle">편집</strong>
+            <button class="panel-close" type="button" onclick="closePanel()">×</button>
+        </div>
 
-                <!-- Logo Controls -->
-                <div id="logoControls" class="control-section" style="display:none;">
-                    <h4>로고</h4>
+        <div class="panel-body">
 
-                    <div class="control-group">
-                        <label for="logoSize">크기: <span id="logoSizeValue">150px</span></label>
-                        <input type="range" id="logoSize" min="50" max="300" value="150"
-                               oninput="updateLogoSizeRealtime(this.value)">
-                    </div>
+            <!-- Logo Controls -->
+            <div id="logoControls" class="control-section" style="display:none;">
+                <h4>로고</h4>
 
-                    <div class="control-group">
-                        <label for="logoUpload">파일:</label>
-                        <input type="file" id="logoUpload" accept="image/*" onchange="uploadLogoRealtime(event)">
-                    </div>
-
-                    <button class="reset-btn" type="button" onclick="resetLogo()">초기화</button>
+                <div class="control-group">
+                    <label for="logoSize">크기: <span id="logoSizeValue">150px</span></label>
+                    <input type="range" id="logoSize" min="50" max="300" value="150"
+                           oninput="updateLogoSizeRealtime(this.value)">
                 </div>
 
-                <!-- Illustration Controls -->
-                <div id="illustrationControls" class="control-section" style="display:none;">
-                    <h4>일러스트</h4>
-
-                    <div class="control-group">
-                        <label for="illustrationSize">크기: <span id="illustrationSizeValue">250px</span></label>
-                        <input type="range" id="illustrationSize" min="50" max="500" value="250"
-                               oninput="updateIllustrationSizeRealtime(this.value)">
-                    </div>
-
-                    <div class="control-group">
-                        <label for="illustrationUpload">파일:</label>
-                        <input type="file" id="illustrationUpload" accept="image/*" onchange="uploadIllustrationRealtime(event)">
-                    </div>
-
-                    <button class="reset-btn" type="button" onclick="resetIllustration()">초기화</button>
+                <div class="control-group">
+                    <label for="logoUpload">파일:</label>
+                    <input type="file" id="logoUpload" accept="image/*" onchange="uploadLogoRealtime(event)">
                 </div>
 
+                <button class="reset-btn" type="button" onclick="resetLogo()">초기화</button>
             </div>
-        </div>
-        <div id="excelPopup" class="hover-popup" hidden>
-            <div class="hover-popup-header">
-                <span class="hover-popup-dot"></span>
-                <strong>엑셀에서 수정</strong>
+
+            <!-- Illustration Controls -->
+            <div id="illustrationControls" class="control-section" style="display:none;">
+                <h4>일러스트</h4>
+
+                <div class="control-group">
+                    <label for="illustrationSize">크기: <span id="illustrationSizeValue">250px</span></label>
+                    <input type="range" id="illustrationSize" min="50" max="500" value="250"
+                           oninput="updateIllustrationSizeRealtime(this.value)">
+                </div>
+
+                <div class="control-group">
+                    <label for="illustrationUpload">파일:</label>
+                    <input type="file" id="illustrationUpload" accept="image/*" onchange="uploadIllustrationRealtime(event)">
+                </div>
+
+                <button class="reset-btn" type="button" onclick="resetIllustration()">초기화</button>
             </div>
-            <p>간사·목자 정보는 엑셀 파일을 수정한 뒤 페이지를 새로고침하세요.</p>
-        </div>
-        <div id="editTooltip" class="hover-popup" hidden>
-            <div class="hover-popup-header">
-                <span class="hover-popup-dot"></span>
-                <strong>편집 도움말</strong>
-            </div>
-            <p id="tooltipContent" style="margin: 8px 0;">
-                <kbd>Shift</kbd> + <kbd>Enter</kbd> : 줄바꿈<br>
-                <kbd>Enter</kbd> : 저장 및 편집 종료<br>
-                <kbd>Esc</kbd> : 편집 취소
-            </p>
+
         </div>
     </div>
-
+    <div id="excelPopup" class="hover-popup" hidden>
+        <div class="hover-popup-header">
+            <span class="hover-popup-dot"></span>
+            <strong>엑셀에서 수정</strong>
+        </div>
+        <p>간사·목자 정보는 엑셀 파일을 수정한 뒤 페이지를 새로고침하세요.</p>
+    </div>
+    <div id="editTooltip" class="hover-popup" hidden>
+        <div class="hover-popup-header">
+            <span class="hover-popup-dot"></span>
+            <strong>편집 도움말</strong>
+        </div>
+        <p id="tooltipContent" style="margin: 8px 0;">
+            <kbd>Shift</kbd> + <kbd>Enter</kbd> : 줄바꿈<br>
+            <kbd>Enter</kbd> : 저장 및 편집 종료<br>
+            <kbd>Esc</kbd> : 편집 취소
+        </p>
+    </div>
 </div>
 
 <script>

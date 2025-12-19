@@ -689,15 +689,16 @@ span[contenteditable="false"] {
 /* 우측 패널 자리(메인 컨텐츠 안 가리게 하는 핵심) */
 .panel-dock {
   width: 300px;
-  min-height: 210mm;
-  flex: 0 0 300px;
-  position: relative;
+  position: fixed;
+  top: 60px; /* 헤더 아래 */
+  right: 20px;
+  z-index: 100; /* 다른 요소들 위에 표시 */
+  max-height: calc(100vh - 80px); /* 화면 높이에 맞춤 */
+  overflow-y: auto;
 }
 
 .hover-popup {
-  position: sticky;
-  top: 0;
-  right: 0;
+  position: relative;
   width: 100%;
   box-sizing: border-box;
   background: #ffffff;
@@ -710,7 +711,6 @@ span[contenteditable="false"] {
   font-size: 14px;
   line-height: 1.6;
   color: #333;
-  z-index: 20; /* 줌 컨트롤보다 위, 편집 패널보다 아래 */
 }
 
 .hover-popup strong {
@@ -749,15 +749,13 @@ span[contenteditable="false"] {
 
 /* ===== Figma-like Floating Panel ===== */
 .edit-panel {
-  position: sticky;
-  top: 20px;
+  position: relative;
   width: 300px;
   background: #fff;
   border: 1px solid rgba(0,0,0,0.12);
   border-radius: 12px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.18);
   overflow: hidden;
-  z-index: 50; /* 줌 컨트롤보다 위에 위치 */
   margin-bottom: 28px; /* 아래 안내창이 그림자에 묻히지 않도록 간격 확보 */
 }
 
