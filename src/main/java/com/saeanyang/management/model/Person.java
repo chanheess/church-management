@@ -14,4 +14,6 @@ public class Person {
     private List<String> positions; // 직분 (간사, 목자, 리더, 인턴)
     private String group;          // 목장
     private String cell;           // 셀
+    private String birthday;       // 생일 (MM-dd 형식)
+    private String status;         // 상태
 }

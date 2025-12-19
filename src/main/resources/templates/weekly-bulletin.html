@@ -7,6 +7,10 @@
 </head>
 
 <body>
+<div class="header-nav">
+    <a href="/bulletin" class="nav-tab active">주보</a>
+    <a href="/attendance" class="nav-tab">연락처 및 출석현황</a>
+</div>
 <div class="workspace">
     <div class="page-stack">
 
@@ -341,38 +345,40 @@
                     </li>
                 </ol>
 
-                <div class="section">
-                    <h3 class="section-subtitle">[ 헌금 ]</h3>
-                    <p>
-                        <span class="editable-text" contenteditable="true" data-text-key="offering_account"
-                              th:utext="${textConfig.additionalFields.get('offering_account') ?: '청년부 회비 계좌 안내 (회비 매월 5천원)<br>1000-5013-3340 토스 박원진'}">
-                            청년부 회비 계좌 안내 (회비 매월 5천원)<br>
-                            1000-5013-3340 토스 박원진
-                        </span>
-                    </p>
-                    <p>
-                        <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_schedule"
-                              th:utext="${textConfig.additionalFields.get('cell_meeting_schedule') ?: '청년부 목장모임 및 금요 예배<br>1목장: 월요일 저녁 8시 / 2목장: 목요일 저녁 8시 40분<br>3목장: 화요일 저녁 8시 / 금요 예배: 금요일 저녁 8시 30분 본당 3층'}">
-                            청년부 목장모임 및 금요 예배<br>
-                            1목장: 월요일 저녁 8시 / 2목장: 목요일 저녁 8시 40분<br>
-                            3목장: 화요일 저녁 8시 / 금요 예배: 금요일 저녁 8시 30분 본당 3층
-                        </span>
-                    </p>
-                </div>
+                <div class="bottom-section-wrapper">
+                    <div class="section offering-section">
+                        <div class="offering-content">
+                            <p>
+                                <strong class="offering-label">청년부 회비 계좌 안내 (회비 매월 5천원)</strong><br>
+                                <span class="editable-text" contenteditable="true" data-text-key="offering_account"
+                                      th:utext="${textConfig.additionalFields.get('offering_account') ?: '1000-5013-3340 토스 박원진'}">
+                                    1000-5013-3340 토스 박원진
+                                </span>
+                            </p>
+                            <p>
+                                <strong class="offering-label">청년부 목장모임 및 금요 예배</strong><br>
+                                <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_schedule"
+                                      th:utext="${textConfig.additionalFields.get('cell_meeting_schedule') ?: '1목장: 월요일 저녁 8시 / 2목장: 목요일 저녁 8시 40분<br>3목장: 화요일 저녁 8시 / 금요 예배: 금요일 저녁 8시 30분 본당 3층'}">
+                                    1목장: 월요일 저녁 8시 / 2목장: 목요일 저녁 8시 40분<br>
+                                    3목장: 화요일 저녁 8시 / 금요 예배: 금요일 저녁 8시 30분 본당 3층
+                                </span>
+                            </p>
+                        </div>
+                    </div>
 
-                <div class="section blessing-section">
-                    <h3 class="section-subtitle">[ 축복 ]</h3>
-                    <div class="blessing-box">
-                        <ul>
-                            <li>
-                                <span class="editable-text" contenteditable="true" data-text-key="blessing_1"
-                                      th:utext="${textConfig.additionalFields.get('blessing_1') ?: '새청년 축복'}">새청년 축복</span>
-                            </li>
-                            <li>
-                                <span class="editable-text" contenteditable="true" data-text-key="blessing_2"
-                                      th:utext="${textConfig.additionalFields.get('blessing_2') ?: '생일자 축복 이상민(14일) 문다비(16일)'}">생일자 축복 이상민(14일) 문다비(16일)</span>
-                            </li>
-                        </ul>
+                    <div class="section blessing-section">
+                        <h3 class="section-subtitle">[ 축복 ]</h3>
+                        <div class="blessing-box">
+                            <ul>
+                                <li>
+                                    <span class="editable-text" contenteditable="true" data-text-key="blessing_1"
+                                          th:utext="${textConfig.additionalFields.get('blessing_1') ?: '새청년 축복'}">새청년 축복</span>
+                                </li>
+                                <li>
+                                    생일자 축복<span class="birthday-names" th:if="${bulletin.birthdayMembers != null && !bulletin.birthdayMembers.isEmpty()}"> <span th:each="member, iterStat : ${bulletin.birthdayMembers}"><span th:text="${member}"></span><span th:if="${!iterStat.last}">, </span></span></span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 package com.saeanyang.management.controller;
 
 import com.saeanyang.management.model.BulletinData;
+import com.saeanyang.management.model.CellGroup;
 import com.saeanyang.management.model.EditableTextConfig;
 import com.saeanyang.management.service.ExcelReaderService;
 import com.saeanyang.management.service.TextConfigService;
@@ -48,7 +49,7 @@ public class BulletinController {
     }
 
     /** 텍스트 한 항목을 서버 쪽 설정 파일에 저장 */
-    @PostMapping("/api/bulletin/text-config")
+    @PostMapping("/bulletin/text-config")
     public ResponseEntity<Void> updateText(@RequestBody TextUpdateRequest request) {
         if (request == null || request.key() == null) {
             return ResponseEntity.badRequest().build();
@@ -60,12 +61,7 @@ public class BulletinController {
     /** 텍스트 단일 항목 업데이트용 요청 바디 */
     public record TextUpdateRequest(String key, String value) {}
 
-    @GetMapping({"/", "/bulletin"})
-    public String redirectRoot() {
-        return "redirect:/api/bulletin";
-    }
-
-    @GetMapping("/api/bulletin")
+    @GetMapping("/bulletin")
     public String showBulletin(Model model) {
         try {
             BulletinData bulletinData = excelReaderService.readBulletinData(excelFilePath);
@@ -85,8 +81,19 @@ public class BulletinController {
         return "weekly-bulletin";
     }
 
+    @GetMapping("/attendance")
+    public String showAttendance(Model model) {
+        try {
+            List<CellGroup> cellGroups = excelReaderService.readAttendanceData(excelFilePath);
+            model.addAttribute("cellGroups", cellGroups);
+        } catch (IOException e) {
+            model.addAttribute("error", "엑셀 파일을 읽을 수 없습니다: " + e.getMessage());
+        }
+        return "attendance";
+    }
+
     /** ===== 로고 ===== */
-    @GetMapping("/api/bulletin/logo")
+    @GetMapping("/bulletin/logo")
     public ResponseEntity<Resource> getLogo() throws IOException {
         File logoFile = new File(logoFilePath);
 
@@ -98,7 +105,7 @@ public class BulletinController {
     }
 
     /** ===== 일러스트 (날짜 기반 선택) ===== */
-    @GetMapping("/api/bulletin/illustration")
+    @GetMapping("/bulletin/illustration")
     public ResponseEntity<Resource> getIllustration() throws IOException {
         File folder = new File(illustrationFolder);
 

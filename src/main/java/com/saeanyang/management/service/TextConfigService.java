@@ -59,7 +59,7 @@ public class TextConfigService {
             "closing_prayer_content", "closing_prayer_leader", "cell_meeting_content", "cell_meeting_participants",
             "offering_prayer_1", "offering_prayer_2", "offering_prayer_3", "offering_prayer_4",
             "offering_member_all", "notice_1", "notice_2", "notice_3", "notice_4",
-            "offering_account", "cell_meeting_schedule", "blessing_1", "blessing_2"
+            "offering_account", "cell_meeting_schedule", "blessing_1"
         };
         for (String key : page2Keys) {
             String value = props.getProperty(key);
@@ -159,6 +159,10 @@ public class TextConfigService {
         config.setContact2("임세일 간사 : 010-3091-5659");
         config.setSloganLabel("새안양 교회 표어");
         config.setSloganTitle("우리가 넉넉히 이기리라");
+
+        // 축복 기본값 설정
+        config.getAdditionalFields().put("blessing_1", "새청년 축복");
+
         return config;
     }
 

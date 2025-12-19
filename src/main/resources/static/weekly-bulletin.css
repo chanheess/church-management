@@ -11,6 +11,36 @@ body {
   font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 
+/* ===== 헤더 네비게이션 ===== */
+.header-nav {
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+
+.nav-tab {
+  padding: 16px 32px;
+  text-decoration: none;
+  color: #666;
+  font-weight: 500;
+  font-size: 16px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.nav-tab:hover {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.nav-tab.active {
+  color: #4CAF50;
+  border-bottom-color: #4CAF50;
+}
+
 /* A4 가로: 297mm x 210mm */
 .page {
   width: 297mm;
@@ -162,6 +192,10 @@ h2.section-title {
   font-size: 15px;
   line-height: 1.8;
   width: 100%;
+}
+
+.section p {
+  text-align: left;
 }
 
 .section-subtitle {
@@ -323,9 +357,40 @@ span[contenteditable="false"] {
   vertical-align: top;
 }
 
-.blessing-section {
-  margin-top: 24px;
+/* ===== 하단 영역 (헌금 + 축복) ===== */
+.bottom-section-wrapper {
+  margin-top: auto;
   width: 100%;
+}
+
+.offering-section {
+  margin-top: 0;
+  width: 100%;
+}
+
+.offering-content {
+  line-height: 1.4;
+}
+
+.offering-content p {
+  margin: 4px 0;
+}
+
+.offering-label {
+  font-weight: bold;
+  cursor: default;
+  user-select: none;
+}
+
+.blessing-section {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.birthday-names {
+  display: inline;
+  cursor: default;
+  user-select: none;
 }
 
 .blessing-box {

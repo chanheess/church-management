@@ -1,0 +1,140 @@
+/* ===============================
+   A4 PAGE (정확 규격)
+================================ */
+:root{
+  --a4-w: 210mm;
+  --a4-h: 297mm;
+
+  /* 프린터에서 가장 흔한 여백 기준(좌우 15mm, 상하 12mm) */
+  --m-x: 15mm;
+  --m-y: 12mm;
+
+  /* 실제 표/콘텐츠가 들어갈 폭 */
+  --content-w: calc(var(--a4-w) - (var(--m-x) * 2)); /* 180mm */
+}
+
+/* 화면에서도 A4처럼 보이게 */
+.attendance-container{
+  width: var(--a4-w);
+  min-height: var(--a4-h);
+  margin: 12px auto;
+  background: #fff;
+  box-sizing: border-box;
+  padding: var(--m-y) var(--m-x);
+
+  /* 화면 미리보기용(출력엔 영향 없음) */
+  box-shadow: 0 0 0 1px #ddd;
+}
+
+/* 셀 그룹 간격 (A4 내에서 3개 들어가게 적당히) */
+.cell-groups{
+  margin: 0 0 10mm 0;
+}
+
+/* ===============================
+   TABLE: 폭을 content-w로 "고정"
+================================ */
+.attendance-table{
+  width: var(--content-w);
+  margin: 0 auto;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11pt;          /* ★ 엑셀 본문 */
+}
+
+/* ===============================
+   CELL (행 높이 + 줄간격 핵심)
+================================ */
+.attendance-table th,
+.attendance-table td{
+  border: 0.5pt solid #000;
+
+  /* padding은 mm 기준 */
+  padding: 0 1.2mm;          /* 상하 0, 좌우만 약간 */
+
+  /* 행 높이 고정 */
+  height: 6.5mm;             /* ★ 엑셀과 거의 동일 */
+
+  text-align: center;
+  vertical-align: middle;
+
+  line-height: 1;            /* ★ single line */
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* ===============================
+   HEADER
+================================ */
+.attendance-table thead th{
+  background: #d9d9d9;
+  font-size: 11pt;         /* ★ 엑셀 헤더 */
+  font-weight: 700;
+  height: 7.5mm;
+}
+
+/* ===============================
+   TABLE TITLE (셀 이름 줄)
+================================ */
+.table-title{
+  font-size: 11pt;
+  font-weight: 800;
+  height: 8mm;
+  line-height: 1;
+}
+
+/* ===============================
+   COLUMN WIDTH (180mm 합계로 딱 맞춤)
+   합계 = 180mm
+================================ */
+.col-no       { width: 10mm; }  /* 순번 */
+.col-name     { width: 22mm; }  /* 이름 */
+.col-birth    { width: 24mm; }  /* 생년월일 */
+.col-phone    { width: 40mm; }  /* 연락처 */
+.col-action   { width: 14mm; }  /* 행삶 */
+.col-training { width: 14mm; }  /* 양육 */
+.col-week     { width: 11.2mm; }/* 5칸*11.2=56mm */
+
+/* 행삶, 양육 컬럼의 기호(○, △) 크기 조정 */
+.attendance-table tbody td:nth-child(5),
+.attendance-table tbody td:nth-child(6) {
+  font-size: 13pt;
+  line-height: 1;
+}
+
+body{
+  font-family: "Malgun Gothic", "맑은 고딕", Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1;
+  color: #000;
+}
+
+ /* 10+22+24+40+14+14+56 = 180mm */
+
+/* ===============================
+   PRINT: 프린터 여백/용지 고정
+================================ */
+@page{
+  size: A4;
+  margin: var(--m-y) var(--m-x);  /* ★ 여기 고정이 제일 중요 */
+}
+
+@media print{
+  .header-nav{ display:none !important; }
+
+  body{
+    margin:0;
+    padding:0;
+    background:#fff;
+  }
+
+  .attendance-container{
+    margin:0;
+    box-shadow:none;
+    width: var(--a4-w);
+    min-height: var(--a4-h);
+    padding:0; /* @page margin이 여백을 담당하므로 컨테이너 padding 제거 */
+  }
+
+  .cell-groups{ page-break-inside: avoid; }
+}

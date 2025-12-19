@@ -20,4 +20,5 @@ public class BulletinData {
     private String year;            // 연도 (표어에 사용)
     private String offeringMonth;   // 헌금위원 월
     private List<String> offeringDates; // 헌금위원 날짜 리스트 (해당 월의 모든 주일)
+    private List<String> birthdayMembers; // 이번 주 생일자 리스트 (이름(일))
 }
