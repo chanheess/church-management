@@ -1,3 +1,88 @@
+/* ===== 헤더 네비게이션 ===== */
+.header-nav {
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.nav-left {
+  display: flex;
+  gap: 0;
+  justify-self: start;
+}
+
+.nav-tab {
+  padding: 16px 32px;
+  text-decoration: none;
+  color: #666;
+  font-weight: 500;
+  font-size: 16px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.nav-tab:hover {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.nav-tab.active {
+  color: #4CAF50;
+  border-bottom-color: #4CAF50;
+}
+
+/* ===== 페이지네이션 컨트롤 ===== */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #333;
+  background-color: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #333;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background-color: #333;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.nav-btn:disabled {
+  border-color: #ccc;
+  color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.nav-btn span {
+  line-height: 1;
+  margin-top: -2px;
+}
+
+.page-indicator {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  min-width: 60px;
+  text-align: center;
+}
+
 /* ===============================
    A4 PAGE (정확 규격)
 ================================ */
@@ -24,6 +109,9 @@
 
   /* 화면 미리보기용(출력엔 영향 없음) */
   box-shadow: 0 0 0 1px #ddd;
+
+  /* 줌 변환을 위한 설정 */
+  transition: transform 0.2s ease;
 }
 
 /* 셀 그룹 간격 (A4 내에서 3개 들어가게 적당히) */
@@ -112,6 +200,40 @@ body{
  /* 10+22+24+40+14+14+56 = 180mm */
 
 /* ===============================
+   ZOOM CONTROL (헤더 인라인)
+================================ */
+.zoom-control-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 20px;
+  justify-self: end;
+}
+
+.zoom-btn {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.zoom-btn:hover {
+  background: #e0e0e0;
+  border-color: #4CAF50;
+}
+
+.zoom-control-inline input[type="range"] {
+  width: 120px;
+  cursor: pointer;
+}
+
+/* ===============================
    PRINT: 프린터 여백/용지 고정
 ================================ */
 @page{
@@ -134,6 +256,7 @@ body{
     width: var(--a4-w);
     min-height: var(--a4-h);
     padding:0; /* @page margin이 여백을 담당하므로 컨테이너 padding 제거 */
+    transform: none !important; /* 프린트 시 줌 제거 */
   }
 
   .cell-groups{ page-break-inside: avoid; }

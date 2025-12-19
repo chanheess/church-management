@@ -8,9 +8,26 @@
 
 <body>
 <div class="header-nav">
-    <a href="/bulletin" class="nav-tab active">주보</a>
-    <a href="/attendance" class="nav-tab">연락처 및 출석현황</a>
+    <div class="nav-left">
+        <a href="/bulletin" class="nav-tab active">주보</a>
+        <a href="/attendance" class="nav-tab">연락처 및 출석현황</a>
+    </div>
+    <div class="pagination-controls">
+        <button id="prevBtn" class="nav-btn" onclick="changePage(-1)">
+            <span>&#8249;</span>
+        </button>
+        <span id="pageIndicator" class="page-indicator">1 / 2</span>
+        <button id="nextBtn" class="nav-btn" onclick="changePage(1)">
+            <span>&#8250;</span>
+        </button>
+    </div>
+    <div class="zoom-control-inline">
+        <button id="zoom-out" class="zoom-btn">−</button>
+        <input type="range" id="zoom-slider" min="50" max="150" value="80" step="5">
+        <button id="zoom-in" class="zoom-btn">+</button>
+    </div>
 </div>
+
 <div class="workspace">
     <div class="page-stack">
 
@@ -454,17 +471,6 @@
         </div>
     </div>
 
-</div>
-
-<!-- 페이지네이션 버튼 -->
-<div class="pagination-controls">
-    <button id="prevBtn" class="nav-btn" onclick="changePage(-1)">
-        <span>&#8249;</span>
-    </button>
-    <span id="pageIndicator" class="page-indicator">1 / 2</span>
-    <button id="nextBtn" class="nav-btn" onclick="changePage(1)">
-        <span>&#8250;</span>
-    </button>
 </div>
 
 <script>
@@ -928,6 +934,41 @@
             }
         });
     }
+
+    // ===== 줌 컨트롤 기능 =====
+    const workspace = document.querySelector('.workspace');
+    const slider = document.getElementById('zoom-slider');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomInBtn = document.getElementById('zoom-in');
+
+    function updateZoom(value) {
+        const scale = value / 100;
+        workspace.style.transform = `scale(${scale})`;
+        workspace.style.transformOrigin = 'top center';
+        slider.value = value;
+    }
+
+    // 슬라이더 값 변경 시
+    slider.addEventListener('input', function() {
+        updateZoom(this.value);
+    });
+
+    // - 버튼
+    zoomOutBtn.addEventListener('click', function() {
+        let value = parseInt(slider.value) - 10;
+        if (value < 50) value = 50;
+        updateZoom(value);
+    });
+
+    // + 버튼
+    zoomInBtn.addEventListener('click', function() {
+        let value = parseInt(slider.value) + 10;
+        if (value > 150) value = 150;
+        updateZoom(value);
+    });
+
+    // 초기 줌 설정 (80%)
+    updateZoom(80);
 </script>
 
 </body>
