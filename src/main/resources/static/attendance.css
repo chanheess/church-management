@@ -233,6 +233,23 @@ body{
   cursor: pointer;
 }
 
+.print-btn {
+  background: #4CAF50;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 8px;
+}
+
+.print-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
 /* ===============================
    PRINT: 프린터 여백/용지 고정
 ================================ */
@@ -242,7 +259,10 @@ body{
 }
 
 @media print{
-  .header-nav{ display:none !important; }
+  .header-nav,
+  .pagination-controls {
+    display:none !important;
+  }
 
   body{
     margin:0;
@@ -259,5 +279,13 @@ body{
     transform: none !important; /* 프린트 시 줌 제거 */
   }
 
-  .cell-groups{ page-break-inside: avoid; }
+  .cell-groups{
+    display: block !important; /* 숨겨진 셀 그룹도 모두 출력 */
+    page-break-inside: avoid;
+    page-break-after: always; /* 각 셀 그룹마다 페이지 구분 */
+  }
+
+  .cell-groups:last-child {
+    page-break-after: auto; /* 마지막 셀 그룹은 페이지 구분 안 함 */
+  }
 }

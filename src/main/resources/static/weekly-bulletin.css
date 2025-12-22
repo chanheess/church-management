@@ -670,6 +670,7 @@ span[contenteditable="false"] {
 .page-stack {
   width: 297mm;      /* page와 동일 폭 */
   flex: 0 0 297mm;   /* 고정 폭으로 가운데 정렬 */
+  transition: transform 0.2s ease; /* 줌 애니메이션 */
 }
 
 /* ===== 전체 작업 캔버스: 페이지 + 우측 패널 영역 ===== */
@@ -683,22 +684,20 @@ span[contenteditable="false"] {
   width: 100%;
   max-width: calc(297mm + 320px + 96px); /* 본문+패널+여백 */
   box-sizing: border-box;
-  transition: transform 0.2s ease;
 }
 
 /* 우측 패널 자리(메인 컨텐츠 안 가리게 하는 핵심) */
 .panel-dock {
   width: 300px;
-  position: fixed;
-  top: 60px; /* 헤더 아래 */
-  right: 20px;
-  z-index: 100; /* 다른 요소들 위에 표시 */
-  max-height: calc(100vh - 80px); /* 화면 높이에 맞춤 */
-  overflow-y: auto;
+  min-height: 210mm;
+  flex: 0 0 300px;
+  position: relative;
 }
 
 .hover-popup {
-  position: relative;
+  position: sticky;
+  top: 0;
+  right: 0;
   width: 100%;
   box-sizing: border-box;
   background: #ffffff;
@@ -711,6 +710,7 @@ span[contenteditable="false"] {
   font-size: 14px;
   line-height: 1.6;
   color: #333;
+  z-index: 20;
 }
 
 .hover-popup strong {
@@ -749,13 +749,15 @@ span[contenteditable="false"] {
 
 /* ===== Figma-like Floating Panel ===== */
 .edit-panel {
-  position: relative;
+  position: sticky;
+  top: 20px;
   width: 300px;
   background: #fff;
   border: 1px solid rgba(0,0,0,0.12);
   border-radius: 12px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.18);
   overflow: hidden;
+  z-index: 50;
   margin-bottom: 28px; /* 아래 안내창이 그림자에 묻히지 않도록 간격 확보 */
 }
 
@@ -796,12 +798,23 @@ span[contenteditable="false"] {
   .workspace {
     padding: 0;
     gap: 0;
+  }
+
+  .page-stack {
+    display: block;
     transform: none !important; /* 줌 제거 */
   }
+
   .page {
+    display: block !important; /* 숨겨진 페이지도 모두 출력 */
     margin: 0;
     padding: 12mm 0; /* 상하만 패딩, 좌우는 섹션에서 처리 */
     box-shadow: none;
+    page-break-after: always; /* 각 페이지마다 페이지 구분 */
+  }
+
+  .page:last-child {
+    page-break-after: auto; /* 마지막 페이지는 페이지 구분 안 함 */
   }
 }
 
@@ -851,4 +864,21 @@ span[contenteditable="false"] {
 .zoom-control-inline input[type="range"] {
   width: 120px;
   cursor: pointer;
+}
+
+.print-btn {
+  background: #4CAF50;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 8px;
+}
+
+.print-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
 }

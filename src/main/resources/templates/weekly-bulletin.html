@@ -25,6 +25,7 @@
         <button id="zoom-out" class="zoom-btn">−</button>
         <input type="range" id="zoom-slider" min="50" max="150" value="80" step="5">
         <button id="zoom-in" class="zoom-btn">+</button>
+        <button id="print-btn" class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
     </div>
 </div>
 
@@ -403,9 +404,7 @@
 
     </div>
 
-</div>
-
-<!-- ✅ 우측 편집 패널 도크 (workspace 외부에 배치하여 줌 영향 없음) -->
+    <!-- ✅ 우측 편집 패널 도크 (페이지와 같은 줄에 고정) -->
 <div class="panel-dock">
     <div id="editPanel" class="edit-panel" hidden>
         <div class="panel-header">
@@ -471,6 +470,8 @@
             <kbd>Esc</kbd> : 편집 취소
         </p>
     </div>
+</div>
+
 </div>
 
 <script>
@@ -936,15 +937,15 @@
     }
 
     // ===== 줌 컨트롤 기능 =====
-    const workspace = document.querySelector('.workspace');
+    const pageStack = document.querySelector('.page-stack');
     const slider = document.getElementById('zoom-slider');
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomInBtn = document.getElementById('zoom-in');
 
     function updateZoom(value) {
         const scale = value / 100;
-        workspace.style.transform = `scale(${scale})`;
-        workspace.style.transformOrigin = 'top center';
+        pageStack.style.transform = `scale(${scale})`;
+        pageStack.style.transformOrigin = 'top center';
         slider.value = value;
     }
 
