@@ -419,8 +419,8 @@
                 <h4>로고</h4>
 
                 <div class="control-group">
-                    <label for="logoSize">크기: <span id="logoSizeValue">150px</span></label>
-                    <input type="range" id="logoSize" min="50" max="300" value="150"
+                    <label for="logoSize">크기: <span id="logoSizeValue">300px</span></label>
+                    <input type="range" id="logoSize" min="50" max="500" value="300"
                            oninput="updateLogoSizeRealtime(this.value)">
                 </div>
 
@@ -437,8 +437,8 @@
                 <h4>일러스트</h4>
 
                 <div class="control-group">
-                    <label for="illustrationSize">크기: <span id="illustrationSizeValue">250px</span></label>
-                    <input type="range" id="illustrationSize" min="50" max="500" value="250"
+                    <label for="illustrationSize">크기: <span id="illustrationSizeValue">300px</span></label>
+                    <input type="range" id="illustrationSize" min="50" max="500" value="300"
                            oninput="updateIllustrationSizeRealtime(this.value)">
                 </div>
 
@@ -559,7 +559,7 @@
             logoControls.style.display = 'block';
 
             const mainLogo = document.getElementById('mainLogo');
-            const currentSize = (mainLogo && mainLogo.width) ? mainLogo.width : 150;
+            const currentSize = (mainLogo && mainLogo.width) ? mainLogo.width : 300;
             document.getElementById('logoSize').value = currentSize;
             document.getElementById('logoSizeValue').textContent = currentSize + 'px';
         } else if (type === 'illustration') {
@@ -567,7 +567,7 @@
             illustrationControls.style.display = 'block';
 
             const mainIllustration = document.getElementById('mainIllustration');
-            const currentSize = (mainIllustration && mainIllustration.width) ? mainIllustration.width : 250;
+            const currentSize = (mainIllustration && mainIllustration.width) ? mainIllustration.width : 300;
             document.getElementById('illustrationSize').value = currentSize;
             document.getElementById('illustrationSizeValue').textContent = currentSize + 'px';
         }
@@ -630,12 +630,12 @@
             const mainLogo = document.getElementById('mainLogo');
             if (mainLogo) {
                 mainLogo.src = '/api/bulletin/logo?' + new Date().getTime();
-                mainLogo.style.width = '150px';
+                mainLogo.style.width = '300px';
             }
             localStorage.removeItem('bulletinLogo');
             localStorage.removeItem('bulletinLogoSize');
-            document.getElementById('logoSize').value = 150;
-            document.getElementById('logoSizeValue').textContent = '150px';
+            document.getElementById('logoSize').value = 300;
+            document.getElementById('logoSizeValue').textContent = '300px';
             document.getElementById('logoUpload').value = '';
         }
     }
@@ -645,12 +645,12 @@
             const mainIllustration = document.getElementById('mainIllustration');
             if (mainIllustration) {
                 mainIllustration.src = '/api/bulletin/illustration?' + new Date().getTime();
-                mainIllustration.style.width = '250px';
+                mainIllustration.style.width = '300px';
             }
             localStorage.removeItem('bulletinIllustration');
             localStorage.removeItem('bulletinIllustrationSize');
-            document.getElementById('illustrationSize').value = 250;
-            document.getElementById('illustrationSizeValue').textContent = '250px';
+            document.getElementById('illustrationSize').value = 300;
+            document.getElementById('illustrationSizeValue').textContent = '300px';
             document.getElementById('illustrationUpload').value = '';
         }
     }

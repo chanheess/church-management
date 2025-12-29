@@ -49,7 +49,7 @@ public class BulletinController {
     }
 
     /** 텍스트 한 항목을 서버 쪽 설정 파일에 저장 */
-    @PostMapping("/bulletin/text-config")
+    @PostMapping("/api/bulletin/text-config")
     public ResponseEntity<Void> updateText(@RequestBody TextUpdateRequest request) {
         if (request == null || request.key() == null) {
             return ResponseEntity.badRequest().build();
@@ -93,7 +93,7 @@ public class BulletinController {
     }
 
     /** ===== 로고 ===== */
-    @GetMapping("/bulletin/logo")
+    @GetMapping("/api/bulletin/logo")
     public ResponseEntity<Resource> getLogo() throws IOException {
         File logoFile = new File(logoFilePath);
 
@@ -105,7 +105,7 @@ public class BulletinController {
     }
 
     /** ===== 일러스트 (날짜 기반 선택) ===== */
-    @GetMapping("/bulletin/illustration")
+    @GetMapping("/api/bulletin/illustration")
     public ResponseEntity<Resource> getIllustration() throws IOException {
         File folder = new File(illustrationFolder);
 
