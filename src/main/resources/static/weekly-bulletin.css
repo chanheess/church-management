@@ -782,7 +782,11 @@ span[contenteditable="false"] {
 }
 
 @media print {
-  body { background: none; }
+  body {
+    background: none;
+    margin: 0;
+    padding: 0;
+  }
 
   /* 프린트 시: 편집 패널/페이지네이션/툴팁/버튼/헤더 숨김 */
   .panel-dock,
@@ -790,7 +794,8 @@ span[contenteditable="false"] {
   .pagination-controls,
   #editTooltip,
   #excelPopup,
-  .header-nav {
+  .header-nav,
+  .zoom-control-inline {
     display: none !important;
   }
 
@@ -798,23 +803,55 @@ span[contenteditable="false"] {
   .workspace {
     padding: 0;
     gap: 0;
+    margin: 0;
+    max-width: 100%;
+    display: block;
   }
 
   .page-stack {
     display: block;
     transform: none !important; /* 줌 제거 */
+    width: 100%;
+    margin: 0;
   }
 
   .page {
-    display: block !important; /* 숨겨진 페이지도 모두 출력 */
+    display: flex !important; /* flex 유지하여 좌우 레이아웃 유지 */
     margin: 0;
     padding: 12mm 0; /* 상하만 패딩, 좌우는 섹션에서 처리 */
     box-shadow: none;
     page-break-after: always; /* 각 페이지마다 페이지 구분 */
+    width: 100%;
+    height: 210mm;
+    box-sizing: border-box;
   }
 
   .page:last-child {
     page-break-after: auto; /* 마지막 페이지는 페이지 구분 안 함 */
+  }
+
+  /* 좌우 영역 프린트 시에도 유지 */
+  .left,
+  .right {
+    width: 50%;
+    padding: 0 10mm;
+  }
+
+  /* 편집 효과 제거 */
+  .editable-text:hover,
+  .editable-text:focus,
+  .illustration img:hover,
+  .main-logo:hover {
+    transform: none !important;
+    background-color: transparent !important;
+    border-bottom-color: transparent !important;
+    outline: none !important;
+  }
+
+  /* 테이블 호버 효과 제거 */
+  .org-box table:hover {
+    transform: none !important;
+    box-shadow: none !important;
   }
 }
 
