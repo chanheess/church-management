@@ -351,16 +351,26 @@ span[contenteditable="false"] {
   text-align: left;
   list-style-position: outside;
   padding-left: 20px;
+  box-sizing: border-box;
 }
 
 .notice-list li {
   margin-bottom: 6px;
   position: relative;
+  word-wrap: break-word;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .notice-list li .editable-text {
-  display: inline;
+  display: inline-block;
   vertical-align: top;
+  max-width: 100%;
+  word-wrap: break-word;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 /* ===== 하단 영역 (헌금 + 축복) ===== */
@@ -414,6 +424,16 @@ span[contenteditable="false"] {
 
 .blessing-box li {
   margin: 4px 0;
+}
+
+.blessing-text {
+  display: inline-block;
+  cursor: default;
+}
+
+/* 새청년 축복 텍스트의 패딩 제거 */
+.blessing-box .editable-text[data-text-key="blessing_1"] {
+  padding: 0 0px !important;
 }
 
 /* 예배/헌금 표 안의 편집 텍스트는 표 선이 어긋나지 않도록 효과 최소화 */

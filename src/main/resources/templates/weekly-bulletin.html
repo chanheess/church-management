@@ -393,7 +393,7 @@
                                           th:utext="${textConfig.additionalFields.get('blessing_1') ?: '새청년 축복'}">새청년 축복</span>
                                 </li>
                                 <li>
-                                    생일자 축복<span class="birthday-names" th:if="${bulletin.birthdayMembers != null && !bulletin.birthdayMembers.isEmpty()}"> <span th:each="member, iterStat : ${bulletin.birthdayMembers}"><span th:text="${member}"></span><span th:if="${!iterStat.last}">, </span></span></span>
+                                    <span class="blessing-text">생일자 축복</span><span class="birthday-names" th:if="${bulletin.birthdayMembers != null && !bulletin.birthdayMembers.isEmpty()}"> <span th:each="member, iterStat : ${bulletin.birthdayMembers}"><span th:text="${member}"></span><span th:if="${!iterStat.last}">, </span></span></span>
                                 </li>
                             </ul>
                         </div>
