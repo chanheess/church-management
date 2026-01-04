@@ -255,7 +255,7 @@ body{
 ================================ */
 @page{
   size: A4;
-  margin: var(--m-y) var(--m-x);  /* ★ 여기 고정이 제일 중요 */
+  margin: var(--m-y) var(--m-x);  /* 모든 페이지에 동일한 여백 적용 */
 }
 
 @media print{
@@ -275,17 +275,22 @@ body{
     box-shadow:none;
     width: var(--a4-w);
     min-height: var(--a4-h);
-    padding:0; /* @page margin이 여백을 담당하므로 컨테이너 padding 제거 */
+    padding: 0; /* @page margin이 모든 페이지에 여백 적용 */
     transform: none !important; /* 프린트 시 줌 제거 */
   }
 
   .cell-groups{
     display: block !important; /* 숨겨진 셀 그룹도 모두 출력 */
     page-break-inside: avoid;
-    page-break-after: always; /* 각 셀 그룹마다 페이지 구분 */
   }
 
+  /* 3개마다 페이지 구분 (3번째, 6번째, 9번째...) */
+  .cell-groups:nth-child(3n) {
+    page-break-after: always;
+  }
+
+  /* 마지막 셀 그룹은 페이지 구분 안 함 */
   .cell-groups:last-child {
-    page-break-after: auto; /* 마지막 셀 그룹은 페이지 구분 안 함 */
+    page-break-after: auto;
   }
 }
