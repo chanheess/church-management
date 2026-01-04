@@ -116,7 +116,7 @@
 
 /* 셀 그룹 간격 (A4 내에서 3개 들어가게 적당히) */
 .cell-groups{
-  margin: 0 0 10mm 0;
+  margin: 0 0 15mm 0;
 }
 
 /* ===============================
@@ -156,16 +156,16 @@
 ================================ */
 .attendance-table thead th{
   background: #d9d9d9;
-  font-size: 11pt;         /* ★ 엑셀 헤더 */
+  font-size: 12pt;         /* ★ 엑셀 헤더 */
   font-weight: 700;
-  height: 7.5mm;
+  height: 8mm;
 }
 
 /* ===============================
    TABLE TITLE (셀 이름 줄)
 ================================ */
 .table-title{
-  font-size: 11pt;
+  font-size: 12pt;
   font-weight: 800;
   height: 8mm;
   line-height: 1;
@@ -255,7 +255,7 @@ body{
 ================================ */
 @page{
   size: A4;
-  margin: var(--m-y) var(--m-x);  /* 모든 페이지에 동일한 여백 적용 */
+  margin: var(--m-y) 0;  /* 상하 여백은 @page가 모든 페이지에 적용, 좌우는 컨테이너가 처리 */
 }
 
 @media print{
@@ -275,7 +275,7 @@ body{
     box-shadow:none;
     width: var(--a4-w);
     min-height: var(--a4-h);
-    padding: 0; /* @page margin이 모든 페이지에 여백 적용 */
+    padding: 0 var(--m-x); /* 좌우 여백만 유지, 상하는 @page가 처리 */
     transform: none !important; /* 프린트 시 줌 제거 */
   }
 
