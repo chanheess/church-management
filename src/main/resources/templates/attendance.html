@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>연락처 및 출석현황</title>
+    <link rel="stylesheet" th:href="@{/weekly-bulletin.css}" />
+    <link rel="stylesheet" th:href="@{/attendance.css}" />
+</head>
+
+<body>
+<div class="header-nav">
+    <div class="nav-left">
+        <a href="/bulletin" class="nav-tab">주보</a>
+        <a href="/attendance" class="nav-tab active">연락처 및 출석현황</a>
+    </div>
+    <div class="pagination-controls">
+        <button id="prevBtn" class="nav-btn" onclick="changePage(-1)">
+            <span>&#8249;</span>
+        </button>
+        <span id="pageIndicator" class="page-indicator">1 / 1</span>
+        <button id="nextBtn" class="nav-btn" onclick="changePage(1)">
+            <span>&#8250;</span>
+        </button>
+    </div>
+    <div class="zoom-control-inline">
+        <button id="zoom-out" class="zoom-btn">−</button>
+        <input type="range" id="zoom-slider" min="50" max="150" value="100" step="5">
+        <button id="zoom-in" class="zoom-btn">+</button>
+        <button id="print-btn" class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
+    </div>
+</div>
+
+<div class="attendance-container">
+
+    <div class="cell-groups" th:each="cellGroup : ${cellGroups}">
+        <table class="attendance-table">
+
+            <!-- 컬럼 폭: CSS 정의와 정확히 일치 (합계 180mm) -->
+            <colgroup>
+                <col class="col-no" />      <!-- 10mm -->
+                <col class="col-name" />    <!-- 22mm -->
+                <col class="col-birth" />   <!-- 24mm -->
+                <col class="col-phone" />   <!-- 40mm -->
+                <col class="col-action" />  <!-- 14mm -->
+                <col class="col-training" /><!-- 14mm -->
+                <col class="col-week" />    <!-- 11.2mm -->
+                <col class="col-week" />    <!-- 11.2mm -->
+                <col class="col-week" />    <!-- 11.2mm -->
+                <col class="col-week" />    <!-- 11.2mm -->
+                <col class="col-week" />    <!-- 11.2mm -->
+            </colgroup>
+
+            <thead>
+            <!-- 1) 상단 타이틀(병합) -->
+            <tr>
+                <th class="table-title" colspan="11">
+                    <span th:text="${cellGroup.cellName}">김정훈</span>셀 연락처 및 출석현황
+                </th>
+            </tr>
+
+            <!-- 2) 메인 헤더 + 월 출석현황(병합) -->
+            <tr>
+                <th rowspan="2"></th>
+                <th rowspan="2">이름</th>
+                <th rowspan="2">생일</th>
+                <th rowspan="2">연락처</th>
+                <th rowspan="2">행삶</th>
+                <th rowspan="2">양육</th>
+                <th colspan="5" th:text="${cellGroup.attendanceMonth}">12월 출석현황</th>
+            </tr>
+
+            <!-- 3) 주차 헤더(5칸) - 일요일 날짜 표시 -->
+            <tr>
+                <th th:each="i : ${#numbers.sequence(0, 4)}"
+                    th:text="${i < cellGroup.sundayDates.size() ? cellGroup.sundayDates[i] : ''}">7일</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- 실제 멤버들 -->
+            <tr th:each="member, iterStat : ${cellGroup.members}">
+                <td th:text="${iterStat.index + 1}">1</td>
+                <td th:text="${member.name}">홍길동</td>
+                <td th:text="${member.birthday}">01-15</td>
+                <td th:text="${member.phone}">010-1234-5678</td>
+                <td th:text="${member.action == '1' ? '◯' : (member.action == '0' ? '△' : '')}"></td>
+                <td th:text="${member.training == '1' ? '◯' : (member.training == '0' ? '△' : '')}"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <!-- 빈 행들 (항상 8개 행 보장) -->
+            <tr th:each="i : ${#numbers.sequence(cellGroup.members.size() + 1, 8)}">
+                <td th:text="${i}"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+<script>
+    // ===== 페이지네이션 기능 =====
+    let currentPage = 1;
+    const itemsPerPage = 3; // 한 페이지에 표시할 셀 그룹 수
+    const cellGroups = document.querySelectorAll('.cell-groups');
+    const totalPages = Math.ceil(cellGroups.length / itemsPerPage);
+
+    function showPage(page) {
+        // 모든 셀 그룹 숨기기
+        cellGroups.forEach((group, index) => {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            if (index >= startIndex && index < endIndex) {
+                group.style.display = 'block';
+            } else {
+                group.style.display = 'none';
+            }
+        });
+
+        // 페이지 인디케이터 업데이트
+        document.getElementById('pageIndicator').textContent = `${page} / ${totalPages}`;
+
+        // 버튼 상태 업데이트
+        document.getElementById('prevBtn').disabled = (page === 1);
+        document.getElementById('nextBtn').disabled = (page === totalPages);
+    }
+
+    function changePage(direction) {
+        const newPage = currentPage + direction;
+        if (newPage >= 1 && newPage <= totalPages) {
+            currentPage = newPage;
+            showPage(currentPage);
+        }
+    }
+
+    // ===== 줌 컨트롤 기능 =====
+    const container = document.querySelector('.attendance-container');
+    const slider = document.getElementById('zoom-slider');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomInBtn = document.getElementById('zoom-in');
+
+    function updateZoom(value) {
+        const scale = value / 100;
+        container.style.transform = `scale(${scale})`;
+        container.style.transformOrigin = 'top center';
+        slider.value = value;
+    }
+
+    // 슬라이더 값 변경 시
+    slider.addEventListener('input', function() {
+        updateZoom(this.value);
+    });
+
+    // - 버튼
+    zoomOutBtn.addEventListener('click', function() {
+        let value = parseInt(slider.value) - 10;
+        if (value < 50) value = 50;
+        updateZoom(value);
+    });
+
+    // + 버튼
+    zoomInBtn.addEventListener('click', function() {
+        let value = parseInt(slider.value) + 10;
+        if (value > 150) value = 150;
+        updateZoom(value);
+    });
+
+    // 초기 설정
+    updateZoom(100);
+    showPage(1);
+</script>
+
+</body>
+</html>

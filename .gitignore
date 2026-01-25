@@ -37,3 +37,4 @@ build/
 # etc
 out/
 .env
+.vscode
