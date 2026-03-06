@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -450,6 +451,10 @@ public class ExcelReaderService {
      * 셀별로 그룹화하여 반환한다.
      */
     public List<CellGroup> readAttendanceData(String filePath) throws IOException {
+        return readAttendanceData(filePath, YearMonth.now());
+    }
+
+    public List<CellGroup> readAttendanceData(String filePath, YearMonth selectedMonth) throws IOException {
         List<CellGroup> cellGroups = new ArrayList<>();
 
         try (FileInputStream fis = new FileInputStream(filePath);
@@ -488,12 +493,13 @@ public class ExcelReaderService {
                 return cellGroups;
             }
 
-            // 현재 월 계산
-            LocalDate today = LocalDate.now();
-            String currentMonth = today.getMonthValue() + "월 출석현황";
+            // 선택 월 계산 (기본: 현재 월)
+            YearMonth targetMonth = selectedMonth == null ? YearMonth.now() : selectedMonth;
+            LocalDate targetDate = targetMonth.atDay(1);
+            String currentMonth = targetMonth.getMonthValue() + "월 출석현황";
 
             // 해당 월의 모든 일요일 날짜 계산
-            List<String> sundayDates = calculateSundaysInMonth(today);
+            List<String> sundayDates = calculateSundaysInMonth(targetDate);
 
             // 셀별로 데이터 그룹화
             Map<String, List<AttendanceMember>> cellMap = new LinkedHashMap<>();

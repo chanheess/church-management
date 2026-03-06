@@ -23,11 +23,6 @@
         </button>
     </div>
     <div class="zoom-control-inline">
-        <form class="month-filter-form" method="get" action="/attendance">
-            <label for="monthPicker"></label>
-            <input type="month" id="monthPicker" name="month" th:value="${selectedMonthInput}" required>
-            <button type="submit" class="month-submit-btn">조회</button>
-        </form>
         <button id="zoom-out" class="zoom-btn">−</button>
         <input type="range" id="zoom-slider" min="50" max="150" value="100" step="5">
         <button id="zoom-in" class="zoom-btn">+</button>

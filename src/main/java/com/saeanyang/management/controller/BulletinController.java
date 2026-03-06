@@ -17,11 +17,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -82,14 +85,27 @@ public class BulletinController {
     }
 
     @GetMapping("/attendance")
-    public String showAttendance(Model model) {
+    public String showAttendance(@RequestParam(value = "month", required = false) String month, Model model) {
         try {
-            List<CellGroup> cellGroups = excelReaderService.readAttendanceData(excelFilePath);
+            YearMonth selectedMonth = parseAttendanceMonth(month);
+            List<CellGroup> cellGroups = excelReaderService.readAttendanceData(excelFilePath, selectedMonth);
             model.addAttribute("cellGroups", cellGroups);
+            model.addAttribute("selectedMonthInput", selectedMonth.toString()); // yyyy-MM
         } catch (IOException e) {
             model.addAttribute("error", "엑셀 파일을 읽을 수 없습니다: " + e.getMessage());
         }
         return "attendance";
+    }
+
+    private YearMonth parseAttendanceMonth(String month) {
+        if (month == null || month.trim().isEmpty()) {
+            return YearMonth.now();
+        }
+        try {
+            return YearMonth.parse(month.trim());
+        } catch (DateTimeParseException e) {
+            return YearMonth.now();
+        }
     }
 
     /** ===== 로고 ===== */
