@@ -210,6 +210,9 @@ body{
   gap: 6px;
   margin-right: 20px;
   justify-self: end;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  min-width: max-content; /* 그리드 열이 좁아져도 라벨이 세로로 쪼개지지 않게 */
 }
 
 .month-filter-form {
@@ -217,6 +220,7 @@ body{
   align-items: center;
   gap: 6px;
   margin-right: 4px;
+  flex-shrink: 0;
 }
 
 .month-filter-form label {
@@ -239,9 +243,12 @@ body{
   background: #fff;
   color: #2f7d34;
   border-radius: 4px;
-  padding: 0 10px;
+  padding: 0 12px;
   font-size: 13px;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .month-submit-btn:hover {
@@ -259,6 +266,7 @@ body{
   cursor: pointer;
   color: #333;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .zoom-btn:hover {
@@ -268,19 +276,28 @@ body{
 
 .zoom-control-inline input[type="range"] {
   width: 120px;
+  min-width: 80px;
   cursor: pointer;
+  flex-shrink: 1;
 }
 
 .print-btn {
   background: #4CAF50;
   border: none;
   border-radius: 4px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 14px;
   color: white;
   cursor: pointer;
   transition: all 0.2s;
   margin-left: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.2;
 }
 
 .print-btn:hover {
