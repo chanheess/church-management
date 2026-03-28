@@ -33,15 +33,8 @@ public class ExcelReaderService {
                 System.out.println("시트 " + i + ": " + workbook.getSheetName(i));
             }
 
-            // "26년 명단" 시트 찾기
-            Sheet sheet = workbook.getSheet("26년명단");
-            if (sheet == null) {
-                // 시트를 못 찾으면 첫 번째 시트 사용
-                System.out.println("'26년명단' 시트를 찾을 수 없습니다. 첫 번째 시트를 사용합니다.");
-                sheet = workbook.getSheetAt(0);
-            } else {
-                System.out.println("'26년명단' 시트를 찾았습니다!");
-            }
+            LocalDate sunday = getCurrentWeekSunday();
+            Sheet sheet = findRosterSheet(workbook, sunday.getYear());
 
             // 하드코딩된 값 설정 (엑셀에 없는 정보)
             bulletinData.setHeadPastor("김한욱 목사");
@@ -60,7 +53,6 @@ public class ExcelReaderService {
             bulletinData.setWorshipLeader("임유빈 간사");
 
             // 이번 주(오늘을 포함해 다음 일요일까지)를 기준으로 하는 주일 날짜 및 연도 계산
-            LocalDate sunday = getCurrentWeekSunday();
             bulletinData.setDate(sunday.toString());
             bulletinData.setYear(String.valueOf(sunday.getYear()));
 
@@ -161,6 +153,32 @@ public class ExcelReaderService {
         }
 
         return sundays;
+    }
+
+    private Sheet findRosterSheet(Workbook workbook, int year) {
+        List<String> candidateNames = buildRosterSheetCandidates(year);
+
+        for (String candidate : candidateNames) {
+            Sheet sheet = workbook.getSheet(candidate);
+            if (sheet != null) {
+                System.out.println("'" + candidate + "' 시트를 찾았습니다!");
+                return sheet;
+            }
+        }
+
+        System.out.println(candidateNames + " 시트를 찾을 수 없습니다. 첫 번째 시트를 사용합니다.");
+        return workbook.getSheetAt(0);
+    }
+
+    private List<String> buildRosterSheetCandidates(int year) {
+        int twoDigitYear = Math.floorMod(year, 100);
+        List<String> candidates = new ArrayList<>();
+
+        candidates.add(twoDigitYear + "년명단");
+        candidates.add(String.format("%02d년명단", twoDigitYear));
+        candidates.add(year + "년명단");
+
+        return candidates.stream().distinct().collect(Collectors.toList());
     }
 
     private List<Person> readPeopleFromExcel(Sheet sheet) {
@@ -459,11 +477,8 @@ public class ExcelReaderService {
 
         try (FileInputStream fis = new FileInputStream(filePath);
              Workbook workbook = new XSSFWorkbook(fis)) {
-
-            Sheet sheet = workbook.getSheet("26년명단");
-            if (sheet == null) {
-                sheet = workbook.getSheetAt(0);
-            }
+            YearMonth targetMonth = selectedMonth == null ? YearMonth.now() : selectedMonth;
+            Sheet sheet = findRosterSheet(workbook, targetMonth.getYear());
 
             // 헤더 행 찾기
             Row headerRow = sheet.getRow(0);
@@ -494,7 +509,6 @@ public class ExcelReaderService {
             }
 
             // 선택 월 계산 (기본: 현재 월)
-            YearMonth targetMonth = selectedMonth == null ? YearMonth.now() : selectedMonth;
             LocalDate targetDate = targetMonth.atDay(1);
             String currentMonth = targetMonth.getMonthValue() + "월 출석현황";
 
