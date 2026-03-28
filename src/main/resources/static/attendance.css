@@ -195,6 +195,8 @@ body{
   font-size: 11pt;
   line-height: 1;
   color: #000;
+  /* 주보 페이지와 동일한 화면 배경(weekly-bulletin.css 제거 후 유지) */
+  background: #eaeaea;
 }
 
  /* 10+22+24+40+14+14+56 = 180mm */
@@ -295,9 +297,12 @@ body{
 }
 
 @media print{
-  .header-nav,
-  .pagination-controls {
-    display:none !important;
+  /*
+   * 헤더·스크립트·확장프로그램이 body에 붙인 형제 노드는 인쇄에서 제외.
+   * (예: "설정에서 퀵메뉴를…" — 앱 코드가 아닌 확장/OS 도우미 UI가 미리보기에 찍히는 경우)
+   */
+  body > *:not(.attendance-container) {
+    display: none !important;
   }
 
   body{
