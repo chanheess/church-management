@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>청년부 주보</title>
+    <link rel="stylesheet" th:href="@{/weekly-bulletin.css}" />
+</head>
+
+<body>
+<div class="header-nav">
+    <div class="nav-left">
+        <a href="/bulletin" class="nav-tab active">주보</a>
+        <a href="/attendance" class="nav-tab">연락처 및 출석현황</a>
+    </div>
+    <div class="pagination-controls">
+        <button id="prevBtn" class="nav-btn" onclick="changePage(-1)">
+            <span>&#8249;</span>
+        </button>
+        <span id="pageIndicator" class="page-indicator">1 / 2</span>
+        <button id="nextBtn" class="nav-btn" onclick="changePage(1)">
+            <span>&#8250;</span>
+        </button>
+    </div>
+    <div class="zoom-control-inline">
+        <button id="zoom-out" class="zoom-btn">−</button>
+        <input type="range" id="zoom-slider" min="50" max="150" value="80" step="5">
+        <button id="zoom-in" class="zoom-btn">+</button>
+        <button id="print-btn" class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
+    </div>
+</div>
+
+<div class="workspace">
+    <div class="page-stack">
+
+        <!-- ===================== PAGE 1 ===================== -->
+        <div class="page" id="page1">
+
+            <!-- ===== LEFT ===== -->
+            <div class="left">
+                <h2 class="section-title">[ 청년부 조직도 ]</h2>
+
+                <div class="org-box">
+                    <div class="org-header">
+                        <div class="org-header-left">
+                            ♥ 담당목사 :
+                            <span class="editable-text"
+                                  contenteditable="true"
+                                  data-text-key="headPastor"
+                                  th:utext="${bulletin.headPastor}">김한욱 목사</span>
+                        </div>
+                        <div class="org-header-right">
+                            ♥ 디렉터 :
+                            <span class="editable-text"
+                                  contenteditable="true"
+                                  data-text-key="director"
+                                  th:utext="${bulletin.director}">고은옥 사모</span>
+                        </div>
+                    </div>
+                    <div class="org-advisor">
+                        ♥ 고문 :
+                        <span class="editable-text"
+                              contenteditable="true"
+                              data-text-key="advisors"
+                              th:utext="${bulletin.advisors}">김기현 장로, 황윤식 장로</span>
+                    </div>
+
+                    <table class="excel-hover-area">
+                        <tr>
+                            <th>간사</th>
+                            <th>목자</th>
+                            <th>셀리더</th>
+                            <th>인턴</th>
+                        </tr>
+                        <tr th:each="team : ${bulletin.teams}">
+                            <td class="excel-edit-target">
+                                <span th:text="${team.division}">1목장</span><br>
+                                <span th:if="${team.secretaries.isEmpty()}">-</span>
+                                <span th:unless="${team.secretaries.isEmpty()}">
+                                    <span th:each="secretary, iterStat : ${team.secretaries}">
+                                        <span th:text="${secretary}"></span>
+                                        <br th:if="${!iterStat.last}" />
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td class="excel-edit-target">
+                                <span th:if="${team.pastors.isEmpty()}">-</span>
+                                <span th:unless="${team.pastors.isEmpty()}">
+                                    <span th:each="pastor, iterStat : ${team.pastors}">
+                                        <span th:text="${pastor}"></span>
+                                        <br th:if="${!iterStat.last}" />
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <span th:if="${team.leaders.isEmpty()}">-</span>
+                                <span th:unless="${team.leaders.isEmpty()}"
+                                      th:text="${#strings.listJoin(team.leaders, ' / ')}"></span>
+                            </td>
+
+                            <td>
+                                <span th:if="${team.interns.isEmpty()}">-</span>
+                                <span th:unless="${team.interns.isEmpty()}"
+                                      th:text="${#strings.listJoin(team.interns, ' / ')}"></span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="org-footer">
+                        새청년 담당 :
+                        <span class="editable-text"
+                              contenteditable="true"
+                              data-text-key="newYouthLeader"
+                              th:utext="${bulletin.newYouthLeader}">임유빈, 신영찬</span>
+                        /
+                        찬양팀 리더 :
+                        <span class="editable-text"
+                              contenteditable="true"
+                              data-text-key="worshipLeader"
+                              th:utext="${bulletin.worshipLeader}">임유빈 간사</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <strong>[ 예배 안내 ]</strong><br>
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="worshipInfo1"
+                          th:utext="${textConfig.worshipInfo1}">
+                        카리스 청년 예배 : 주일 낮 12:30 3층 본당
+                    </span><br>
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="worshipInfo2"
+                          th:utext="${textConfig.worshipInfo2}">
+                        청년 금요 회복 예배 : 금요일 저녁 8:30 3층 본당
+                    </span>
+                </div>
+
+                <div class="section">
+                    <strong>[ 오시는 길 ]</strong><br>
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="wayToChurch1"
+                          th:utext="${textConfig.wayToChurch1}">
+                        1호선 관악역 하차 후 예술공원 방면 도보 10분
+                    </span><br>
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="wayToChurch2"
+                          th:utext="${textConfig.wayToChurch2}">
+                        버스 : 1, 20, 51, 5530, 5713, 5625, 5626
+                    </span>
+                </div>
+
+                <div class="section">
+                    <strong>[ 연락처 ]</strong><br>
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="contact1"
+                          th:utext="${textConfig.contact1}">
+                        교회 : 031-472-5670
+                    </span><br>
+                    <span class="editable-text"
+                          contenteditable="true"
+                          data-text-key="contact2"
+                          th:utext="${textConfig.contact2}">
+                        임세일 간사 : 010-3091-5659
+                    </span>
+                </div>
+            </div>
+
+            <!-- ===== RIGHT ===== -->
+            <div class="right">
+                <div class="slogan">
+                    <span th:text="${bulletin.year}">2025</span>
+                    새안양 교회 표어
+                </div>
+                <div class="title editable-text"
+                     contenteditable="true"
+                     data-text-key="sloganTitle"
+                     th:utext="${textConfig.sloganTitle}">
+                    우리가 넉넉히 이기리라
+                </div>
+
+                <div class="logo-container">
+                    <img id="mainLogo" th:src="@{/api/bulletin/logo}" alt="로고" class="main-logo" onclick="openPanel('logo')">
+                </div>
+
+                <div class="illustration">
+                    <img id="mainIllustration" th:src="@{/api/bulletin/illustration}" alt="일러스트" onclick="openPanel('illustration')">
+                </div>
+
+                <div class="date" th:text="${bulletin.date}">2025-12-14</div>
+            </div>
+        </div>
+
+        <!-- ===================== PAGE 2 ===================== -->
+        <div class="page" id="page2" style="display:none;">
+            <div class="left">
+                <h2 class="section-title">[ 예배 순서 ]</h2>
+
+                <table class="service-table">
+                    <tr>
+                        <th>찬양</th>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="worship_songs"
+                                  th:utext="${textConfig.additionalFields.get('worship_songs') ?: '나의 피난처 예수<br>왕이신 하나님<br>높으신 주<br>성령의 불타는 교회<br>다시한번'}">
+                                나의 피난처 예수<br>
+                                왕이신 하나님<br>
+                                높으신 주<br>
+                                성령의 불타는 교회<br>
+                                다시한번
+                            </span>
+                        </td>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="worship_team"
+                                  th:utext="${textConfig.additionalFields.get('worship_team') ?: 'Mountain movers'}">Mountain movers</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>대표기도</th>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="prayer_topic"
+                                  th:utext="${textConfig.additionalFields.get('prayer_topic') ?: ''}"></span>
+                        </td>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="prayer_leader"
+                                  th:utext="${textConfig.additionalFields.get('prayer_leader') ?: '김태관 인턴'}">김태관 인턴</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>성경 봉독</th>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="scripture_reading"
+                                  th:utext="${textConfig.additionalFields.get('scripture_reading') ?: '마태복음 6장 27~34절'}">마태복음 6장 27~34절</span>
+                        </td>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="scripture_reader"
+                                  th:utext="${textConfig.additionalFields.get('scripture_reader') ?: '다함께'}">다함께</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>말씀선포</th>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="sermon_title"
+                                  th:utext="${textConfig.additionalFields.get('sermon_title') ?: '염려를 이기는 믿음'}">염려를 이기는 믿음</span>
+                        </td>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="sermon_pastor"
+                                  th:utext="${textConfig.additionalFields.get('sermon_pastor') ?: '김한욱 목사'}">김한욱 목사</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>헌금</th>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="offering_song"
+                                  th:utext="${textConfig.additionalFields.get('offering_song') ?: '-'}">-</span>
+                        </td>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="offering_team"
+                                  th:utext="${textConfig.additionalFields.get('offering_team') ?: 'Mountain movers'}">Mountain movers</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>환영 및 광고</th>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="announcement_content"
+                                  th:utext="${textConfig.additionalFields.get('announcement_content') ?: ''}"></span>
+                        </td>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="announcement_leader"
+                                  th:utext="${textConfig.additionalFields.get('announcement_leader') ?: '임유빈 간사'}">임유빈 간사</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>마침기도</th>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="closing_prayer_content"
+                                  th:utext="${textConfig.additionalFields.get('closing_prayer_content') ?: ''}"></span>
+                        </td>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="closing_prayer_leader"
+                                  th:utext="${textConfig.additionalFields.get('closing_prayer_leader') ?: '고은옥 사모'}">고은옥 사모</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>셀 모임</th>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_content"
+                                  th:utext="${textConfig.additionalFields.get('cell_meeting_content') ?: ''}"></span>
+                        </td>
+                        <td>
+                            <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_participants"
+                                  th:utext="${textConfig.additionalFields.get('cell_meeting_participants') ?: '다함께'}">다함께</span>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="section service-subsection">
+                    <h3 class="section-subtitle">[ 대표기도 헌금위원 ]</h3>
+                    <table class="offering-table">
+                        <tr>
+                            <th colspan="2">
+                                <span contenteditable="false">날짜</span>
+                            </th>
+                            <th>
+                                <span contenteditable="false">대표기도</span>
+                            </th>
+                            <th>
+                                <span contenteditable="false">헌금위원</span>
+                            </th>
+                        </tr>
+                        <tr th:each="date, iterStat : ${bulletin.offeringDates}">
+                            <td th:if="${iterStat.first}" th:attr="rowspan=${#lists.size(bulletin.offeringDates)}" class="month-cell">
+                                <span contenteditable="false" th:text="${bulletin.offeringMonth}">12월</span>
+                            </td>
+                            <td>
+                                <span contenteditable="false" th:text="${date}">7일</span>
+                            </td>
+                            <td>
+                                <span class="editable-text" contenteditable="true"
+                                      th:attr="data-text-key='offering_prayer_' + ${iterStat.index + 1}"
+                                      th:utext="${textConfig.additionalFields.get('offering_prayer_' + (iterStat.index + 1)) ?: (iterStat.index == 0 ? '박찬희 리더' : (iterStat.index == 1 ? '김태관 인턴' : (iterStat.index == 2 ? '김소원 인턴' : (iterStat.index == 3 ? '황소연 인턴' : '-'))))}">박찬희 리더</span>
+                            </td>
+                            <td th:if="${iterStat.first}" th:attr="rowspan=${#lists.size(bulletin.offeringDates)}" class="offering-member-cell">
+                                <span class="editable-text" contenteditable="true" data-text-key="offering_member_all"
+                                      th:utext="${textConfig.additionalFields.get('offering_member_all') ?: '-'}">-</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="right">
+                <h2 class="section-title">[ 광고 ]</h2>
+                <ol class="notice-list" id="noticeList">
+                    <li>
+                        <span class="editable-text" contenteditable="true" data-text-key="notice_1"
+                              th:utext="${textConfig.additionalFields.get('notice_1') ?: '카리스 청년 예배에 오신 여러분을 진심으로 환영합니다. 예배는 신앙의 생명입니다. 예배 3분 전 기도로 준비하시기 바랍니다.'}">
+                            카리스 청년 예배에 오신 여러분을 진심으로 환영합니다. 예배는 신앙의 생명입니다. 예배 3분 전 기도로 준비하시기 바랍니다.
+                        </span>
+                    </li>
+                    <li>
+                        <span class="editable-text" contenteditable="true" data-text-key="notice_2"
+                              th:utext="${textConfig.additionalFields.get('notice_2') ?: '예배의 자리가 축복의 자리입니다. 예배하는 자를 찾으시는 하나님 앞에 공적 예배(새벽, 수요, 주일, 주일 오후)에 참여하셔서 큰 은혜를 체험하시기 바랍니다.'}">
+                            예배의 자리가 축복의 자리입니다. 예배하는 자를 찾으시는 하나님 앞에 공적 예배(새벽, 수요, 주일, 주일 오후)에 참여하셔서
+                            큰 은혜를 체험하시기 바랍니다.
+                        </span>
+                    </li>
+                    <li>
+                        <span class="editable-text" contenteditable="true" data-text-key="notice_3"
+                              th:utext="${textConfig.additionalFields.get('notice_3') ?: '매주 금요일 11시에 청년부 전도를 진행하고 있습니다. 많은 참여 부탁드립니다.'}">
+                            매주 금요일 11시에 청년부 전도를 진행하고 있습니다. 많은 참여 부탁드립니다.
+                        </span>
+                    </li>
+                    <li>
+                        <span class="editable-text" contenteditable="true" data-text-key="notice_4"
+                              th:utext="${textConfig.additionalFields.get('notice_4') ?: '성탄발표 준비 안내: 성탄 전야제(12월 24일 저녁 7시)에 청년부 성탄발표가 있습니다. 연습은 12월 7일, 12일, 14일, 19일에 진행됩니다.'}">
+                            성탄발표 준비 안내: 성탄 전야제(12월 24일 저녁 7시)에 청년부 성탄발표가 있습니다. 연습은 12월 7일, 12일, 14일, 19일에 진행됩니다.
+                        </span>
+                    </li>
+                </ol>
+
+                <div class="bottom-section-wrapper">
+                    <div class="section offering-section">
+                        <div class="offering-content">
+                            <p>
+                                <strong class="offering-label">청년부 회비 계좌 안내 (회비 매월 5천원)</strong><br>
+                                <span class="editable-text" contenteditable="true" data-text-key="offering_account"
+                                      th:utext="${textConfig.additionalFields.get('offering_account') ?: '1000-5013-3340 토스 박원진'}">
+                                    1000-5013-3340 토스 박원진
+                                </span>
+                            </p>
+                            <p>
+                                <strong class="offering-label">청년부 목장모임 및 금요 예배</strong><br>
+                                <span class="editable-text" contenteditable="true" data-text-key="cell_meeting_schedule"
+                                      th:utext="${textConfig.additionalFields.get('cell_meeting_schedule') ?: '1목장: 월요일 저녁 8시 / 2목장: 목요일 저녁 8시 40분<br>3목장: 화요일 저녁 8시 / 금요 예배: 금요일 저녁 8시 30분 본당 3층'}">
+                                    1목장: 월요일 저녁 8시 / 2목장: 목요일 저녁 8시 40분<br>
+                                    3목장: 화요일 저녁 8시 / 금요 예배: 금요일 저녁 8시 30분 본당 3층
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="section blessing-section">
+                        <h3 class="section-subtitle">[ 축복 ]</h3>
+                        <div class="blessing-box">
+                            <ul>
+                                <li>
+                                    <span class="editable-text" contenteditable="true" data-text-key="blessing_1"
+                                          th:utext="${textConfig.additionalFields.get('blessing_1') ?: '새청년 축복'}">새청년 축복</span>
+                                </li>
+                                <li>
+                                    <span class="blessing-text">생일자 축복</span><span class="birthday-names" th:if="${bulletin.birthdayMembers != null && !bulletin.birthdayMembers.isEmpty()}"> <span th:each="member, iterStat : ${bulletin.birthdayMembers}"><span th:text="${member}"></span><span th:if="${!iterStat.last}">, </span></span></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ✅ 우측 편집 패널 도크 (페이지와 같은 줄에 고정) -->
+<div class="panel-dock">
+    <div id="editPanel" class="edit-panel" hidden>
+        <div class="panel-header">
+            <strong id="panelTitle">편집</strong>
+            <button class="panel-close" type="button" onclick="closePanel()">×</button>
+        </div>
+
+        <div class="panel-body">
+
+            <!-- Logo Controls -->
+            <div id="logoControls" class="control-section" style="display:none;">
+                <h4>로고</h4>
+
+                <div class="control-group">
+                    <label for="logoSize">크기: <span id="logoSizeValue">300px</span></label>
+                    <input type="range" id="logoSize" min="50" max="500" value="300"
+                           oninput="updateLogoSizeRealtime(this.value)">
+                </div>
+
+                <div class="control-group">
+                    <label for="logoUpload">파일:</label>
+                    <input type="file" id="logoUpload" accept="image/*" onchange="uploadLogoRealtime(event)">
+                </div>
+
+                <button class="reset-btn" type="button" onclick="resetLogo()">초기화</button>
+            </div>
+
+            <!-- Illustration Controls -->
+            <div id="illustrationControls" class="control-section" style="display:none;">
+                <h4>일러스트</h4>
+
+                <div class="control-group">
+                    <label for="illustrationSize">크기: <span id="illustrationSizeValue">300px</span></label>
+                    <input type="range" id="illustrationSize" min="50" max="500" value="300"
+                           oninput="updateIllustrationSizeRealtime(this.value)">
+                </div>
+
+                <div class="control-group">
+                    <label for="illustrationUpload">파일:</label>
+                    <input type="file" id="illustrationUpload" accept="image/*" onchange="uploadIllustrationRealtime(event)">
+                </div>
+
+                <button class="reset-btn" type="button" onclick="resetIllustration()">초기화</button>
+            </div>
+
+        </div>
+    </div>
+    <div id="excelPopup" class="hover-popup" hidden>
+        <div class="hover-popup-header">
+            <span class="hover-popup-dot"></span>
+            <strong>엑셀에서 수정</strong>
+        </div>
+        <p>간사·목자 정보는 엑셀 파일을 수정한 뒤 페이지를 새로고침하세요.</p>
+    </div>
+    <div id="editTooltip" class="hover-popup" hidden>
+        <div class="hover-popup-header">
+            <span class="hover-popup-dot"></span>
+            <strong>편집 도움말</strong>
+        </div>
+        <p id="tooltipContent" style="margin: 8px 0;">
+            <kbd>Shift</kbd> + <kbd>Enter</kbd> : 줄바꿈<br>
+            <kbd>Enter</kbd> : 저장 및 편집 종료<br>
+            <kbd>Esc</kbd> : 편집 취소
+        </p>
+    </div>
+</div>
+
+</div>
+
+<script>
+    // 페이지네이션 변수
+    let currentPageIndex = 1;
+    const totalPages = 2;
+
+    function changePage(direction) {
+        const newPage = currentPageIndex + direction;
+        if (newPage < 1 || newPage > totalPages) return;
+
+        // 현재 페이지 숨기기
+        document.getElementById('page' + currentPageIndex).style.display = 'none';
+
+        // 새 페이지 표시
+        currentPageIndex = newPage;
+        document.getElementById('page' + currentPageIndex).style.display = 'flex';
+
+        // 페이지 인디케이터 업데이트
+        document.getElementById('pageIndicator').textContent = currentPageIndex + ' / ' + totalPages;
+
+        // 버튼 활성화/비활성화
+        document.getElementById('prevBtn').disabled = (currentPageIndex === 1);
+        document.getElementById('nextBtn').disabled = (currentPageIndex === totalPages);
+
+        // 패널 닫기(원하면 유지해도 됨)
+        closePanel();
+
+        // 스크롤 맨 위
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('prevBtn').disabled = true;
+        if (totalPages === 1) document.getElementById('nextBtn').disabled = true;
+
+        // 저장된 로고 복원
+        try {
+            const savedLogo = localStorage.getItem('bulletinLogo');
+            const savedSize = localStorage.getItem('bulletinLogoSize');
+            const mainLogo = document.getElementById('mainLogo');
+
+            if (mainLogo) {
+                if (savedLogo) mainLogo.src = savedLogo;
+                if (savedSize) mainLogo.style.width = savedSize + 'px';
+            }
+        } catch (e) {
+            console.warn('저장된 로고 설정 불러오기 실패:', e);
+        }
+
+        // 저장된 일러스트 복원
+        try {
+            const savedIllustration = localStorage.getItem('bulletinIllustration');
+            const savedIllustrationSize = localStorage.getItem('bulletinIllustrationSize');
+            const mainIllustration = document.getElementById('mainIllustration');
+
+            if (mainIllustration) {
+                if (savedIllustration) mainIllustration.src = savedIllustration;
+                if (savedIllustrationSize) mainIllustration.style.width = savedIllustrationSize + 'px';
+            }
+        } catch (e) {
+            console.warn('저장된 일러스트 설정 불러오기 실패:', e);
+        }
+    });
+
+    // ===== Floating Panel 편집 기능 =====
+    let currentEditType = null;
+
+    function openPanel(type) {
+        currentEditType = type;
+
+        // 텍스트 편집 툴팁 닫기
+        hideEditTooltip();
+
+        const panel = document.getElementById('editPanel');
+        const logoControls = document.getElementById('logoControls');
+        const illustrationControls = document.getElementById('illustrationControls');
+        const panelTitle = document.getElementById('panelTitle');
+
+        logoControls.style.display = 'none';
+        illustrationControls.style.display = 'none';
+
+        if (type === 'logo') {
+            panelTitle.textContent = '로고 편집';
+            logoControls.style.display = 'block';
+
+            const mainLogo = document.getElementById('mainLogo');
+            const currentSize = (mainLogo && mainLogo.width) ? mainLogo.width : 300;
+            document.getElementById('logoSize').value = currentSize;
+            document.getElementById('logoSizeValue').textContent = currentSize + 'px';
+        } else if (type === 'illustration') {
+            panelTitle.textContent = '일러스트 편집';
+            illustrationControls.style.display = 'block';
+
+            const mainIllustration = document.getElementById('mainIllustration');
+            const currentSize = (mainIllustration && mainIllustration.width) ? mainIllustration.width : 300;
+            document.getElementById('illustrationSize').value = currentSize;
+            document.getElementById('illustrationSizeValue').textContent = currentSize + 'px';
+        }
+
+        panel.hidden = false;
+    }
+
+    function closePanel() {
+        const panel = document.getElementById('editPanel');
+        if (panel) panel.hidden = true;
+        currentEditType = null;
+    }
+
+    function updateLogoSizeRealtime(value) {
+        const mainLogo = document.getElementById('mainLogo');
+        if (mainLogo) mainLogo.style.width = value + 'px';
+        document.getElementById('logoSizeValue').textContent = value + 'px';
+        try { localStorage.setItem('bulletinLogoSize', value); } catch (e) {}
+    }
+
+    function updateIllustrationSizeRealtime(value) {
+        const mainIllustration = document.getElementById('mainIllustration');
+        if (mainIllustration) mainIllustration.style.width = value + 'px';
+        document.getElementById('illustrationSizeValue').textContent = value + 'px';
+        try { localStorage.setItem('bulletinIllustrationSize', value); } catch (e) {}
+    }
+
+    function uploadLogoRealtime(event) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const mainLogo = document.getElementById('mainLogo');
+                if (mainLogo) mainLogo.src = e.target.result;
+                try { localStorage.setItem('bulletinLogo', e.target.result); } catch (ex) {}
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('이미지 파일만 업로드할 수 있습니다.');
+        }
+    }
+
+    function uploadIllustrationRealtime(event) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const mainIllustration = document.getElementById('mainIllustration');
+                if (mainIllustration) mainIllustration.src = e.target.result;
+                try { localStorage.setItem('bulletinIllustration', e.target.result); } catch (ex) {}
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('이미지 파일만 업로드할 수 있습니다.');
+        }
+    }
+
+    function resetLogo() {
+        if (confirm('로고를 초기 상태로 되돌리시겠습니까?')) {
+            const mainLogo = document.getElementById('mainLogo');
+            if (mainLogo) {
+                mainLogo.src = '/api/bulletin/logo?' + new Date().getTime();
+                mainLogo.style.width = '300px';
+            }
+            localStorage.removeItem('bulletinLogo');
+            localStorage.removeItem('bulletinLogoSize');
+            document.getElementById('logoSize').value = 300;
+            document.getElementById('logoSizeValue').textContent = '300px';
+            document.getElementById('logoUpload').value = '';
+        }
+    }
+
+    function resetIllustration() {
+        if (confirm('일러스트를 초기 상태로 되돌리시겠습니까?')) {
+            const mainIllustration = document.getElementById('mainIllustration');
+            if (mainIllustration) {
+                mainIllustration.src = '/api/bulletin/illustration?' + new Date().getTime();
+                mainIllustration.style.width = '300px';
+            }
+            localStorage.removeItem('bulletinIllustration');
+            localStorage.removeItem('bulletinIllustrationSize');
+            document.getElementById('illustrationSize').value = 300;
+            document.getElementById('illustrationSizeValue').textContent = '300px';
+            document.getElementById('illustrationUpload').value = '';
+        }
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') closePanel();
+    });
+
+    // ===== 간사/목자 호버 안내 (표 전체 영역) =====
+    (function initExcelHoverHint() {
+        const popup = document.getElementById('excelPopup');
+        const table = document.querySelector('.excel-hover-area');
+        if (!popup || !table) return;
+
+        // 표 내부 셀(td/th)만 대상으로 지정 (헤더/푸터 텍스트 영역 제외)
+        const cells = table.querySelectorAll('th, td');
+        const extraTargets = [popup]; // 팝업 위로 이동 시에도 유지
+
+        let hoverCount = 0;
+        let hideTimer = null;
+
+        const show = () => {
+            if (hideTimer) {
+                clearTimeout(hideTimer);
+                hideTimer = null;
+            }
+            popup.hidden = false;
+        };
+
+        const scheduleHide = () => {
+            if (hideTimer) clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => {
+                if (hoverCount <= 0) popup.hidden = true;
+            }, 120);
+        };
+
+        cells.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                hoverCount += 1;
+                show();
+            });
+            el.addEventListener('mouseleave', () => {
+                hoverCount -= 1;
+                scheduleHide();
+            });
+        });
+
+        extraTargets.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                hoverCount += 1;
+                show();
+            });
+            el.addEventListener('mouseleave', () => {
+                hoverCount -= 1;
+                scheduleHide();
+            });
+        });
+    })();
+
+    // ===== 편집 가능한 텍스트 요소에 이벤트 리스너 추가 =====
+    function attachEditableTextEvents(el) {
+        const key = el.dataset.textKey;
+        if (!key) return;
+
+        // contenteditable이 false인 요소는 편집 이벤트 추가하지 않음
+        if (el.getAttribute('contenteditable') === 'false') return;
+
+        // 광고 항목인지 확인
+        const isNoticeItem = key.startsWith('notice_');
+
+        el.addEventListener('blur', () => {
+            // innerText로 가져온 후 줄바꿈을 <br> 태그로 변환
+            const value = el.innerText.trim().replace(/\n/g, '<br>');
+            fetch('/api/bulletin/text-config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key, value })
+            }).catch(err => console.error('텍스트 저장 실패:', err));
+
+            // 광고 항목이고 내용이 비어있으면 삭제
+            if (isNoticeItem && value === '') {
+                const li = el.closest('li');
+                const noticeList = document.getElementById('noticeList');
+                if (noticeList && noticeList.children.length > 1) {
+                    li.remove();
+                    reindexNotices();
+                }
+            }
+        });
+
+        // 키보드 이벤트 처리
+        el.addEventListener('keydown', (event) => {
+            // IME 조합 중일 때는 처리하지 않음 (한글 입력 중 엔터 문제 방지)
+            if (event.isComposing || event.keyCode === 229) {
+                return;
+            }
+
+            // 광고 항목에서만 특수 처리
+            if (isNoticeItem) {
+                // Shift + Enter: 줄바꿈 허용
+                if (event.key === 'Enter' && event.shiftKey) {
+                    return;
+                }
+
+                // Enter만 누르면: 새 항목 추가
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+
+                    // 현재 내용 저장
+                    const value = el.innerText.trim().replace(/\n/g, '<br>');
+                    fetch('/api/bulletin/text-config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key, value })
+                    }).catch(err => console.error('텍스트 저장 실패:', err));
+
+                    // 새 항목 추가
+                    addNoticeAfter(el.closest('li'));
+                    return;
+                }
+
+                // Backspace: 빈 항목이면 삭제하고 이전 항목으로 이동
+                if (event.key === 'Backspace' && el.innerText.trim() === '') {
+                    event.preventDefault();
+                    const li = el.closest('li');
+                    const noticeList = document.getElementById('noticeList');
+
+                    if (noticeList.children.length > 1) {
+                        const prevLi = li.previousElementSibling;
+                        li.remove();
+                        reindexNotices();
+
+                        // 이전 항목의 끝으로 포커스 이동
+                        if (prevLi) {
+                            const prevSpan = prevLi.querySelector('.editable-text');
+                            if (prevSpan) {
+                                prevSpan.focus();
+                                // 커서를 끝으로 이동
+                                const range = document.createRange();
+                                const sel = window.getSelection();
+                                range.selectNodeContents(prevSpan);
+                                range.collapse(false);
+                                sel.removeAllRanges();
+                                sel.addRange(range);
+                            }
+                        }
+                    }
+                    return;
+                }
+            } else {
+                // 광고 항목이 아닌 경우 기존 로직
+                // Shift + Enter: 줄바꿈 허용
+                if (event.key === 'Enter' && event.shiftKey) {
+                    return;
+                }
+
+                // Enter만 누르면: 저장 및 포커스 아웃
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    el.blur();
+                }
+            }
+
+            // Esc: 편집 취소
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                el.blur();
+            }
+        });
+
+        // 포커스 시 툴팁 표시
+        el.addEventListener('focus', (event) => {
+            showEditTooltip(event.target);
+        });
+
+        // 포커스 아웃 시 툴팁 숨김
+        el.addEventListener('blur', () => {
+            setTimeout(() => {
+                // 다른 편집 가능한 요소에 포커스가 없으면 툴팁 숨김
+                if (!document.activeElement.classList.contains('editable-text')) {
+                    hideEditTooltip();
+                }
+            }, 100);
+        });
+    }
+
+    function addNoticeAfter(currentLi) {
+        const noticeList = document.getElementById('noticeList');
+        const currentIndex = Array.from(noticeList.children).indexOf(currentLi);
+        const newIndex = currentIndex + 2; // 다음 인덱스
+
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="editable-text" contenteditable="true" data-text-key="notice_${newIndex}"></span>`;
+
+        // 현재 항목 다음에 삽입
+        if (currentLi.nextElementSibling) {
+            noticeList.insertBefore(li, currentLi.nextElementSibling);
+        } else {
+            noticeList.appendChild(li);
+        }
+
+        // 재색인
+        reindexNotices();
+
+        // 새로 추가된 editable-text에 이벤트 리스너 추가
+        const newSpan = li.querySelector('.editable-text');
+        attachEditableTextEvents(newSpan);
+
+        // 자동 포커스
+        newSpan.focus();
+    }
+
+    // ===== 인라인 텍스트 편집 자동 저장 (서버 파일에) =====
+    (function initEditableTextAutoSave() {
+        const elements = document.querySelectorAll('.editable-text[data-text-key]');
+        if (!elements.length) return;
+
+        // 모든 editable-text 요소에 통합된 이벤트 리스너 추가
+        elements.forEach(el => {
+            attachEditableTextEvents(el);
+        });
+    })();
+
+    // ===== 편집 도움말 툴팁 제어 =====
+    function showEditTooltip(element) {
+        // 일러스트/로고 편집 패널 닫기
+        closePanel();
+
+        const tooltip = document.getElementById('editTooltip');
+        const tooltipContent = document.getElementById('tooltipContent');
+
+        // 광고 항목인지 확인
+        const key = element.dataset.textKey;
+        const isNoticeItem = key && key.startsWith('notice_');
+
+        if (isNoticeItem) {
+            // 광고 항목용 도움말
+            tooltipContent.innerHTML = `
+                <kbd>Shift</kbd> + <kbd>Enter</kbd> : 줄바꿈<br>
+                <kbd>Enter</kbd> : 새 광고 항목 추가<br>
+                <kbd>Backspace</kbd> (빈 항목) : 항목 삭제<br>
+                <kbd>Esc</kbd> : 편집 취소
+            `;
+        } else {
+            // 일반 텍스트용 도움말
+            tooltipContent.innerHTML = `
+                <kbd>Shift</kbd> + <kbd>Enter</kbd> : 줄바꿈<br>
+                <kbd>Enter</kbd> : 저장 및 편집 종료<br>
+                <kbd>Esc</kbd> : 편집 취소
+            `;
+        }
+
+        tooltip.hidden = false;
+    }
+
+    function hideEditTooltip() {
+        const tooltip = document.getElementById('editTooltip');
+        tooltip.hidden = true;
+    }
+
+    // ===== 광고 항목 재색인 =====
+    function reindexNotices() {
+        const noticeList = document.getElementById('noticeList');
+        const items = noticeList.querySelectorAll('li');
+
+        items.forEach((li, index) => {
+            const span = li.querySelector('.editable-text');
+            const newKey = `notice_${index + 1}`;
+
+            // data-text-key 업데이트
+            const oldKey = span.dataset.textKey;
+            span.dataset.textKey = newKey;
+
+            // 서버에 키 변경 반영 (이전 키의 값을 새 키로 복사)
+            if (oldKey !== newKey) {
+                const value = span.innerText.trim().replace(/\n/g, '<br>');
+                fetch('/api/bulletin/text-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: newKey, value })
+                }).catch(err => console.error('텍스트 재색인 실패:', err));
+            }
+        });
+    }
+
+    // ===== 줌 컨트롤 기능 =====
+    const pageStack = document.querySelector('.page-stack');
+    const slider = document.getElementById('zoom-slider');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomInBtn = document.getElementById('zoom-in');
+
+    function updateZoom(value) {
+        const scale = value / 100;
+        pageStack.style.transform = `scale(${scale})`;
+        pageStack.style.transformOrigin = 'top center';
+        slider.value = value;
+    }
+
+    // 슬라이더 값 변경 시
+    slider.addEventListener('input', function() {
+        updateZoom(this.value);
+    });
+
+    // - 버튼
+    zoomOutBtn.addEventListener('click', function() {
+        let value = parseInt(slider.value) - 10;
+        if (value < 50) value = 50;
+        updateZoom(value);
+    });
+
+    // + 버튼
+    zoomInBtn.addEventListener('click', function() {
+        let value = parseInt(slider.value) + 10;
+        if (value > 150) value = 150;
+        updateZoom(value);
+    });
+
+    // 초기 줌 설정 (100%)
+    updateZoom(100);
+</script>
+
+</body>
+</html>

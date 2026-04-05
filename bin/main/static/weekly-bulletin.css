@@ -1,0 +1,941 @@
+/* ===== A4 가로 기본 설정 ===== */
+@page {
+  size: A4 landscape;   /* 핵심 */
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #eaeaea;
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+/* ===== 헤더 네비게이션 ===== */
+.header-nav {
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.nav-left {
+  display: flex;
+  gap: 0;
+  justify-self: start;
+}
+
+.nav-tab {
+  padding: 16px 32px;
+  text-decoration: none;
+  color: #666;
+  font-weight: 500;
+  font-size: 16px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.nav-tab:hover {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.nav-tab.active {
+  color: #4CAF50;
+  border-bottom-color: #4CAF50;
+}
+
+/* A4 가로: 297mm x 210mm */
+.page {
+  width: 297mm;
+  height: 210mm;
+  background: #ffffff;
+  margin: auto;
+  display: flex;
+  box-sizing: border-box;
+  padding: 12mm 0; /* 상하 패딩만, 좌우는 각 섹션에서 처리 */
+}
+
+/* ===== 좌/우 레이아웃 ===== */
+.left {
+  width: 50%;
+  padding: 0 10mm; /* 좌우 균등 패딩으로 중앙 정렬 */
+  box-sizing: border-box;
+  overflow: hidden; /* 넘치는 내용 숨김 */
+  word-wrap: break-word; /* 긴 단어 줄바꿈 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.right {
+  width: 50%;
+  padding: 0 10mm; /* 좌우 균등 패딩으로 중앙 정렬 */
+  text-align: center;
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden; /* 넘치는 내용 숨김 */
+  word-wrap: break-word; /* 긴 단어 줄바꿈 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+/* ===== 제목 ===== */
+h2.section-title {
+  font-size: 20px;
+  margin: 0 0 6px 0;
+  width: 100%;
+  text-align: left;
+}
+
+/* ===== 조직도 박스 ===== */
+.org-box {
+  background: #f5f3ea;
+  border-radius: 20px;
+  padding: 18px;
+  font-size: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.org-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.org-header-left,
+.org-header-right {
+  flex: 1;
+}
+
+.org-advisor {
+  margin-bottom: 8px;
+}
+
+.editable-text {
+  border-bottom: 1px dashed transparent;
+  padding: 0 2px;
+  cursor: text;
+  transition: transform 0.18s ease, background-color 0.18s ease, border-bottom-color 0.18s ease;
+  display: inline-block;
+}
+
+.editable-text:focus {
+  outline: none;
+  border-bottom-color: #4CAF50;
+  background-color: rgba(76, 175, 80, 0.06);
+  transform: scale(1.03);
+}
+
+.editable-text:hover {
+  transform: scale(1.03);
+  background-color: rgba(0, 0, 0, 0.02);
+  border-bottom-color: rgba(0, 0, 0, 0.2);
+}
+
+.org-box table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  table-layout: fixed;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transform-origin: center;
+}
+
+.org-box table:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.org-box th,
+.org-box td {
+  border: 1px solid #ffffff;
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.org-box th:nth-child(1),
+.org-box td:nth-child(1) {
+  width: 15%;
+}
+
+.org-box th:nth-child(2),
+.org-box td:nth-child(2) {
+  width: 15%;
+}
+
+.org-box th:nth-child(3),
+.org-box td:nth-child(3) {
+  width: 35%;
+  word-wrap: break-word;
+  word-break: keep-all;
+  white-space: normal;
+}
+
+.org-box th:nth-child(4),
+.org-box td:nth-child(4) {
+  width: 35%;
+  word-wrap: break-word;
+  word-break: keep-all;
+  white-space: normal;
+}
+
+.org-footer {
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+/* ===== 섹션 ===== */
+.section {
+  margin-top: 18px;
+  font-size: 15px;
+  line-height: 1.8;
+  width: 100%;
+}
+
+.section p {
+  text-align: left;
+}
+
+.section-subtitle {
+  font-size: 20px;
+  margin: 0 0 6px 0;
+  width: 100%;
+  text-align: left;
+}
+
+/* ===== 오른쪽 ===== */
+.slogan {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 8px;
+  margin-top: 5px;
+  width: 100%;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+/* ===== PAGE 2: 예배 순서 테이블 ===== */
+.service-table {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 13px;
+  table-layout: fixed; /* 고정 테이블 레이아웃 */
+}
+
+.service-table th,
+.service-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  vertical-align: middle;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+  height: auto;
+  line-height: 1.6;
+  text-align: center; /* 모든 셀 가운데 정렬 */
+}
+
+.service-table th {
+  width: 20%;
+  background-color: #f5f3ea;
+  font-weight: bold;
+}
+
+.service-table td:nth-child(2) {
+  width: 50%;
+  word-break: keep-all;
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.service-table td:nth-child(3) {
+  width: 30%;
+  word-break: keep-all;
+}
+
+.service-subsection {
+  margin-top: 22px;
+  width: 100%;
+}
+
+.offering-table {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 8px;
+  table-layout: fixed; /* 고정 테이블 레이아웃 */
+}
+
+.offering-table th,
+.offering-table td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: center;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+  height: auto;
+  line-height: 1.5;
+}
+
+.offering-table th {
+  background-color: #f5f3ea;
+  font-weight: bold;
+}
+
+.month-cell {
+  width: 10%;
+  background-color: #ffffff !important;
+  font-weight: bold;
+}
+
+/* 수정 불가능한 텍스트 (날짜, 월, 헤더) */
+span[contenteditable="false"] {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* 헌금위원 셀 (셀 통합) */
+.offering-member-cell {
+  vertical-align: middle;
+}
+
+/* 첫 번째 행의 날짜 헤더 (colspan=2) */
+.offering-table tr:first-child th:first-child {
+  width: 20%;
+}
+
+/* 날짜 데이터 열 (첫 행은 month-cell이 있어서 nth-child(2), 나머지는 nth-child(1)) */
+.offering-table tr:nth-child(2) td:nth-child(2),
+.offering-table tr:nth-child(n+3) td:nth-child(1) {
+  width: 10%;
+}
+
+/* 대표기도 열 */
+.offering-table th:nth-child(2),
+.offering-table tr:nth-child(2) td:nth-child(3),
+.offering-table tr:nth-child(n+3) td:nth-child(2) {
+  width: 35%;
+}
+
+/* 헌금위원 열 */
+.offering-table th:nth-child(3),
+.offering-table tr:nth-child(2) td:nth-child(4),
+.offering-table tr:nth-child(n+3) td:nth-child(3) {
+  width: 35%;
+}
+
+/* ===== PAGE 2: 오른쪽 광고/축복 ===== */
+.notice-list {
+  margin: 10px 0 0 18px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  width: 100%;
+  text-align: left;
+  list-style-position: outside;
+  padding-left: 20px;
+  box-sizing: border-box;
+}
+
+.notice-list li {
+  margin-bottom: 6px;
+  position: relative;
+  word-wrap: break-word;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.notice-list li .editable-text {
+  display: inline-block;
+  vertical-align: top;
+  max-width: 100%;
+  word-wrap: break-word;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* ===== 하단 영역 (헌금 + 축복) ===== */
+.bottom-section-wrapper {
+  margin-top: auto;
+  width: 100%;
+}
+
+.offering-section {
+  margin-top: 0;
+  width: 100%;
+}
+
+.offering-content {
+  line-height: 1.4;
+}
+
+.offering-content p {
+  margin: 4px 0;
+}
+
+.offering-label {
+  font-weight: bold;
+  cursor: default;
+  user-select: none;
+}
+
+.blessing-section {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.birthday-names {
+  display: inline;
+  cursor: default;
+  user-select: none;
+}
+
+.blessing-box {
+  background-color: #f5f3ea;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.blessing-box ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.blessing-box li {
+  margin: 4px 0;
+}
+
+.blessing-text {
+  display: inline-block;
+  cursor: default;
+}
+
+/* 새청년 축복 텍스트의 패딩 제거 */
+.blessing-box .editable-text[data-text-key="blessing_1"] {
+  padding: 0 0px !important;
+}
+
+/* 예배/헌금 표 안의 편집 텍스트는 표 선이 어긋나지 않도록 효과 최소화 */
+.service-table .editable-text,
+.offering-table .editable-text {
+  border-bottom: none;
+  padding: 0;
+  transform: none;
+  display: inline-block;
+  width: 100%;
+  min-height: 20px;
+  box-sizing: border-box;
+  text-align: center; /* 표 안의 텍스트 가운데 정렬 */
+}
+
+.service-table .editable-text:hover,
+.offering-table .editable-text:hover,
+.service-table .editable-text:focus,
+.offering-table .editable-text:focus {
+  transform: none;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-bottom: none;
+  outline: 1px dashed #4CAF50;
+  outline-offset: -1px;
+}
+
+.blessing {
+  font-style: italic;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.logo {
+  font-size: 42px;
+  letter-spacing: 10px;
+  margin: 15px 0;
+}
+
+.since {
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+}
+
+.illustration {
+  margin-top: 25px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.illustration img {
+  width: 95%;
+  max-width: 95%;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.illustration img:hover {
+  transform: scale(1.02);
+}
+
+.date {
+  width: 100%;
+  font-size: 12px;
+  margin-top: auto; /* flex 레이아웃에서 하단 배치 */
+  padding-top: 10px;
+  text-align: center;
+}
+
+/* ===== 로고 컨테이너 ===== */
+.logo-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.main-logo {
+  width: 150px;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.main-logo:hover {
+  transform: scale(1.05);
+}
+
+
+.control-section {
+  margin-bottom: 30px;
+}
+
+.control-section h4 {
+  margin: 0 0 20px 0;
+  color: #444;
+  font-size: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.control-group {
+  width: 100%;
+  margin: 20px 0;
+  box-sizing: border-box;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #555;
+  font-size: 14px;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.control-group input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+  border: none;
+}
+
+.control-group input[type="file"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #fafafa;
+  transition: border-color 0.2s;
+}
+
+.control-group input[type="file"]:hover {
+  border-color: #4CAF50;
+}
+
+#logoSizeValue,
+#illustrationSizeValue {
+  float: right;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.reset-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #ff5252;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.2s;
+}
+
+.reset-btn:hover {
+  background-color: #e74444;
+}
+
+/* ===== 편집 도움말 툴팁 (kbd 스타일) ===== */
+.hover-popup kbd {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  border: 1px solid #d0d0d0;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: "SF Mono", "Consolas", monospace;
+  font-size: 10px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  display: inline-block;
+  min-width: 24px;
+  text-align: center;
+  color: #333;
+  font-weight: 500;
+}
+
+/* ===== 페이지네이션 ===== */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #333;
+  background-color: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #333;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background-color: #333;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.nav-btn:disabled {
+  border-color: #ccc;
+  color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.nav-btn span {
+  line-height: 1;
+  margin-top: -2px;
+}
+
+.page-indicator {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  min-width: 60px;
+  text-align: center;
+}
+
+.page-stack {
+  width: 297mm;      /* page와 동일 폭 */
+  flex: 0 0 297mm;   /* 고정 폭으로 가운데 정렬 */
+  transition: transform 0.2s ease; /* 줌 애니메이션 */
+}
+
+/* ===== 전체 작업 캔버스: 페이지 + 우측 패널 영역 ===== */
+.workspace {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 24px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: calc(297mm + 320px + 96px); /* 본문+패널+여백 */
+  box-sizing: border-box;
+}
+
+/* 우측 패널 자리(메인 컨텐츠 안 가리게 하는 핵심) */
+.panel-dock {
+  width: 300px;
+  min-height: 210mm;
+  flex: 0 0 300px;
+  position: relative;
+}
+
+.hover-popup {
+  position: sticky;
+  top: 0;
+  right: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 14px;
+  margin-top: 20px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  z-index: 20;
+}
+
+.hover-popup strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #2b2b2b;
+}
+
+.hover-popup p {
+  margin: 0;
+  color: #4a4a4a;
+}
+
+.hover-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.hover-popup-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff9800;
+  box-shadow: 0 0 4px rgba(255, 152, 0, 0.8);
+  flex-shrink: 0;
+}
+
+/* 헤더 안에서는 strong을 한 줄에 나란히 정렬 */
+.hover-popup-header strong {
+  display: inline-block;
+  margin-bottom: 0;
+  line-height: 1.1;
+}
+
+/* ===== Figma-like Floating Panel ===== */
+.edit-panel {
+  position: sticky;
+  top: 20px;
+  width: 300px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  overflow: hidden;
+  z-index: 50;
+  margin-bottom: 28px; /* 아래 안내창이 그림자에 묻히지 않도록 간격 확보 */
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.panel-close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.panel-body {
+  padding: 12px;
+}
+
+@media print {
+  body {
+    background: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* 프린트 시: 편집 패널/페이지네이션/툴팁/버튼/헤더 숨김 */
+  .panel-dock,
+  .edit-panel,
+  .pagination-controls,
+  #editTooltip,
+  #excelPopup,
+  .header-nav,
+  .zoom-control-inline {
+    display: none !important;
+  }
+
+  /* 프린트 시 페이지는 딱 맞게 */
+  .workspace {
+    padding: 0;
+    gap: 0;
+    margin: 0;
+    max-width: 100%;
+    display: block;
+  }
+
+  .page-stack {
+    display: block;
+    transform: none !important; /* 줌 제거 */
+    width: 100%;
+    margin: 0;
+  }
+
+  .page {
+    display: flex !important; /* flex 유지하여 좌우 레이아웃 유지 */
+    margin: 0;
+    padding: 12mm 0; /* 상하만 패딩, 좌우는 섹션에서 처리 */
+    box-shadow: none;
+    page-break-after: always; /* 각 페이지마다 페이지 구분 */
+    width: 100%;
+    height: 210mm;
+    box-sizing: border-box;
+  }
+
+  .page:last-child {
+    page-break-after: auto; /* 마지막 페이지는 페이지 구분 안 함 */
+  }
+
+  /* 좌우 영역 프린트 시에도 유지 */
+  .left,
+  .right {
+    width: 50%;
+    padding: 0 10mm;
+  }
+
+  /* 편집 효과 제거 */
+  .editable-text:hover,
+  .editable-text:focus,
+  .illustration img:hover,
+  .main-logo:hover {
+    transform: none !important;
+    background-color: transparent !important;
+    border-bottom-color: transparent !important;
+    outline: none !important;
+  }
+
+  /* 테이블 호버 효과 제거 */
+  .org-box table:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+@media (max-width: 1400px) {
+  .workspace {
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+  }
+
+  .panel-dock,
+  .edit-panel {
+    width: 320px;
+    flex: 0 0 auto;
+  }
+}
+
+/* ===============================
+   ZOOM CONTROL (헤더 인라인)
+================================ */
+.zoom-control-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 20px;
+  justify-self: end;
+}
+
+.zoom-btn {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.zoom-btn:hover {
+  background: #e0e0e0;
+  border-color: #4CAF50;
+}
+
+.zoom-control-inline input[type="range"] {
+  width: 120px;
+  cursor: pointer;
+}
+
+.print-btn {
+  background: #4CAF50;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 8px;
+}
+
+.print-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}

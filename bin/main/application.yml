@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: weekly-bulletin
+
+bulletin:
+  excel:
+    path: ${BULLETIN_EXCEL_PATH:}
+  logo:
+    path: ${BULLETIN_LOGO_PATH:}
+  illustration:
+    folder: ${BULLETIN_ILLUSTRATIONS_PATH:}
+  text:
+    path: ${BULLETIN_TEXT_PATH:}
+
+server:
+  port: 8082
