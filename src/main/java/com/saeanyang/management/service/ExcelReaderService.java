@@ -21,6 +21,17 @@ import java.util.stream.Collectors;
 @Service
 public class ExcelReaderService {
 
+    /**
+     * 명단 시트에서 사람 목록만 읽는다 (대표기도 순서 등에 사용).
+     */
+    public List<Person> readRosterPeople(String filePath, int year) throws IOException {
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+            Sheet sheet = findRosterSheet(workbook, year);
+            return readPeopleFromExcel(sheet);
+        }
+    }
+
     public BulletinData readBulletinData(String filePath) throws IOException {
         BulletinData bulletinData = new BulletinData();
 

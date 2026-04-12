@@ -11,6 +11,7 @@
     <div class="nav-left">
         <a href="/bulletin" class="nav-tab active">주보</a>
         <a href="/attendance" class="nav-tab">연락처 및 출석현황</a>
+        <a href="/representative-prayer" class="nav-tab">대표기도</a>
     </div>
     <div class="pagination-controls">
         <button id="prevBtn" class="nav-btn" onclick="changePage(-1)">
@@ -227,7 +228,8 @@
                         </td>
                         <td>
                             <span class="editable-text" contenteditable="true" data-text-key="prayer_leader"
-                                  th:utext="${textConfig.additionalFields.get('prayer_leader') ?: '김태관 인턴'}">김태관 인턴</span>
+                                  th:classappend="${bulletin != null && bulletin.representativePrayerLeader != null && !#strings.isEmpty(bulletin.representativePrayerLeader) && bulletin.representativePrayerLeader != '-'} ? ' no-blur-persist' : ''"
+                                  th:utext="${(bulletin != null && bulletin.representativePrayerLeader != null && !#strings.isEmpty(bulletin.representativePrayerLeader) && bulletin.representativePrayerLeader != '-') ? bulletin.representativePrayerLeader : (textConfig.additionalFields.get('prayer_leader') ?: '김태관 인턴')}">김태관 인턴</span>
                         </td>
                     </tr>
                     <tr>
@@ -319,10 +321,11 @@
                             <td>
                                 <span contenteditable="false" th:text="${date}">7일</span>
                             </td>
-                            <td>
+                            <td th:with="prayKey=${'offering_prayer_' + (iterStat.index + 1)},cfgPray=${textConfig.additionalFields != null ? textConfig.additionalFields.get(prayKey) : null},autoPray=${bulletin.monthlyRepresentativePrayers != null && iterStat.index &lt; #lists.size(bulletin.monthlyRepresentativePrayers) ? bulletin.monthlyRepresentativePrayers.get(iterStat.index) : null},fallbackPray=${iterStat.index == 0 ? '박찬희 리더' : (iterStat.index == 1 ? '김태관 인턴' : (iterStat.index == 2 ? '김소원 인턴' : (iterStat.index == 3 ? '황소연 인턴' : '-')))},showAuto=${(cfgPray == null || #strings.isEmpty(cfgPray)) &amp;&amp; autoPray != null &amp;&amp; !#strings.isEmpty(autoPray) &amp;&amp; autoPray != '-'},displayPray=${(cfgPray != null &amp;&amp; !#strings.isEmpty(cfgPray)) ? cfgPray : (showAuto ? autoPray : fallbackPray)}">
                                 <span class="editable-text" contenteditable="true"
-                                      th:attr="data-text-key='offering_prayer_' + ${iterStat.index + 1}"
-                                      th:utext="${textConfig.additionalFields.get('offering_prayer_' + (iterStat.index + 1)) ?: (iterStat.index == 0 ? '박찬희 리더' : (iterStat.index == 1 ? '김태관 인턴' : (iterStat.index == 2 ? '김소원 인턴' : (iterStat.index == 3 ? '황소연 인턴' : '-'))))}">박찬희 리더</span>
+                                      th:attr="data-text-key=${prayKey}"
+                                      th:classappend="${showAuto} ? ' no-blur-persist' : ''"
+                                      th:utext="${displayPray}">박찬희 리더</span>
                             </td>
                             <td th:if="${iterStat.first}" th:attr="rowspan=${#lists.size(bulletin.offeringDates)}" class="offering-member-cell">
                                 <span class="editable-text" contenteditable="true" data-text-key="offering_member_all"
@@ -721,7 +724,14 @@
         // 광고 항목인지 확인
         const isNoticeItem = key.startsWith('notice_');
 
+        el.addEventListener('input', () => {
+            el.classList.remove('no-blur-persist');
+        });
+
         el.addEventListener('blur', () => {
+            if (el.classList.contains('no-blur-persist')) {
+                return;
+            }
             // innerText로 가져온 후 줄바꿈을 <br> 태그로 변환
             const value = el.innerText.trim().replace(/\n/g, '<br>');
             fetch('/api/bulletin/text-config', {

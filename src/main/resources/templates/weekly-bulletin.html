@@ -11,6 +11,7 @@
     <div class="nav-left">
         <a href="/bulletin" class="nav-tab active">주보</a>
         <a href="/attendance" class="nav-tab">연락처 및 출석현황</a>
+        <a href="/representative-prayer" class="nav-tab">대표기도</a>
     </div>
     <div class="pagination-controls">
         <button id="prevBtn" class="nav-btn" onclick="changePage(-1)">
@@ -226,8 +227,8 @@
                                   th:utext="${textConfig.additionalFields.get('prayer_topic') ?: ''}"></span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="prayer_leader"
-                                  th:utext="${textConfig.additionalFields.get('prayer_leader') ?: '김태관 인턴'}">김태관 인턴</span>
+                            <span contenteditable="false"
+                                  th:text="${(bulletin != null && bulletin.representativePrayerLeader != null && bulletin.representativePrayerLeader != '-') ? bulletin.representativePrayerLeader : '-'}">-</span>
                         </td>
                     </tr>
                     <tr>
@@ -320,13 +321,12 @@
                                 <span contenteditable="false" th:text="${date}">7일</span>
                             </td>
                             <td>
-                                <span class="editable-text" contenteditable="true"
-                                      th:attr="data-text-key='offering_prayer_' + ${iterStat.index + 1}"
-                                      th:utext="${textConfig.additionalFields.get('offering_prayer_' + (iterStat.index + 1)) ?: (iterStat.index == 0 ? '박찬희 리더' : (iterStat.index == 1 ? '김태관 인턴' : (iterStat.index == 2 ? '김소원 인턴' : (iterStat.index == 3 ? '황소연 인턴' : '-'))))}">박찬희 리더</span>
+                                <span contenteditable="false"
+                                      th:text="${bulletin.monthlyRepresentativePrayers != null && iterStat.index < #lists.size(bulletin.monthlyRepresentativePrayers) ? bulletin.monthlyRepresentativePrayers.get(iterStat.index) : '-'}">-</span>
                             </td>
                             <td th:if="${iterStat.first}" th:attr="rowspan=${#lists.size(bulletin.offeringDates)}" class="offering-member-cell">
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_member_all"
-                                      th:utext="${textConfig.additionalFields.get('offering_member_all') ?: '-'}">-</span>
+                                <span contenteditable="false"
+                                      th:text="${bulletin.monthlyOfferingText != null && bulletin.monthlyOfferingText != '—' ? bulletin.monthlyOfferingText : '-'}">-</span>
                             </td>
                         </tr>
                     </table>
@@ -721,7 +721,14 @@
         // 광고 항목인지 확인
         const isNoticeItem = key.startsWith('notice_');
 
+        el.addEventListener('input', () => {
+            el.classList.remove('no-blur-persist');
+        });
+
         el.addEventListener('blur', () => {
+            if (el.classList.contains('no-blur-persist')) {
+                return;
+            }
             // innerText로 가져온 후 줄바꿈을 <br> 태그로 변환
             const value = el.innerText.trim().replace(/\n/g, '<br>');
             fetch('/api/bulletin/text-config', {
