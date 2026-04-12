@@ -4,6 +4,7 @@ import com.saeanyang.management.model.BulletinData;
 import com.saeanyang.management.model.CellGroup;
 import com.saeanyang.management.model.EditableTextConfig;
 import com.saeanyang.management.service.ExcelReaderService;
+import com.saeanyang.management.service.RepresentativePrayerService;
 import com.saeanyang.management.service.TextConfigService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -35,6 +36,7 @@ public class BulletinController {
 
     private final ExcelReaderService excelReaderService;
     private final TextConfigService textConfigService;
+    private final RepresentativePrayerService representativePrayerService;
 
     @Value("${bulletin.excel.path}")
     private String excelFilePath;
@@ -46,9 +48,11 @@ public class BulletinController {
     private String illustrationFolder;
 
     public BulletinController(ExcelReaderService excelReaderService,
-                              TextConfigService textConfigService) {
+                              TextConfigService textConfigService,
+                              RepresentativePrayerService representativePrayerService) {
         this.excelReaderService = excelReaderService;
         this.textConfigService = textConfigService;
+        this.representativePrayerService = representativePrayerService;
     }
 
     /** 텍스트 한 항목을 서버 쪽 설정 파일에 저장 */
@@ -75,6 +79,20 @@ public class BulletinController {
             bulletinData.setAdvisors(textConfig.getAdvisors());
             bulletinData.setNewYouthLeader(textConfig.getNewYouthLeader());
             bulletinData.setWorshipLeader(textConfig.getWorshipLeader());
+
+            try {
+                LocalDate bulletinSunday = LocalDate.parse(bulletinData.getDate());
+                bulletinData.setRepresentativePrayerLeader(
+                        representativePrayerService.resolveLeader(bulletinSunday));
+                bulletinData.setMonthlyRepresentativePrayers(
+                        representativePrayerService.resolveLeadersForMonth(bulletinSunday));
+                bulletinData.setMonthlyOfferingText(
+                        representativePrayerService.resolveMonthlyOfferingText(bulletinSunday));
+            } catch (Exception ex) {
+                bulletinData.setRepresentativePrayerLeader(null);
+                bulletinData.setMonthlyRepresentativePrayers(null);
+                bulletinData.setMonthlyOfferingText(null);
+            }
 
             model.addAttribute("bulletin", bulletinData);
             model.addAttribute("textConfig", textConfig);
