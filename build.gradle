@@ -42,13 +42,16 @@ bootJar {
 	archiveBaseName = 'church-management'
 }
 
+def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+def jpackageBin = "${System.getProperty('java.home')}/bin/jpackage${isWindows ? '.exe' : ''}"
+
 // ===== 앱 패키징 (jpackage) =====
-// macOS : ./gradlew packageApp          → build/dist/ChurchManagement.app
-// Windows: ./gradlew packageApp         → build/dist/ChurchManagement/ChurchManagement.exe
-//          ./gradlew packageAppInstaller → build/dist/ChurchManagement-1.0.0.msi  (msi 설치파일)
+// macOS : ./gradlew packageApp         → build/dist/ChurchManagement.app
+// Windows: ./gradlew packageApp        → build/dist/ChurchManagement-1.0.0.exe  (설치파일)
+// Windows: ./gradlew packagePortableApp → build/dist/ChurchManagement/ChurchManagement.exe  (폴더형)
 tasks.register('packageApp', Exec) {
 	dependsOn 'bootJar'
-	description = 'jpackage로 네이티브 앱 번들을 생성합니다. (macOS: .app  Windows: .exe)'
+	description = 'jpackage로 기본 배포본을 생성합니다. (macOS: .app, Windows: 설치형 .exe)'
 
 	doFirst {
 		def distDir = file('build/dist')
@@ -56,10 +59,43 @@ tasks.register('packageApp', Exec) {
 		distDir.mkdirs()
 
 		def jarName = bootJar.archiveFileName.get()
-		def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
-		def ext = isWindows ? '.exe' : ''
-		def jpackageBin = "${System.getProperty('java.home')}/bin/jpackage${ext}"
+		def packageType = isWindows ? 'exe' : 'app-image'
+		def cmd = [jpackageBin,
+			'--input', layout.buildDirectory.dir('libs').get().asFile.absolutePath,
+			'--main-jar', jarName,
+			'--name', 'ChurchManagement',
+			'--app-version', version,
+			'--description', '주보 관리',
+			'--type', packageType,
+			'--dest', layout.buildDirectory.dir('dist').get().asFile.absolutePath,
+			'--java-options', '-Djava.awt.headless=false',
+			'--java-options', '-Xmx512m']
 
+		if (isWindows) {
+			cmd += [
+				'--win-menu',
+				'--win-shortcut',
+				'--win-dir-chooser',
+				'--win-per-user-install'
+			]
+		} else {
+			cmd += ['--java-options', '-Dapple.awt.application.name=ChurchManagement']
+		}
+
+		commandLine cmd
+	}
+}
+
+tasks.register('packagePortableApp', Exec) {
+	dependsOn 'bootJar'
+	description = 'jpackage로 폴더형 앱 번들을 생성합니다. (macOS: .app, Windows: app-image 폴더)'
+
+	doFirst {
+		def distDir = file('build/dist')
+		if (distDir.exists()) distDir.deleteDir()
+		distDir.mkdirs()
+
+		def jarName = bootJar.archiveFileName.get()
 		def cmd = [jpackageBin,
 			'--input', layout.buildDirectory.dir('libs').get().asFile.absolutePath,
 			'--main-jar', jarName,
@@ -80,18 +116,20 @@ tasks.register('packageApp', Exec) {
 }
 
 // Windows 전용: MSI 설치 파일 생성 (WiX Toolset 필요)
-tasks.register('packageAppInstaller', Exec) {
+tasks.register('packageWindowsMsi', Exec) {
 	dependsOn 'bootJar'
 	description = 'Windows용 MSI 설치 파일을 생성합니다. (WiX Toolset 필요)'
 
 	doFirst {
+		if (!isWindows) {
+			throw new GradleException('packageWindowsMsi는 Windows에서만 실행할 수 있습니다.')
+		}
+
 		def distDir = file('build/dist-installer')
 		if (distDir.exists()) distDir.deleteDir()
 		distDir.mkdirs()
 
 		def jarName = bootJar.archiveFileName.get()
-		def jpackageBin = "${System.getProperty('java.home')}/bin/jpackage.exe"
-
 		commandLine jpackageBin,
 			'--input', layout.buildDirectory.dir('libs').get().asFile.absolutePath,
 			'--main-jar', jarName,
@@ -104,6 +142,7 @@ tasks.register('packageAppInstaller', Exec) {
 			'--java-options', '-Xmx512m',
 			'--win-menu',
 			'--win-shortcut',
-			'--win-dir-chooser'
+			'--win-dir-chooser',
+			'--win-per-user-install'
 	}
 }
