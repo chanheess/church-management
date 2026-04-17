@@ -115,14 +115,14 @@ tasks.register('packagePortableApp', Exec) {
 	}
 }
 
-// Windows 전용: MSI 설치 파일 생성 (WiX Toolset 필요)
-tasks.register('packageWindowsMsi', Exec) {
+// Windows 전용: EXE 설치 파일 생성
+tasks.register('packageWindowsExe', Exec) {
 	dependsOn 'bootJar'
-	description = 'Windows용 MSI 설치 파일을 생성합니다. (WiX Toolset 필요)'
+	description = 'Windows용 EXE 설치 파일을 생성합니다.'
 
 	doFirst {
 		if (!isWindows) {
-			throw new GradleException('packageWindowsMsi는 Windows에서만 실행할 수 있습니다.')
+			throw new GradleException('packageWindowsExe는 Windows에서만 실행할 수 있습니다.')
 		}
 
 		def distDir = file('build/dist-installer')
@@ -136,7 +136,7 @@ tasks.register('packageWindowsMsi', Exec) {
 			'--name', 'ChurchManagement',
 			'--app-version', version,
 			'--description', '주보 관리',
-			'--type', 'msi',
+			'--type', 'exe',
 			'--dest', layout.buildDirectory.dir('dist-installer').get().asFile.absolutePath,
 			'--java-options', '-Djava.awt.headless=false',
 			'--java-options', '-Xmx512m',
