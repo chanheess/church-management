@@ -63,12 +63,10 @@ public class ChurchManagementApplication {
         }
 
         // 트레이 아이콘 이미지 생성 (16x16 단색 원)
-        Image iconImage = Toolkit.getDefaultToolkit().createImage(
-            ChurchManagementApplication.class.getResource("/static/tray-icon.png")
-        );
-        if (iconImage == null) {
-            iconImage = createDefaultTrayIcon();
-        }
+        java.net.URL iconUrl = ChurchManagementApplication.class.getResource("/static/tray-icon.png");
+        Image iconImage = (iconUrl != null)
+            ? Toolkit.getDefaultToolkit().createImage(iconUrl)
+            : createDefaultTrayIcon();
 
         PopupMenu menu = new PopupMenu();
 

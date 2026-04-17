@@ -108,16 +108,38 @@ public class BulletinController {
 
     @GetMapping("/bulletin")
     public String showBulletin(@RequestParam(value = "date", required = false) String date, Model model) {
+        // 기본값 먼저 세팅 — 오류가 나도 템플릿이 null 참조로 500이 나지 않도록
+        EditableTextConfig textConfig = textConfigService.loadConfig();
+        LocalDate targetSunday = parseBulletinDate(date);
+        BulletinData bulletinData = new BulletinData();
+        bulletinData.setDate(targetSunday.toString());
+        bulletinData.setYear(String.valueOf(targetSunday.getYear()));
+        bulletinData.setHeadPastor(textConfig.getHeadPastor());
+        bulletinData.setDirector(textConfig.getDirector());
+        bulletinData.setAdvisors(textConfig.getAdvisors());
+        bulletinData.setNewYouthLeader(textConfig.getNewYouthLeader());
+        bulletinData.setWorshipLeader(textConfig.getWorshipLeader());
+        bulletinData.setTeams(java.util.Collections.emptyList());
+        bulletinData.setOfferingDates(java.util.Collections.emptyList());
+        bulletinData.setBirthdayMembers(java.util.Collections.emptyList());
+
+        model.addAttribute("bulletin", bulletinData);
+        model.addAttribute("textConfig", textConfig);
+        model.addAttribute("selectedDate", targetSunday.toString());
+
         try {
-            LocalDate targetSunday = parseBulletinDate(date);
-            BulletinData bulletinData = excelReaderService.readBulletinData(effectiveExcelPath(), targetSunday);
-            // 서버에 저장된 텍스트 설정 반영
-            EditableTextConfig textConfig = textConfigService.loadConfig();
-            bulletinData.setHeadPastor(textConfig.getHeadPastor());
-            bulletinData.setDirector(textConfig.getDirector());
-            bulletinData.setAdvisors(textConfig.getAdvisors());
-            bulletinData.setNewYouthLeader(textConfig.getNewYouthLeader());
-            bulletinData.setWorshipLeader(textConfig.getWorshipLeader());
+            String excelPath = effectiveExcelPath();
+            if (excelPath != null && !excelPath.isBlank()) {
+                bulletinData = excelReaderService.readBulletinData(excelPath, targetSunday);
+                bulletinData.setHeadPastor(textConfig.getHeadPastor());
+                bulletinData.setDirector(textConfig.getDirector());
+                bulletinData.setAdvisors(textConfig.getAdvisors());
+                bulletinData.setNewYouthLeader(textConfig.getNewYouthLeader());
+                bulletinData.setWorshipLeader(textConfig.getWorshipLeader());
+                model.addAttribute("bulletin", bulletinData);
+            } else {
+                model.addAttribute("error", "엑셀 파일 경로가 설정되지 않았습니다. ⚙ 설정에서 경로를 지정해 주세요.");
+            }
 
             try {
                 LocalDate bulletinSunday = LocalDate.parse(bulletinData.getDate());
@@ -132,10 +154,6 @@ public class BulletinController {
                 bulletinData.setMonthlyRepresentativePrayers(null);
                 bulletinData.setMonthlyOfferingText(null);
             }
-
-            model.addAttribute("bulletin", bulletinData);
-            model.addAttribute("textConfig", textConfig);
-            model.addAttribute("selectedDate", targetSunday.toString());
         } catch (IOException e) {
             model.addAttribute("error", "엑셀 파일을 읽을 수 없습니다: " + e.getMessage());
         }
@@ -183,9 +201,11 @@ public class BulletinController {
     /** ===== 로고 ===== */
     @GetMapping("/api/bulletin/logo")
     public ResponseEntity<Resource> getLogo() throws IOException {
-        File logoFile = new File(effectiveLogoPath());
+        String logoPath = effectiveLogoPath();
+        if (logoPath == null || logoPath.isBlank()) return ResponseEntity.notFound().build();
+        File logoFile = new File(logoPath);
 
-        if (!logoFile.exists()) {
+        if (!logoFile.exists() || !logoFile.isFile()) {
             return ResponseEntity.notFound().build();
         }
 
@@ -195,7 +215,9 @@ public class BulletinController {
     /** ===== 일러스트 (날짜 기반 선택) ===== */
     @GetMapping("/api/bulletin/illustration")
     public ResponseEntity<Resource> getIllustration() throws IOException {
-        File folder = new File(effectiveIllustrationFolder());
+        String folderPath = effectiveIllustrationFolder();
+        if (folderPath == null || folderPath.isBlank()) return ResponseEntity.notFound().build();
+        File folder = new File(folderPath);
 
         if (!folder.exists() || !folder.isDirectory()) {
             return ResponseEntity.notFound().build();

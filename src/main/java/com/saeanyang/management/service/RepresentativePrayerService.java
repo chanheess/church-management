@@ -41,6 +41,7 @@ public class RepresentativePrayerService {
     private static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
 
     private final ExcelReaderService excelReaderService;
+    private final TextConfigService textConfigService;
     private final JsonMapper objectMapper;
 
     @Value("${bulletin.excel.path:}")
@@ -52,8 +53,10 @@ public class RepresentativePrayerService {
     @Value("${bulletin.representative-prayer.path:}")
     private String prayerConfigPath;
 
-    public RepresentativePrayerService(ExcelReaderService excelReaderService) {
+    public RepresentativePrayerService(ExcelReaderService excelReaderService,
+                                      TextConfigService textConfigService) {
         this.excelReaderService = excelReaderService;
+        this.textConfigService = textConfigService;
         this.objectMapper = JsonMapper.builder()
                 .findAndAddModules()
                 .enable(SerializationFeature.INDENT_OUTPUT)
@@ -418,10 +421,11 @@ public class RepresentativePrayerService {
     }
 
     private List<Person> readPeopleForYear(int year) throws IOException {
-        if (excelFilePath == null || excelFilePath.isBlank()) {
+        String effectiveExcelPath = textConfigService.getPathConfig("excelPath", excelFilePath);
+        if (effectiveExcelPath == null || effectiveExcelPath.isBlank()) {
             return List.of();
         }
-        return excelReaderService.readRosterPeople(excelFilePath, year);
+        return excelReaderService.readRosterPeople(effectiveExcelPath, year);
     }
 
     private RepresentativePrayerConfig loadAndPruneConfig() throws IOException {
