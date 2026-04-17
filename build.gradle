@@ -38,6 +38,10 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+bootJar {
+	archiveBaseName = 'church-management'
+}
+
 // ===== 앱 패키징 (jpackage) =====
 // macOS : ./gradlew packageApp          → build/dist/ChurchManagement.app
 // Windows: ./gradlew packageApp         → build/dist/ChurchManagement/ChurchManagement.exe
@@ -46,7 +50,7 @@ tasks.register('packageApp', Exec) {
 	dependsOn 'bootJar'
 	description = 'jpackage로 네이티브 앱 번들을 생성합니다. (macOS: .app  Windows: .exe)'
 
-	def jarName = "church-management-${version}.jar"
+	def jarName = "${rootProject.name}-${version}.jar"
 	def jpackageBin = "${System.getProperty('java.home')}/bin/jpackage"
 	def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
 
@@ -80,7 +84,7 @@ tasks.register('packageAppInstaller', Exec) {
 	dependsOn 'bootJar'
 	description = 'Windows용 MSI 설치 파일을 생성합니다. (WiX Toolset 필요)'
 
-	def jarName = "church-management-${version}.jar"
+	def jarName = "${rootProject.name}-${version}.jar"
 	def jpackageBin = "${System.getProperty('java.home')}/bin/jpackage"
 
 	doFirst {
