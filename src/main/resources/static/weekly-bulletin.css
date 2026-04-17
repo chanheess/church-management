@@ -62,7 +62,7 @@ body {
 /* ===== 좌/우 레이아웃 ===== */
 .left {
   width: 50%;
-  padding: 0 10mm; /* 좌우 균등 패딩으로 중앙 정렬 */
+  padding: 0 11mm;
   box-sizing: border-box;
   overflow: hidden; /* 넘치는 내용 숨김 */
   word-wrap: break-word; /* 긴 단어 줄바꿈 */
@@ -87,7 +87,7 @@ body {
 
 /* ===== 제목 ===== */
 h2.section-title {
-  font-size: 20px;
+  font-size: 18px;
   margin: 0 0 6px 0;
   width: 100%;
   text-align: left;
@@ -98,7 +98,7 @@ h2.section-title {
   background: #f5f3ea;
   border-radius: 20px;
   padding: 18px;
-  font-size: 15px;
+  font-size: 13px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -196,7 +196,7 @@ h2.section-title {
 /* ===== 섹션 ===== */
 .section {
   margin-top: 18px;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.8;
   width: 100%;
 }
@@ -206,7 +206,7 @@ h2.section-title {
 }
 
 .section-subtitle {
-  font-size: 20px;
+  font-size: 18px;
   margin: 0 0 6px 0;
   width: 100%;
   text-align: left;
@@ -274,6 +274,11 @@ h2.section-title {
   width: 100%;
 }
 
+#page2 .left .service-subsection {
+  margin-top: auto;
+  padding-top: 22px;
+}
+
 .offering-table {
   width: 100%;
   max-width: 100%;
@@ -314,7 +319,7 @@ span[contenteditable="false"] {
 
 /* 헌금위원 셀 (셀 통합) */
 .offering-member-cell {
-  vertical-align: middle;
+  vertical-align: bottom;
 }
 
 /* 첫 번째 행의 날짜 헤더 (colspan=2) */
@@ -333,6 +338,11 @@ span[contenteditable="false"] {
 .offering-table tr:nth-child(2) td:nth-child(3),
 .offering-table tr:nth-child(n+3) td:nth-child(2) {
   width: 35%;
+}
+
+.offering-table tr:nth-child(2) td:nth-child(3),
+.offering-table tr:nth-child(n+3) td:nth-child(2) {
+  vertical-align: bottom;
 }
 
 /* 헌금위원 열 */
@@ -516,7 +526,7 @@ span[contenteditable="false"] {
 }
 
 .main-logo {
-  width: 150px;
+  width: 279px;
   height: auto;
   cursor: pointer;
   transition: transform 0.2s;
@@ -856,7 +866,7 @@ span[contenteditable="false"] {
   .left,
   .right {
     width: 50%;
-    padding: 0 10mm;
+    padding: 10px 11mm;
   }
 
   /* 편집 효과 제거 */

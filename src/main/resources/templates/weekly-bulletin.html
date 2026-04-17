@@ -426,8 +426,8 @@
                 <h4>로고</h4>
 
                 <div class="control-group">
-                    <label for="logoSize">크기: <span id="logoSizeValue">300px</span></label>
-                    <input type="range" id="logoSize" min="50" max="500" value="300"
+                    <label for="logoSize">크기: <span id="logoSizeValue">279px</span></label>
+                    <input type="range" id="logoSize" min="50" max="500" value="279"
                            oninput="updateLogoSizeRealtime(this.value)">
                 </div>
 
@@ -444,8 +444,8 @@
                 <h4>일러스트</h4>
 
                 <div class="control-group">
-                    <label for="illustrationSize">크기: <span id="illustrationSizeValue">300px</span></label>
-                    <input type="range" id="illustrationSize" min="50" max="500" value="300"
+                    <label for="illustrationSize">크기: <span id="illustrationSizeValue">410px</span></label>
+                    <input type="range" id="illustrationSize" min="50" max="500" value="410"
                            oninput="updateIllustrationSizeRealtime(this.value)">
                 </div>
 
@@ -551,7 +551,11 @@
 
             if (mainLogo) {
                 if (savedLogo) mainLogo.src = savedLogo;
-                if (savedSize) mainLogo.style.width = savedSize + 'px';
+                if (savedSize) {
+                    mainLogo.style.width = savedSize + 'px';
+                } else {
+                    mainLogo.style.width = '279px';
+                }
             }
         } catch (e) {
             console.warn('저장된 로고 설정 불러오기 실패:', e);
@@ -565,7 +569,11 @@
 
             if (mainIllustration) {
                 if (savedIllustration) mainIllustration.src = savedIllustration;
-                if (savedIllustrationSize) mainIllustration.style.width = savedIllustrationSize + 'px';
+                if (savedIllustrationSize) {
+                    mainIllustration.style.width = savedIllustrationSize + 'px';
+                } else {
+                    mainIllustration.style.width = '410px';
+                }
             }
         } catch (e) {
             console.warn('저장된 일러스트 설정 불러오기 실패:', e);
@@ -594,7 +602,7 @@
             logoControls.style.display = 'block';
 
             const mainLogo = document.getElementById('mainLogo');
-            const currentSize = (mainLogo && mainLogo.width) ? mainLogo.width : 300;
+            const currentSize = (mainLogo && mainLogo.width) ? mainLogo.width : 279;
             document.getElementById('logoSize').value = currentSize;
             document.getElementById('logoSizeValue').textContent = currentSize + 'px';
         } else if (type === 'illustration') {
@@ -602,7 +610,7 @@
             illustrationControls.style.display = 'block';
 
             const mainIllustration = document.getElementById('mainIllustration');
-            const currentSize = (mainIllustration && mainIllustration.width) ? mainIllustration.width : 300;
+            const currentSize = (mainIllustration && mainIllustration.width) ? mainIllustration.width : 410;
             document.getElementById('illustrationSize').value = currentSize;
             document.getElementById('illustrationSizeValue').textContent = currentSize + 'px';
         }
@@ -665,12 +673,12 @@
             const mainLogo = document.getElementById('mainLogo');
             if (mainLogo) {
                 mainLogo.src = '/api/bulletin/logo?' + new Date().getTime();
-                mainLogo.style.width = '300px';
+                mainLogo.style.width = '279px';
             }
             localStorage.removeItem('bulletinLogo');
             localStorage.removeItem('bulletinLogoSize');
-            document.getElementById('logoSize').value = 300;
-            document.getElementById('logoSizeValue').textContent = '300px';
+            document.getElementById('logoSize').value = 279;
+            document.getElementById('logoSizeValue').textContent = '279px';
             document.getElementById('logoUpload').value = '';
         }
     }
@@ -680,12 +688,12 @@
             const mainIllustration = document.getElementById('mainIllustration');
             if (mainIllustration) {
                 mainIllustration.src = '/api/bulletin/illustration?' + new Date().getTime();
-                mainIllustration.style.width = '300px';
+                mainIllustration.style.width = '410px';
             }
             localStorage.removeItem('bulletinIllustration');
             localStorage.removeItem('bulletinIllustrationSize');
-            document.getElementById('illustrationSize').value = 300;
-            document.getElementById('illustrationSizeValue').textContent = '300px';
+            document.getElementById('illustrationSize').value = 410;
+            document.getElementById('illustrationSizeValue').textContent = '410px';
             document.getElementById('illustrationUpload').value = '';
         }
     }
