@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.saeanyang'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 description = '주보 관리'
 
 java {
@@ -36,4 +36,70 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// ===== 앱 패키징 (jpackage) =====
+// macOS : ./gradlew packageApp          → build/dist/ChurchManagement.app
+// Windows: ./gradlew packageApp         → build/dist/ChurchManagement/ChurchManagement.exe
+//          ./gradlew packageAppInstaller → build/dist/ChurchManagement-1.0.0.msi  (msi 설치파일)
+tasks.register('packageApp', Exec) {
+	dependsOn 'bootJar'
+	description = 'jpackage로 네이티브 앱 번들을 생성합니다. (macOS: .app  Windows: .exe)'
+
+	def jarName = "church-management-${version}.jar"
+	def jpackageBin = "${System.getProperty('java.home')}/bin/jpackage"
+	def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+
+	doFirst {
+		def distDir = file('build/dist')
+		if (distDir.exists()) distDir.deleteDir()
+		distDir.mkdirs()
+	}
+
+	def cmd = [jpackageBin,
+		'--input', 'build/libs',
+		'--main-jar', jarName,
+		'--name', 'ChurchManagement',
+		'--app-version', version,
+		'--description', '주보 관리',
+		'--type', 'app-image',
+		'--dest', 'build/dist',
+		'--java-options', '-Djava.awt.headless=false',
+		'--java-options', '-Xmx512m']
+
+	if (!isWindows) {
+		// macOS 전용 옵션
+		cmd += ['--java-options', '-Dapple.awt.application.name=ChurchManagement']
+	}
+
+	commandLine cmd
+}
+
+// Windows 전용: MSI 설치 파일 생성 (WiX Toolset 필요)
+tasks.register('packageAppInstaller', Exec) {
+	dependsOn 'bootJar'
+	description = 'Windows용 MSI 설치 파일을 생성합니다. (WiX Toolset 필요)'
+
+	def jarName = "church-management-${version}.jar"
+	def jpackageBin = "${System.getProperty('java.home')}/bin/jpackage"
+
+	doFirst {
+		def distDir = file('build/dist-installer')
+		if (distDir.exists()) distDir.deleteDir()
+		distDir.mkdirs()
+	}
+
+	commandLine jpackageBin,
+		'--input', 'build/libs',
+		'--main-jar', jarName,
+		'--name', 'ChurchManagement',
+		'--app-version', version,
+		'--description', '주보 관리',
+		'--type', 'msi',
+		'--dest', 'build/dist-installer',
+		'--java-options', '-Djava.awt.headless=false',
+		'--java-options', '-Xmx512m',
+		'--win-menu',
+		'--win-shortcut',
+		'--win-dir-chooser'
 }
