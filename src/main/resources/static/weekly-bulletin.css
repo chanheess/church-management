@@ -196,7 +196,7 @@ h2.section-title {
 /* ===== 섹션 ===== */
 .section {
   margin-top: 18px;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.8;
   width: 100%;
 }
@@ -319,7 +319,7 @@ span[contenteditable="false"] {
 
 /* 헌금위원 셀 (셀 통합) */
 .offering-member-cell {
-  vertical-align: bottom;
+  vertical-align: middle;
 }
 
 /* 첫 번째 행의 날짜 헤더 (colspan=2) */
@@ -356,7 +356,7 @@ span[contenteditable="false"] {
 .notice-list {
   margin: 10px 0 0 18px;
   padding: 0;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.6;
   width: 100%;
   text-align: left;
@@ -424,7 +424,7 @@ span[contenteditable="false"] {
   background-color: #f5f3ea;
   border-radius: 6px;
   padding: 10px 14px;
-  font-size: 14px;
+  font-size: 13px;
   text-align: left;
 }
 
