@@ -22,11 +22,18 @@
             <span>&#8250;</span>
         </button>
     </div>
+    <form class="date-nav" method="get" action="/bulletin">
+        <label for="bulletinDatePicker"></label>
+        <input type="date" id="bulletinDatePicker" name="date" class="date-picker"
+               th:value="${selectedDate}" required>
+        <button type="submit" class="date-submit-btn">조회</button>
+    </form>
     <div class="zoom-control-inline">
         <button id="zoom-out" class="zoom-btn">−</button>
         <input type="range" id="zoom-slider" min="50" max="150" value="80" step="5">
         <button id="zoom-in" class="zoom-btn">+</button>
         <button id="print-btn" class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
+        <button class="settings-nav-btn" onclick="openSettingsPanel()">⚙ 설정</button>
     </div>
 </div>
 
@@ -452,6 +459,34 @@
 
         </div>
     </div>
+    <!-- ===== 경로 설정 패널 ===== -->
+    <div id="settingsPanel" class="edit-panel" hidden>
+        <div class="panel-header">
+            <strong id="settingsPanelTitle">경로 설정</strong>
+            <button class="panel-close" type="button" onclick="closeSettingsPanel()">×</button>
+        </div>
+        <div class="panel-body">
+            <div class="control-section" style="display:block;">
+                <div class="control-group">
+                    <label for="excelPathInput">엑셀 파일 경로</label>
+                    <input type="text" id="excelPathInput" class="path-input" placeholder="/path/to/file.xlsx">
+                </div>
+                <div class="control-group">
+                    <label for="logoPathInput">로고 이미지 경로</label>
+                    <input type="text" id="logoPathInput" class="path-input" placeholder="/path/to/logo.png">
+                </div>
+                <div class="control-group">
+                    <label for="illustrationFolderInput">주보 이미지 폴더 경로</label>
+                    <input type="text" id="illustrationFolderInput" class="path-input" placeholder="/path/to/folder">
+                </div>
+                <div class="settings-btn-row">
+                    <button class="save-settings-btn" type="button" onclick="savePathsConfig()">저장 후 새로고침</button>
+                    <button class="reset-btn" type="button" onclick="closeSettingsPanel()">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="excelPopup" class="hover-popup" hidden>
         <div class="hover-popup-header">
             <span class="hover-popup-dot"></span>
@@ -656,8 +691,55 @@
     }
 
     document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') closePanel();
+        if (event.key === 'Escape') {
+            closePanel();
+            closeSettingsPanel();
+        }
     });
+
+    // ===== 경로 설정 패널 =====
+    function openSettingsPanel() {
+        closePanel();
+        hideEditTooltip();
+
+        fetch('/api/config/paths')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('excelPathInput').value = data.excelPath || '';
+                document.getElementById('logoPathInput').value = data.logoPath || '';
+                document.getElementById('illustrationFolderInput').value = data.illustrationFolder || '';
+            })
+            .catch(err => console.error('경로 설정 불러오기 실패:', err));
+
+        document.getElementById('settingsPanel').hidden = false;
+    }
+
+    function closeSettingsPanel() {
+        document.getElementById('settingsPanel').hidden = true;
+    }
+
+    function savePathsConfig() {
+        const excelPath = document.getElementById('excelPathInput').value.trim();
+        const logoPath = document.getElementById('logoPathInput').value.trim();
+        const illustrationFolder = document.getElementById('illustrationFolderInput').value.trim();
+
+        fetch('/api/config/paths', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ excelPath, logoPath, illustrationFolder })
+        })
+        .then(r => {
+            if (r.ok) {
+                location.reload();
+            } else {
+                alert('저장에 실패했습니다.');
+            }
+        })
+        .catch(err => {
+            console.error('경로 저장 실패:', err);
+            alert('저장에 실패했습니다.');
+        });
+    }
 
     // ===== 간사/목자 호버 안내 (표 전체 영역) =====
     (function initExcelHoverHint() {

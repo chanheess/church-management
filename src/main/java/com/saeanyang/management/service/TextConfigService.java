@@ -185,6 +185,19 @@ public class TextConfigService {
         EditableTextConfig config = loadConfig();
         return config.getAdditionalFields().getOrDefault(key, defaultValue);
     }
+
+    /** 파일 경로 설정 조회 (없으면 defaultValue 반환) */
+    public String getPathConfig(String key, String defaultValue) {
+        String value = loadConfig().getAdditionalFields().get("__path_" + key);
+        return (value != null && !value.isBlank()) ? value : defaultValue;
+    }
+
+    /** 파일 경로 설정 일괄 저장 */
+    public void updatePathConfigs(String excelPath, String logoPath, String illustrationFolder) {
+        if (excelPath != null) updateField("__path_excelPath", excelPath);
+        if (logoPath != null) updateField("__path_logoPath", logoPath);
+        if (illustrationFolder != null) updateField("__path_illustrationFolder", illustrationFolder);
+    }
 }
 
 

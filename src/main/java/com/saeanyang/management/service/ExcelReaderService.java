@@ -33,6 +33,10 @@ public class ExcelReaderService {
     }
 
     public BulletinData readBulletinData(String filePath) throws IOException {
+        return readBulletinData(filePath, getCurrentWeekSunday());
+    }
+
+    public BulletinData readBulletinData(String filePath, LocalDate targetSunday) throws IOException {
         BulletinData bulletinData = new BulletinData();
 
         try (FileInputStream fis = new FileInputStream(filePath);
@@ -44,7 +48,7 @@ public class ExcelReaderService {
                 System.out.println("시트 " + i + ": " + workbook.getSheetName(i));
             }
 
-            LocalDate sunday = getCurrentWeekSunday();
+            LocalDate sunday = targetSunday;
             Sheet sheet = findRosterSheet(workbook, sunday.getYear());
 
             // 하드코딩된 값 설정 (엑셀에 없는 정보)
@@ -115,13 +119,23 @@ public class ExcelReaderService {
             }
 
             try {
-                // 생일 파싱 (MM-dd, M-d, MM/dd, M/d 등 다양한 형식 지원)
-                String cleaned = birthdayStr.trim().replace("/", "-");
+                // 구분자(-, /, .)를 모두 -로 통일 후 파싱
+                String cleaned = birthdayStr.trim().replace("/", "-").replace(".", "-");
                 String[] parts = cleaned.split("-");
-                if (parts.length != 2) continue;
 
-                int month = Integer.parseInt(parts[0].trim());
-                int day = Integer.parseInt(parts[1].trim());
+                int month, day;
+                if (parts.length == 2) {
+                    // M-d 또는 MM-dd 형식
+                    month = Integer.parseInt(parts[0].trim());
+                    day = Integer.parseInt(parts[1].trim());
+                } else if (parts.length == 3) {
+                    // yyyy-M-d 또는 yy-M-d 형식: 앞 파트가 연도
+                    month = Integer.parseInt(parts[1].trim());
+                    day = Integer.parseInt(parts[2].trim());
+                } else {
+                    System.out.println("  → 생일 파싱 실패: " + person.getName() + ", 생일값: " + birthdayStr);
+                    continue;
+                }
 
                 // 이번 주 범위 안에 생일이 있는지 확인
                 LocalDate birthThisYear = LocalDate.of(weekStart.getYear(), month, day);
@@ -221,7 +235,7 @@ public class ExcelReaderService {
             if (header.contains("직분")) positionCol = i;
             if (header.contains("목장")) groupCol = i;
             if (header.contains("셀")) cellCol = i;
-            if (header.contains("생일")) birthdayCol = i;
+            if (header.contains("생일") || header.contains("생년월일")) birthdayCol = i;
             if (header.contains("상태")) statusCol = i;
         }
 
@@ -243,7 +257,7 @@ public class ExcelReaderService {
             String positionStr = positionCol >= 0 ? getCellValue(row, positionCol) : "";
             String group = groupCol >= 0 ? getCellValue(row, groupCol) : "";
             String cell = cellCol >= 0 ? getCellValue(row, cellCol) : "";
-            String birthday = birthdayCol >= 0 ? getCellValue(row, birthdayCol) : "";
+            String birthday = birthdayCol >= 0 ? getBirthdayValue(row, birthdayCol) : "";
             String status = statusCol >= 0 ? getCellValue(row, statusCol) : "";
 
             // 이름이 없으면 스킵

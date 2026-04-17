@@ -19,13 +19,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +58,29 @@ public class BulletinController {
         this.representativePrayerService = representativePrayerService;
     }
 
+    // ===== 경로 설정 API =====
+
+    public record PathsConfig(String excelPath, String logoPath, String illustrationFolder) {}
+    public record PathsUpdateRequest(String excelPath, String logoPath, String illustrationFolder) {}
+
+    @GetMapping("/api/config/paths")
+    @ResponseBody
+    public PathsConfig getPathsConfig() {
+        return new PathsConfig(
+            textConfigService.getPathConfig("excelPath", excelFilePath),
+            textConfigService.getPathConfig("logoPath", logoFilePath),
+            textConfigService.getPathConfig("illustrationFolder", illustrationFolder)
+        );
+    }
+
+    @PostMapping("/api/config/paths")
+    @ResponseBody
+    public ResponseEntity<Void> updatePathsConfig(@RequestBody PathsUpdateRequest request) {
+        if (request == null) return ResponseEntity.badRequest().build();
+        textConfigService.updatePathConfigs(request.excelPath(), request.logoPath(), request.illustrationFolder());
+        return ResponseEntity.ok().build();
+    }
+
     /** 텍스트 한 항목을 서버 쪽 설정 파일에 저장 */
     @PostMapping("/api/bulletin/text-config")
     public ResponseEntity<Void> updateText(@RequestBody TextUpdateRequest request) {
@@ -68,10 +94,23 @@ public class BulletinController {
     /** 텍스트 단일 항목 업데이트용 요청 바디 */
     public record TextUpdateRequest(String key, String value) {}
 
+    private String effectiveExcelPath() {
+        return textConfigService.getPathConfig("excelPath", excelFilePath);
+    }
+
+    private String effectiveLogoPath() {
+        return textConfigService.getPathConfig("logoPath", logoFilePath);
+    }
+
+    private String effectiveIllustrationFolder() {
+        return textConfigService.getPathConfig("illustrationFolder", illustrationFolder);
+    }
+
     @GetMapping("/bulletin")
-    public String showBulletin(Model model) {
+    public String showBulletin(@RequestParam(value = "date", required = false) String date, Model model) {
         try {
-            BulletinData bulletinData = excelReaderService.readBulletinData(excelFilePath);
+            LocalDate targetSunday = parseBulletinDate(date);
+            BulletinData bulletinData = excelReaderService.readBulletinData(effectiveExcelPath(), targetSunday);
             // 서버에 저장된 텍스트 설정 반영
             EditableTextConfig textConfig = textConfigService.loadConfig();
             bulletinData.setHeadPastor(textConfig.getHeadPastor());
@@ -96,17 +135,32 @@ public class BulletinController {
 
             model.addAttribute("bulletin", bulletinData);
             model.addAttribute("textConfig", textConfig);
+            model.addAttribute("selectedDate", targetSunday.toString());
         } catch (IOException e) {
             model.addAttribute("error", "엑셀 파일을 읽을 수 없습니다: " + e.getMessage());
         }
         return "weekly-bulletin";
     }
 
+    private LocalDate parseBulletinDate(String date) {
+        if (date == null || date.trim().isEmpty()) {
+            LocalDate today = LocalDate.now();
+            return today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        }
+        try {
+            LocalDate parsed = LocalDate.parse(date.trim());
+            return parsed.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        } catch (DateTimeParseException e) {
+            LocalDate today = LocalDate.now();
+            return today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        }
+    }
+
     @GetMapping("/attendance")
     public String showAttendance(@RequestParam(value = "month", required = false) String month, Model model) {
         try {
             YearMonth selectedMonth = parseAttendanceMonth(month);
-            List<CellGroup> cellGroups = excelReaderService.readAttendanceData(excelFilePath, selectedMonth);
+            List<CellGroup> cellGroups = excelReaderService.readAttendanceData(effectiveExcelPath(), selectedMonth);
             model.addAttribute("cellGroups", cellGroups);
             model.addAttribute("selectedMonthInput", selectedMonth.toString()); // yyyy-MM
         } catch (IOException e) {
@@ -129,7 +183,7 @@ public class BulletinController {
     /** ===== 로고 ===== */
     @GetMapping("/api/bulletin/logo")
     public ResponseEntity<Resource> getLogo() throws IOException {
-        File logoFile = new File(logoFilePath);
+        File logoFile = new File(effectiveLogoPath());
 
         if (!logoFile.exists()) {
             return ResponseEntity.notFound().build();
@@ -141,7 +195,7 @@ public class BulletinController {
     /** ===== 일러스트 (날짜 기반 선택) ===== */
     @GetMapping("/api/bulletin/illustration")
     public ResponseEntity<Resource> getIllustration() throws IOException {
-        File folder = new File(illustrationFolder);
+        File folder = new File(effectiveIllustrationFolder());
 
         if (!folder.exists() || !folder.isDirectory()) {
             return ResponseEntity.notFound().build();
