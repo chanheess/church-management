@@ -95,7 +95,7 @@ h2.section-title {
 
 /* ===== 조직도 박스 ===== */
 .org-box {
-  background: #f5f3ea;
+  background: #eee9d1;
   border-radius: 20px;
   padding: 18px;
   font-size: 13px;
@@ -156,8 +156,8 @@ h2.section-title {
 
 .org-box th,
 .org-box td {
-  border: 1px solid #ffffff;
-  padding: 8px;
+  border: 2px solid #ffffff;
+  padding: 7px;
   text-align: center;
   vertical-align: middle;
 }
@@ -191,6 +191,7 @@ h2.section-title {
 .org-footer {
   margin-top: 12px;
   font-weight: bold;
+  text-align: center;
 }
 
 /* ===== 섹션 ===== */
@@ -253,7 +254,7 @@ h2.section-title {
 
 .service-table th {
   width: 20%;
-  background-color: #f5f3ea;
+  background-color: #eee9d1;
   font-weight: bold;
 }
 
@@ -301,7 +302,7 @@ h2.section-title {
 }
 
 .offering-table th {
-  background-color: #f5f3ea;
+  background-color: #eee9d1;
   font-weight: bold;
 }
 
@@ -357,7 +358,7 @@ span[contenteditable="false"] {
   margin: 10px 0 0 18px;
   padding: 0;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: var(--notice-line-height, 1.6);
   width: 100%;
   text-align: left;
   list-style-position: outside;
@@ -421,7 +422,7 @@ span[contenteditable="false"] {
 }
 
 .blessing-box {
-  background-color: #f5f3ea;
+  background-color: #eee9d1;
   border-radius: 6px;
   padding: 10px 14px;
   font-size: 13px;
@@ -609,7 +610,8 @@ span[contenteditable="false"] {
 }
 
 #logoSizeValue,
-#illustrationSizeValue {
+#illustrationSizeValue,
+#noticeLineHeightValue {
   float: right;
   color: #4CAF50;
   font-weight: bold;
