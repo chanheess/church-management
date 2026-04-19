@@ -138,7 +138,7 @@
             cell.addEventListener('dragstart', function (e) {
                 dragSrc = {
                     date: this.dataset.date,
-                    name: this.dataset.name,
+                    name: this.textContent.trim(),
                     label: this.dataset.label
                 };
                 this.classList.add('is-dragging');
@@ -169,36 +169,38 @@
                 this.classList.remove('drag-over');
                 if (!dragSrc || this.dataset.date === dragSrc.date) return;
 
-                var tgt = {
-                    date: this.dataset.date,
-                    name: this.dataset.name,
-                    label: this.dataset.label
-                };
+                // await 전에 모든 값을 로컬 변수로 캡처 (dragend가 먼저 실행돼 dragSrc=null이 되는 것을 방지)
+                var srcDate = dragSrc.date;
+                var srcName = dragSrc.name;
+                var srcLabel = dragSrc.label;
+                var tgtDate = this.dataset.date;
+                var tgtName = this.textContent.trim();
+                var tgtLabel = this.dataset.label;
 
                 var confirmed = confirm(
-                    dragSrc.label + '  ' + dragSrc.name + '\n↕\n' +
-                    tgt.label + '  ' + tgt.name + '\n\n두 주일을 스왑하시겠습니까?'
+                    srcLabel + '  ' + srcName + '\n↕\n' +
+                    tgtLabel + '  ' + tgtName + '\n\n두 주일을 스왑하시겠습니까?'
                 );
                 if (!confirmed) return;
 
                 try {
-                    var res = await fetch('/api/representative-prayer/swap', {
-                        method: 'POST',
+                    var res1 = await fetch('/api/representative-prayer/override', {
+                        method: 'PUT',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({dateA: dragSrc.date, dateB: tgt.date})
+                        body: JSON.stringify({date: srcDate, name: tgtName})
                     });
-                    if (res.ok) {
+                    var res2 = await fetch('/api/representative-prayer/override', {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({date: tgtDate, name: srcName})
+                    });
+                    if (res1.ok && res2.ok) {
                         window.location.reload();
                         return;
                     }
-                    var msg = '스왑에 실패했습니다.';
-                    try {
-                        var j = await res.json();
-                        if (j && j.message) msg = j.message;
-                    } catch (ignored) { }
-                    alert(msg);
+                    alert('스왑에 실패했습니다.');
                 } catch (err) {
-                    alert('요청 중 오류가 발생했습니다.');
+                    alert('요청 중 오류: ' + err.message);
                 }
             });
         });
@@ -206,7 +208,7 @@
         document.querySelectorAll('.cell-prayer[data-date]').forEach(function (cell) {
             cell.addEventListener('click', function () {
                 if (this.querySelector('input')) return;
-                var original = this.dataset.name || this.textContent.trim();
+                var original = this.textContent.trim();
                 var date = this.dataset.date;
                 var td = this;
 
