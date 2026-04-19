@@ -312,6 +312,11 @@ body{
 }
 
 @media print{
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   /*
    * 헤더·스크립트·확장프로그램이 body에 붙인 형제 노드는 인쇄에서 제외.
    * (예: "설정에서 퀵메뉴를…" — 앱 코드가 아닌 확장/OS 도우미 UI가 미리보기에 찍히는 경우)
