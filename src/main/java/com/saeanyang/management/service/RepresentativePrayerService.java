@@ -80,8 +80,11 @@ public class RepresentativePrayerService {
             throws IOException {
         List<Person> people = readPeopleForYear(year);
         List<String> rotation = buildRotationOrder(people);
-        Map<LocalDate, String> base = buildBaseSchedule(year, rotation, cfg.getDateOverrides(), cfg.getNameOverrides());
-        Map<LocalDate, String> resolved = applySwaps(base, cfg.getSwaps());
+        // 적용 순서: base(순번) → swap → nameOverride
+        // nameOverride가 swap보다 나중에 적용되어야 override 값이 swap에 의해 뒤바뀌지 않음
+        Map<LocalDate, String> base = buildBaseSchedule(year, rotation, cfg.getDateOverrides());
+        Map<LocalDate, String> afterSwaps = applySwaps(base, cfg.getSwaps());
+        Map<LocalDate, String> resolved = applyNameOverrides(afterSwaps, cfg.getNameOverrides());
 
         List<LocalDate> sundays = sundaysInYear(year);
         Map<LocalDate, LocalDate> partner = swapPartnerMap(cfg.getSwaps());
@@ -187,8 +190,9 @@ public class RepresentativePrayerService {
         RepresentativePrayerConfig cfg = loadAndPruneConfig();
         List<Person> people = readPeopleForYear(year);
         List<String> rotation = buildRotationOrder(people);
-        Map<LocalDate, String> base = buildBaseSchedule(year, rotation, cfg.getDateOverrides(), cfg.getNameOverrides());
-        Map<LocalDate, String> resolved = applySwaps(base, cfg.getSwaps());
+        Map<LocalDate, String> base = buildBaseSchedule(year, rotation, cfg.getDateOverrides());
+        Map<LocalDate, String> afterSwaps = applySwaps(base, cfg.getSwaps());
+        Map<LocalDate, String> resolved = applyNameOverrides(afterSwaps, cfg.getNameOverrides());
         return resolved.getOrDefault(sunday, "-");
     }
 
@@ -204,8 +208,9 @@ public class RepresentativePrayerService {
         RepresentativePrayerConfig cfg = loadAndPruneConfig();
         List<Person> people = readPeopleForYear(year);
         List<String> rotation = buildRotationOrder(people);
-        Map<LocalDate, String> base = buildBaseSchedule(year, rotation, cfg.getDateOverrides(), cfg.getNameOverrides());
-        Map<LocalDate, String> resolved = applySwaps(base, cfg.getSwaps());
+        Map<LocalDate, String> base = buildBaseSchedule(year, rotation, cfg.getDateOverrides());
+        Map<LocalDate, String> afterSwaps = applySwaps(base, cfg.getSwaps());
+        Map<LocalDate, String> resolved = applyNameOverrides(afterSwaps, cfg.getNameOverrides());
 
         LocalDate first = LocalDate.of(year, month, 1);
         LocalDate last = first.with(TemporalAdjusters.lastDayOfMonth());
@@ -309,8 +314,7 @@ public class RepresentativePrayerService {
     }
 
     private Map<LocalDate, String> buildBaseSchedule(int year, List<String> rotation,
-                                                     Map<String, String> dateOverrides,
-                                                     Map<String, String> nameOverrides) {
+                                                     Map<String, String> dateOverrides) {
         Map<LocalDate, String> map = new LinkedHashMap<>();
         List<LocalDate> sundays = sundaysInYear(year);
         if (rotation.isEmpty()) {
@@ -327,16 +331,26 @@ public class RepresentativePrayerService {
                 // 특수 문구(추석 등) — 순번 소비 없음
                 map.put(sun, dateOverrides.get(key));
             } else {
-                String person = rotation.get(rotIndex % rotation.size());
-                // 직접 입력한 이름 — 순번은 소비하되 표시 이름만 변경
-                if (nameOverrides != null && nameOverrides.containsKey(key)) {
-                    map.put(sun, nameOverrides.get(key));
-                } else {
-                    map.put(sun, person);
-                }
+                map.put(sun, rotation.get(rotIndex % rotation.size()));
                 rotIndex++;
             }
         }
+        return map;
+    }
+
+    // nameOverride는 swap보다 나중에 적용 — swap 결과를 덮어써야 함
+    private Map<LocalDate, String> applyNameOverrides(Map<LocalDate, String> resolved,
+                                                      Map<String, String> nameOverrides) {
+        if (nameOverrides == null || nameOverrides.isEmpty()) return resolved;
+        Map<LocalDate, String> map = new LinkedHashMap<>(resolved);
+        nameOverrides.forEach((key, value) -> {
+            try {
+                LocalDate date = LocalDate.parse(key);
+                if (value != null && !value.isBlank()) {
+                    map.put(date, value);
+                }
+            } catch (Exception ignored) {}
+        });
         return map;
     }
 
