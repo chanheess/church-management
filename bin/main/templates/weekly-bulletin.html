@@ -22,11 +22,18 @@
             <span>&#8250;</span>
         </button>
     </div>
+    <form class="date-nav" method="get" action="/bulletin">
+        <label for="bulletinDatePicker"></label>
+        <input type="date" id="bulletinDatePicker" name="date" class="date-picker"
+               th:value="${selectedDate}" required>
+        <button type="submit" class="date-submit-btn">조회</button>
+    </form>
     <div class="zoom-control-inline">
         <button id="zoom-out" class="zoom-btn">−</button>
         <input type="range" id="zoom-slider" min="50" max="150" value="80" step="5">
         <button id="zoom-in" class="zoom-btn">+</button>
         <button id="print-btn" class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
+        <button class="settings-nav-btn" onclick="openSettingsPanel()">⚙ 설정</button>
     </div>
 </div>
 
@@ -227,9 +234,8 @@
                                   th:utext="${textConfig.additionalFields.get('prayer_topic') ?: ''}"></span>
                         </td>
                         <td>
-                            <span class="editable-text" contenteditable="true" data-text-key="prayer_leader"
-                                  th:classappend="${bulletin != null && bulletin.representativePrayerLeader != null && !#strings.isEmpty(bulletin.representativePrayerLeader) && bulletin.representativePrayerLeader != '-'} ? ' no-blur-persist' : ''"
-                                  th:utext="${(bulletin != null && bulletin.representativePrayerLeader != null && !#strings.isEmpty(bulletin.representativePrayerLeader) && bulletin.representativePrayerLeader != '-') ? bulletin.representativePrayerLeader : (textConfig.additionalFields.get('prayer_leader') ?: '김태관 인턴')}">김태관 인턴</span>
+                            <span contenteditable="false"
+                                  th:text="${(bulletin != null && bulletin.representativePrayerLeader != null && bulletin.representativePrayerLeader != '-') ? bulletin.representativePrayerLeader : '-'}">-</span>
                         </td>
                     </tr>
                     <tr>
@@ -321,15 +327,13 @@
                             <td>
                                 <span contenteditable="false" th:text="${date}">7일</span>
                             </td>
-                            <td th:with="prayKey=${'offering_prayer_' + (iterStat.index + 1)},cfgPray=${textConfig.additionalFields != null ? textConfig.additionalFields.get(prayKey) : null},autoPray=${bulletin.monthlyRepresentativePrayers != null && iterStat.index &lt; #lists.size(bulletin.monthlyRepresentativePrayers) ? bulletin.monthlyRepresentativePrayers.get(iterStat.index) : null},fallbackPray=${iterStat.index == 0 ? '박찬희 리더' : (iterStat.index == 1 ? '김태관 인턴' : (iterStat.index == 2 ? '김소원 인턴' : (iterStat.index == 3 ? '황소연 인턴' : '-')))},showAuto=${(cfgPray == null || #strings.isEmpty(cfgPray)) &amp;&amp; autoPray != null &amp;&amp; !#strings.isEmpty(autoPray) &amp;&amp; autoPray != '-'},displayPray=${(cfgPray != null &amp;&amp; !#strings.isEmpty(cfgPray)) ? cfgPray : (showAuto ? autoPray : fallbackPray)}">
-                                <span class="editable-text" contenteditable="true"
-                                      th:attr="data-text-key=${prayKey}"
-                                      th:classappend="${showAuto} ? ' no-blur-persist' : ''"
-                                      th:utext="${displayPray}">박찬희 리더</span>
+                            <td>
+                                <span contenteditable="false"
+                                      th:text="${bulletin.monthlyRepresentativePrayers != null && iterStat.index < #lists.size(bulletin.monthlyRepresentativePrayers) ? bulletin.monthlyRepresentativePrayers.get(iterStat.index) : '-'}">-</span>
                             </td>
                             <td th:if="${iterStat.first}" th:attr="rowspan=${#lists.size(bulletin.offeringDates)}" class="offering-member-cell">
-                                <span class="editable-text" contenteditable="true" data-text-key="offering_member_all"
-                                      th:utext="${textConfig.additionalFields.get('offering_member_all') ?: '-'}">-</span>
+                                <span contenteditable="false"
+                                      th:text="${bulletin.monthlyOfferingText != null && bulletin.monthlyOfferingText != '—' ? bulletin.monthlyOfferingText : '-'}">-</span>
                             </td>
                         </tr>
                     </table>
@@ -422,8 +426,8 @@
                 <h4>로고</h4>
 
                 <div class="control-group">
-                    <label for="logoSize">크기: <span id="logoSizeValue">300px</span></label>
-                    <input type="range" id="logoSize" min="50" max="500" value="300"
+                    <label for="logoSize">크기: <span id="logoSizeValue">279px</span></label>
+                    <input type="range" id="logoSize" min="50" max="500" value="279"
                            oninput="updateLogoSizeRealtime(this.value)">
                 </div>
 
@@ -440,8 +444,8 @@
                 <h4>일러스트</h4>
 
                 <div class="control-group">
-                    <label for="illustrationSize">크기: <span id="illustrationSizeValue">300px</span></label>
-                    <input type="range" id="illustrationSize" min="50" max="500" value="300"
+                    <label for="illustrationSize">크기: <span id="illustrationSizeValue">410px</span></label>
+                    <input type="range" id="illustrationSize" min="50" max="500" value="410"
                            oninput="updateIllustrationSizeRealtime(this.value)">
                 </div>
 
@@ -453,8 +457,48 @@
                 <button class="reset-btn" type="button" onclick="resetIllustration()">초기화</button>
             </div>
 
+            <div id="noticeControls" class="control-section" style="display:none;">
+                <h4>광고</h4>
+
+                <div class="control-group">
+                    <label for="noticeLineHeight">줄간격: <span id="noticeLineHeightValue">1.6</span></label>
+                    <input type="range" id="noticeLineHeight" min="1.1" max="1.8" step="0.05" value="1.6"
+                           oninput="updateNoticeLineHeightRealtime(this.value)">
+                </div>
+
+                <button class="reset-btn" type="button" onclick="resetNoticeLineHeight()">기본값으로 초기화</button>
+            </div>
+
         </div>
     </div>
+    <!-- ===== 경로 설정 패널 ===== -->
+    <div id="settingsPanel" class="edit-panel" hidden>
+        <div class="panel-header">
+            <strong id="settingsPanelTitle">경로 설정</strong>
+            <button class="panel-close" type="button" onclick="closeSettingsPanel()">×</button>
+        </div>
+        <div class="panel-body">
+            <div class="control-section" style="display:block;">
+                <div class="control-group">
+                    <label for="excelPathInput">엑셀 파일 경로</label>
+                    <input type="text" id="excelPathInput" class="path-input" placeholder="/path/to/file.xlsx">
+                </div>
+                <div class="control-group">
+                    <label for="logoPathInput">로고 이미지 경로</label>
+                    <input type="text" id="logoPathInput" class="path-input" placeholder="/path/to/logo.png">
+                </div>
+                <div class="control-group">
+                    <label for="illustrationFolderInput">주보 이미지 폴더 경로</label>
+                    <input type="text" id="illustrationFolderInput" class="path-input" placeholder="/path/to/folder">
+                </div>
+                <div class="settings-btn-row">
+                    <button class="save-settings-btn" type="button" onclick="savePathsConfig()">저장 후 새로고침</button>
+                    <button class="reset-btn" type="button" onclick="closeSettingsPanel()">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="excelPopup" class="hover-popup" hidden>
         <div class="hover-popup-header">
             <span class="hover-popup-dot"></span>
@@ -519,7 +563,11 @@
 
             if (mainLogo) {
                 if (savedLogo) mainLogo.src = savedLogo;
-                if (savedSize) mainLogo.style.width = savedSize + 'px';
+                if (savedSize) {
+                    mainLogo.style.width = savedSize + 'px';
+                } else {
+                    mainLogo.style.width = '279px';
+                }
             }
         } catch (e) {
             console.warn('저장된 로고 설정 불러오기 실패:', e);
@@ -533,10 +581,22 @@
 
             if (mainIllustration) {
                 if (savedIllustration) mainIllustration.src = savedIllustration;
-                if (savedIllustrationSize) mainIllustration.style.width = savedIllustrationSize + 'px';
+                if (savedIllustrationSize) {
+                    mainIllustration.style.width = savedIllustrationSize + 'px';
+                } else {
+                    mainIllustration.style.width = '410px';
+                }
             }
         } catch (e) {
             console.warn('저장된 일러스트 설정 불러오기 실패:', e);
+        }
+
+        try {
+            const savedNoticeLineHeight = localStorage.getItem('bulletinNoticeLineHeight');
+            const lineHeight = savedNoticeLineHeight || '1.6';
+            applyNoticeLineHeight(lineHeight);
+        } catch (e) {
+            console.warn('저장된 광고 줄간격 설정 불러오기 실패:', e);
         }
     });
 
@@ -552,17 +612,19 @@
         const panel = document.getElementById('editPanel');
         const logoControls = document.getElementById('logoControls');
         const illustrationControls = document.getElementById('illustrationControls');
+        const noticeControls = document.getElementById('noticeControls');
         const panelTitle = document.getElementById('panelTitle');
 
         logoControls.style.display = 'none';
         illustrationControls.style.display = 'none';
+        noticeControls.style.display = 'none';
 
         if (type === 'logo') {
             panelTitle.textContent = '로고 편집';
             logoControls.style.display = 'block';
 
             const mainLogo = document.getElementById('mainLogo');
-            const currentSize = (mainLogo && mainLogo.width) ? mainLogo.width : 300;
+            const currentSize = (mainLogo && mainLogo.width) ? mainLogo.width : 279;
             document.getElementById('logoSize').value = currentSize;
             document.getElementById('logoSizeValue').textContent = currentSize + 'px';
         } else if (type === 'illustration') {
@@ -570,9 +632,20 @@
             illustrationControls.style.display = 'block';
 
             const mainIllustration = document.getElementById('mainIllustration');
-            const currentSize = (mainIllustration && mainIllustration.width) ? mainIllustration.width : 300;
+            const currentSize = (mainIllustration && mainIllustration.width) ? mainIllustration.width : 410;
             document.getElementById('illustrationSize').value = currentSize;
             document.getElementById('illustrationSizeValue').textContent = currentSize + 'px';
+        } else if (type === 'notice') {
+            panelTitle.textContent = '광고 편집';
+            noticeControls.style.display = 'block';
+
+            const noticeList = document.getElementById('noticeList');
+            const currentLineHeight = noticeList
+                ? parseFloat(window.getComputedStyle(noticeList).lineHeight) / parseFloat(window.getComputedStyle(noticeList).fontSize)
+                : 1.6;
+            const normalizedLineHeight = Number.isFinite(currentLineHeight) ? currentLineHeight.toFixed(2) : '1.6';
+            document.getElementById('noticeLineHeight').value = normalizedLineHeight;
+            document.getElementById('noticeLineHeightValue').textContent = normalizedLineHeight;
         }
 
         panel.hidden = false;
@@ -596,6 +669,22 @@
         if (mainIllustration) mainIllustration.style.width = value + 'px';
         document.getElementById('illustrationSizeValue').textContent = value + 'px';
         try { localStorage.setItem('bulletinIllustrationSize', value); } catch (e) {}
+    }
+
+    function applyNoticeLineHeight(value) {
+        const noticeList = document.getElementById('noticeList');
+        if (noticeList) {
+            noticeList.style.setProperty('--notice-line-height', value);
+        }
+        const valueLabel = document.getElementById('noticeLineHeightValue');
+        const slider = document.getElementById('noticeLineHeight');
+        if (valueLabel) valueLabel.textContent = value;
+        if (slider) slider.value = value;
+    }
+
+    function updateNoticeLineHeightRealtime(value) {
+        applyNoticeLineHeight(value);
+        try { localStorage.setItem('bulletinNoticeLineHeight', value); } catch (e) {}
     }
 
     function uploadLogoRealtime(event) {
@@ -633,12 +722,12 @@
             const mainLogo = document.getElementById('mainLogo');
             if (mainLogo) {
                 mainLogo.src = '/api/bulletin/logo?' + new Date().getTime();
-                mainLogo.style.width = '300px';
+                mainLogo.style.width = '279px';
             }
             localStorage.removeItem('bulletinLogo');
             localStorage.removeItem('bulletinLogoSize');
-            document.getElementById('logoSize').value = 300;
-            document.getElementById('logoSizeValue').textContent = '300px';
+            document.getElementById('logoSize').value = 279;
+            document.getElementById('logoSizeValue').textContent = '279px';
             document.getElementById('logoUpload').value = '';
         }
     }
@@ -648,19 +737,71 @@
             const mainIllustration = document.getElementById('mainIllustration');
             if (mainIllustration) {
                 mainIllustration.src = '/api/bulletin/illustration?' + new Date().getTime();
-                mainIllustration.style.width = '300px';
+                mainIllustration.style.width = '410px';
             }
             localStorage.removeItem('bulletinIllustration');
             localStorage.removeItem('bulletinIllustrationSize');
-            document.getElementById('illustrationSize').value = 300;
-            document.getElementById('illustrationSizeValue').textContent = '300px';
+            document.getElementById('illustrationSize').value = 410;
+            document.getElementById('illustrationSizeValue').textContent = '410px';
             document.getElementById('illustrationUpload').value = '';
         }
     }
 
+    function resetNoticeLineHeight() {
+        applyNoticeLineHeight('1.6');
+        localStorage.removeItem('bulletinNoticeLineHeight');
+    }
+
     document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') closePanel();
+        if (event.key === 'Escape') {
+            closePanel();
+            closeSettingsPanel();
+        }
     });
+
+    // ===== 경로 설정 패널 =====
+    function openSettingsPanel() {
+        closePanel();
+        hideEditTooltip();
+
+        fetch('/api/config/paths')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('excelPathInput').value = data.excelPath || '';
+                document.getElementById('logoPathInput').value = data.logoPath || '';
+                document.getElementById('illustrationFolderInput').value = data.illustrationFolder || '';
+            })
+            .catch(err => console.error('경로 설정 불러오기 실패:', err));
+
+        document.getElementById('settingsPanel').hidden = false;
+    }
+
+    function closeSettingsPanel() {
+        document.getElementById('settingsPanel').hidden = true;
+    }
+
+    function savePathsConfig() {
+        const excelPath = document.getElementById('excelPathInput').value.trim();
+        const logoPath = document.getElementById('logoPathInput').value.trim();
+        const illustrationFolder = document.getElementById('illustrationFolderInput').value.trim();
+
+        fetch('/api/config/paths', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ excelPath, logoPath, illustrationFolder })
+        })
+        .then(r => {
+            if (r.ok) {
+                location.reload();
+            } else {
+                alert('저장에 실패했습니다.');
+            }
+        })
+        .catch(err => {
+            console.error('경로 저장 실패:', err);
+            alert('저장에 실패했습니다.');
+        });
+    }
 
     // ===== 간사/목자 호버 안내 (표 전체 영역) =====
     (function initExcelHoverHint() {
@@ -833,6 +974,11 @@
 
         // 포커스 시 툴팁 표시
         el.addEventListener('focus', (event) => {
+            if (isNoticeItem) {
+                openPanel('notice');
+            } else {
+                closePanel();
+            }
             showEditTooltip(event.target);
         });
 
@@ -886,9 +1032,6 @@
 
     // ===== 편집 도움말 툴팁 제어 =====
     function showEditTooltip(element) {
-        // 일러스트/로고 편집 패널 닫기
-        closePanel();
-
         const tooltip = document.getElementById('editTooltip');
         const tooltipContent = document.getElementById('tooltipContent');
 

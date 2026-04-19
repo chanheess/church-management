@@ -25,39 +25,8 @@
 </div>
 
 <div class="workspace workspace-wide">
-    <div class="intro">
-        <strong>기본 순서</strong>는 엑셀 명단의 직분·목장을 기준으로 합니다.
-        <ul>
-            <li>직분 우선순위: 간사 → 목자 → 리더 → 인턴</li>
-            <li>같은 직분 안에서 목장 순서: 1목장 → 2목장 → 3목장</li>
-            <li>같은 목장·직분에서는 이름 가나다순</li>
-        </ul>
-        <strong>스왑</strong>은 두 주일의 담당만 맞바꿉니다. 스왑에 포함된 두 날짜가 모두 지나면 자동으로 기본 순서만 남도록 기록에서 제거됩니다.
-        노란색으로 칠해진 칸은 기본 순서와 다른 적용 값(스왑 등)입니다.
-    </div>
-
+<div class="content-main">
     <div class="error-banner" th:if="${scheduleError != null}" th:text="${scheduleError}">오류</div>
-
-    <div class="swap-panel" th:if="${scheduleError == null && prayerPage != null && !prayerPage.rows.isEmpty()}">
-        <div>
-            <label for="swapDateA">첫 번째 주일</label>
-            <select id="swapDateA">
-                <option th:each="r : ${prayerPage.rows}" th:value="${r.isoDate}"
-                        th:text="${r.label + ' — ' + r.resolvedLeader}">1월 5일</option>
-            </select>
-        </div>
-        <div>
-            <label for="swapDateB">두 번째 주일</label>
-            <select id="swapDateB">
-                <option th:each="r : ${prayerPage.rows}" th:value="${r.isoDate}"
-                        th:text="${r.label + ' — ' + r.resolvedLeader}">1월 12일</option>
-            </select>
-        </div>
-        <button type="button" id="swapBtn">스왑 적용</button>
-        <p class="swap-note">이미 다른 스왑에 포함된 주일은 선택할 수 없습니다. 추석 등 특수 문구는
-            <code>representative-prayer.json</code> 의 <code>dateOverrides</code> 로 지정합니다.
-            헌금위원(월별 한 칸)은 같은 파일의 <code>monthlyOffering</code> 에서 월 키 <code>"1"</code>~<code>"12"</code>로 적습니다.</p>
-    </div>
 
     <div class="master-sheet" th:if="${scheduleError == null && prayerPage != null}">
         <div class="master-title-bar">
@@ -75,20 +44,17 @@
                         <th>대표기도</th>
                         <th>헌금위원</th>
                     </tr>
-                    <tr>
-                        <th>월</th>
-                        <th>일</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
                     </thead>
                     <tbody>
                     <th:block th:each="m : ${prayerPage.yearView.leftHalf}">
                         <tr th:each="row, it : ${m.days}">
                             <td th:if="${it.first}" class="cell-month" th:rowspan="${m.sundayCount}" th:text="${m.monthLabel}">1월</td>
                             <td class="cell-day" th:text="${row.dayLabel}">5일</td>
-                            <td class="cell-prayer" th:classappend="${row.highlightSwapped} ? 'is-swapped'" th:text="${row.prayer}">—</td>
-                            <td th:if="${it.first}" class="cell-offering" th:rowspan="${m.sundayCount}" th:text="${m.offeringText}">—</td>
+                            <td class="cell-prayer"
+                                th:text="${row.prayer}"
+                                th:attr="draggable=${!row.isoDate.isEmpty() ? 'true' : 'false'},data-date=${row.isoDate},data-name=${row.prayer},data-label=${row.fullLabel}">—</td>
+                            <td th:if="${it.first}" class="cell-offering" th:rowspan="${m.sundayCount}"
+                                th:text="${m.offeringText}" th:data-month="${m.month}">—</td>
                         </tr>
                     </th:block>
                     </tbody>
@@ -102,20 +68,17 @@
                         <th>대표기도</th>
                         <th>헌금위원</th>
                     </tr>
-                    <tr>
-                        <th>월</th>
-                        <th>일</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
                     </thead>
                     <tbody>
                     <th:block th:each="m : ${prayerPage.yearView.rightHalf}">
                         <tr th:each="row, it : ${m.days}">
                             <td th:if="${it.first}" class="cell-month" th:rowspan="${m.sundayCount}" th:text="${m.monthLabel}">7월</td>
                             <td class="cell-day" th:text="${row.dayLabel}">5일</td>
-                            <td class="cell-prayer" th:classappend="${row.highlightSwapped} ? 'is-swapped'" th:text="${row.prayer}">—</td>
-                            <td th:if="${it.first}" class="cell-offering" th:rowspan="${m.sundayCount}" th:text="${m.offeringText}">—</td>
+                            <td class="cell-prayer"
+                                th:text="${row.prayer}"
+                                th:attr="draggable=${!row.isoDate.isEmpty() ? 'true' : 'false'},data-date=${row.isoDate},data-name=${row.prayer},data-label=${row.fullLabel}">—</td>
+                            <td th:if="${it.first}" class="cell-offering" th:rowspan="${m.sundayCount}"
+                                th:text="${m.offeringText}" th:data-month="${m.month}">—</td>
                         </tr>
                     </th:block>
                     </tbody>
@@ -123,52 +86,257 @@
             </div>
         </div>
 
-        <div class="master-footer">
-            <p class="footer-rule"><strong>대표기도 순서</strong> 직분: 간사 → 목자 → 리더 → 인턴. 같은 직분·목장 안에서는 셀(이름) 가나다순입니다.</p>
-            <p class="footer-note">일정을 바꿀 때는 서로 협의 후 스왑 기능을 사용하거나 담당자에게 알려 주세요. 헌금은 안내에 따라 모아 전달합니다.</p>
+    </div>
+
+    <div class="swap-panel" th:if="${scheduleError == null && prayerPage != null && !prayerPage.rows.isEmpty()}" style="margin-top:0;">
+        <div class="drag-hint">
+            <span class="drag-icon">⇅</span>
+            <span>대표기도 셀을 <strong>드래그</strong>해서 다른 주일로 <strong>드롭</strong>하면 스왑됩니다.</span>
         </div>
     </div>
 
-    <p class="config-hint">
-        설정 파일: <code>representative-prayer.json</code> — <code>swaps</code>, <code>dateOverrides</code>,
-        <code>monthlyOffering</code>(월별 헌금위원 문구), 저장 시각은 <code>lastModifiedAt</code>에 자동 기록됩니다.
-        경로는 <code>bulletin.representative-prayer.path</code> 또는 <code>BULLETIN_REPRESENTATIVE_PRAYER_PATH</code> 입니다.
-    </p>
+    <div class="intro">
+        <strong>기본 순서</strong>는 엑셀 명단의 직분·목장을 기준으로 합니다.
+        <ul>
+            <li>직분 우선순위: 간사 → 목자 → 리더 → 인턴</li>
+            <li>같은 직분 안에서 목장 순서: 1목장 → 2목장 → 3목장</li>
+            <li>같은 목장·직분에서는 이름 가나다순</li>
+        </ul>
+        <ul>
+            <li><strong>대표기도 순서</strong> 직분: 간사 → 목자 → 리더 → 인턴. 같은 직분·목장 안에서는 셀(이름) 가나다순입니다.</li>
+            <li>일정을 바꿀 때는 서로 협의 후 대표기도 셀을 드래그&amp;드롭하여 스왑하거나 담당자에게 알려 주세요. 헌금은 안내에 따라 모아 전달합니다.</li>
+        </ul>
+    </div>
+
+</div><!-- /.content-main -->
+
+<div class="panel-dock">
+    <div id="editTooltip" class="hover-popup" hidden>
+        <div class="hover-popup-header">
+            <span class="hover-popup-dot"></span>
+            <strong>편집 도움말</strong>
+        </div>
+        <p id="tooltipContent" style="margin: 8px 0;">
+            <kbd>Enter</kbd> : 저장<br>
+            <kbd>Esc</kbd> : 편집 취소
+        </p>
+    </div>
 </div>
 
+</div><!-- /.workspace -->
+
 <script th:if="${scheduleError == null && prayerPage != null && !prayerPage.rows.isEmpty()}">
+    function showEditTooltip() {
+        document.getElementById('editTooltip').hidden = false;
+    }
+    function hideEditTooltip() {
+        document.getElementById('editTooltip').hidden = true;
+    }
+
     (function () {
-        const btn = document.getElementById('swapBtn');
-        if (!btn) return;
-        btn.addEventListener('click', async function () {
-            const a = document.getElementById('swapDateA').value;
-            const b = document.getElementById('swapDateB').value;
-            if (!a || !b || a === b) {
-                alert('서로 다른 두 주일을 선택하세요.');
-                return;
-            }
-            btn.disabled = true;
-            try {
-                const res = await fetch('/api/representative-prayer/swap', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({dateA: a, dateB: b})
+        let dragSrc = null;
+
+        document.querySelectorAll('.cell-prayer[data-date]').forEach(function (cell) {
+            cell.addEventListener('dragstart', function (e) {
+                dragSrc = {
+                    date: this.dataset.date,
+                    name: this.dataset.name,
+                    label: this.dataset.label
+                };
+                this.classList.add('is-dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            cell.addEventListener('dragend', function () {
+                this.classList.remove('is-dragging');
+                document.querySelectorAll('.cell-prayer.drag-over').forEach(function (el) {
+                    el.classList.remove('drag-over');
                 });
-                if (res.ok) {
-                    window.location.reload();
-                    return;
-                }
-                let msg = '스왑에 실패했습니다.';
+                dragSrc = null;
+            });
+
+            cell.addEventListener('dragover', function (e) {
+                if (!dragSrc || this.dataset.date === dragSrc.date) return;
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                this.classList.add('drag-over');
+            });
+
+            cell.addEventListener('dragleave', function () {
+                this.classList.remove('drag-over');
+            });
+
+            cell.addEventListener('drop', async function (e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                if (!dragSrc || this.dataset.date === dragSrc.date) return;
+
+                var tgt = {
+                    date: this.dataset.date,
+                    name: this.dataset.name,
+                    label: this.dataset.label
+                };
+
+                var confirmed = confirm(
+                    dragSrc.label + '  ' + dragSrc.name + '\n↕\n' +
+                    tgt.label + '  ' + tgt.name + '\n\n두 주일을 스왑하시겠습니까?'
+                );
+                if (!confirmed) return;
+
                 try {
-                    const j = await res.json();
-                    if (j && j.message) msg = j.message;
-                } catch (e) { /* ignore */ }
-                alert(msg);
-            } catch (e) {
-                alert('요청 중 오류가 발생했습니다.');
-            } finally {
-                btn.disabled = false;
-            }
+                    var res = await fetch('/api/representative-prayer/swap', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({dateA: dragSrc.date, dateB: tgt.date})
+                    });
+                    if (res.ok) {
+                        window.location.reload();
+                        return;
+                    }
+                    var msg = '스왑에 실패했습니다.';
+                    try {
+                        var j = await res.json();
+                        if (j && j.message) msg = j.message;
+                    } catch (ignored) { }
+                    alert(msg);
+                } catch (err) {
+                    alert('요청 중 오류가 발생했습니다.');
+                }
+            });
+        });
+
+        document.querySelectorAll('.cell-prayer[data-date]').forEach(function (cell) {
+            cell.addEventListener('click', function () {
+                if (this.querySelector('input')) return;
+                var original = this.dataset.name || this.textContent.trim();
+                var date = this.dataset.date;
+                var td = this;
+
+                td.draggable = false;
+                td.textContent = '';
+
+                var span = document.createElement('span');
+                span.contentEditable = 'true';
+                span.textContent = original;
+                span.className = 'prayer-edit-input';
+                td.appendChild(span);
+                span.focus();
+                var range = document.createRange();
+                range.selectNodeContents(span);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+
+                function cancel() {
+                    td.textContent = original;
+                    td.draggable = true;
+                }
+
+                async function save() {
+                    var newName = span.textContent.trim();
+                    if (newName === original) { cancel(); return; }
+                    try {
+                        var res = await fetch('/api/representative-prayer/override', {
+                            method: 'PUT',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({date: date, name: newName})
+                        });
+                        if (res.ok) { window.location.reload(); return; }
+                        cancel();
+                    } catch (e) { cancel(); }
+                }
+
+                span.addEventListener('focus', showEditTooltip);
+                span.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') { e.preventDefault(); save(); }
+                    if (e.key === 'Escape') { cancel(); }
+                });
+                span.addEventListener('blur', function () {
+                    setTimeout(hideEditTooltip, 150);
+                    save();
+                });
+            });
+        });
+
+        document.querySelectorAll('.cell-offering[data-month]').forEach(function (cell) {
+            cell.style.cursor = 'text';
+            cell.addEventListener('click', function () {
+                if (this.querySelector('[contenteditable]')) return;
+                var original = this.textContent.trim();
+                var month = this.dataset.month;
+                var td = this;
+
+                td.textContent = '';
+
+                var span = document.createElement('span');
+                span.contentEditable = 'true';
+                span.textContent = original;
+                span.className = 'prayer-edit-input';
+                td.appendChild(span);
+                span.focus();
+                var range = document.createRange();
+                range.selectNodeContents(span);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+
+                function cancel() {
+                    td.textContent = original;
+                }
+
+                async function save() {
+                    var newText = span.textContent.trim();
+                    if (newText === original) { cancel(); return; }
+                    try {
+                        var res = await fetch('/api/representative-prayer/offering', {
+                            method: 'PUT',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({month: parseInt(month), text: newText})
+                        });
+                        if (res.ok) { window.location.reload(); return; }
+                        cancel();
+                    } catch (e) { cancel(); }
+                }
+
+                span.addEventListener('focus', showEditTooltip);
+                span.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') { e.preventDefault(); save(); }
+                    if (e.key === 'Escape') { cancel(); }
+                });
+                span.addEventListener('blur', function () {
+                    setTimeout(hideEditTooltip, 150);
+                    save();
+                });
+            });
+        });
+
+        document.querySelectorAll('.btn-cancel-swap').forEach(function (btn) {
+            btn.addEventListener('click', async function () {
+                var date = this.dataset.date;
+                var fullLabel = this.dataset.fullLabel;
+                var partnerLabel = this.dataset.partnerLabel || '';
+                var msg = fullLabel + (partnerLabel ? ' ↔ ' + partnerLabel : '') + '\n\n이 스왑을 취소하시겠습니까?';
+                if (!confirm(msg)) return;
+                try {
+                    var res = await fetch('/api/representative-prayer/swap', {
+                        method: 'DELETE',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({date: date})
+                    });
+                    if (res.ok) {
+                        window.location.reload();
+                        return;
+                    }
+                    var errMsg = '취소에 실패했습니다.';
+                    try {
+                        var j = await res.json();
+                        if (j && j.message) errMsg = j.message;
+                    } catch (ignored) { }
+                    alert(errMsg);
+                } catch (err) {
+                    alert('요청 중 오류가 발생했습니다.');
+                }
+            });
         });
     })();
 </script>

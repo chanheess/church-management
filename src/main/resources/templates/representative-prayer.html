@@ -25,6 +25,7 @@
 </div>
 
 <div class="workspace workspace-wide">
+<div class="content-main">
     <div class="error-banner" th:if="${scheduleError != null}" th:text="${scheduleError}">오류</div>
 
     <div class="master-sheet" th:if="${scheduleError == null && prayerPage != null}">
@@ -87,29 +88,49 @@
 
     </div>
 
-    <div class="swap-panel" th:if="${scheduleError == null && prayerPage != null && !prayerPage.rows.isEmpty()}" style="margin-top:0;">
-        <div class="drag-hint">
-            <span class="drag-icon">⇅</span>
-            <span>대표기도 셀을 <strong>드래그</strong>해서 다른 주일로 <strong>드롭</strong>하면 스왑됩니다.</span>
+</div><!-- /.content-main -->
+
+<div class="panel-dock">
+    <!-- 편집 도움말: 편집 시작 시 최상단에 표시 -->
+    <div id="editTooltip" class="hover-popup" hidden>
+        <div class="hover-popup-header">
+            <span class="hover-popup-dot"></span>
+            <strong>편집 도움말</strong>
         </div>
+        <p id="tooltipContent" style="margin: 8px 0;">
+            <kbd>Enter</kbd> : 저장<br>
+            <kbd>Esc</kbd> : 편집 취소
+        </p>
     </div>
-
-    <div class="intro">
-        <strong>기본 순서</strong>는 엑셀 명단의 직분·목장을 기준으로 합니다.
-        <ul>
-            <li>직분 우선순위: 간사 → 목자 → 리더 → 인턴</li>
-            <li>같은 직분 안에서 목장 순서: 1목장 → 2목장 → 3목장</li>
-            <li>같은 목장·직분에서는 이름 가나다순</li>
+    <!-- 기본 안내: 항상 표시 -->
+    <div class="hover-popup side-guide" th:if="${scheduleError == null && prayerPage != null}">
+        <div class="hover-popup-header">
+            <span class="hover-popup-dot" style="background:#42a5f5; box-shadow:0 0 4px rgba(66,165,245,0.8);"></span>
+            <strong>사용 안내</strong>
+        </div>
+        <ul class="side-guide-list">
+            <li><strong>🔀 드래그&amp;드롭</strong>대표기도 셀을 다른 주일로 드래그하면 스왑됩니다.</li>
+            <li><strong>✏️ 이름 편집</strong>대표기도 · 헌금위원 셀을 클릭하면 직접 수정할 수 있습니다.</li>
         </ul>
-        <ul>
-            <li><strong>대표기도 순서</strong> 직분: 간사 → 목자 → 리더 → 인턴. 같은 직분·목장 안에서는 셀(이름) 가나다순입니다.</li>
-            <li>일정을 바꿀 때는 서로 협의 후 대표기도 셀을 드래그&amp;드롭하여 스왑하거나 담당자에게 알려 주세요. 헌금은 안내에 따라 모아 전달합니다.</li>
-        </ul>
+        <hr class="side-guide-divider">
+        <p class="side-guide-order"><strong>기본 순서 기준</strong>
+            직분: 간사 → 목자 → 리더 → 인턴<br>
+            같은 직분 내: 1목장 → 2목장 → 3목장<br>
+            같은 목장 내: 가나다순
+        </p>
     </div>
-
 </div>
 
+</div><!-- /.workspace -->
+
 <script th:if="${scheduleError == null && prayerPage != null && !prayerPage.rows.isEmpty()}">
+    function showEditTooltip() {
+        document.getElementById('editTooltip').hidden = false;
+    }
+    function hideEditTooltip() {
+        document.getElementById('editTooltip').hidden = true;
+    }
+
     (function () {
         let dragSrc = null;
 
@@ -197,19 +218,18 @@
                 span.textContent = original;
                 span.className = 'prayer-edit-input';
                 td.appendChild(span);
-                span.focus();
-                var range = document.createRange();
-                range.selectNodeContents(span);
-                var sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
+
+                var cancelled = false;
 
                 function cancel() {
+                    cancelled = true;
+                    hideEditTooltip();
                     td.textContent = original;
                     td.draggable = true;
                 }
 
                 async function save() {
+                    if (cancelled) return;
                     var newName = span.textContent.trim();
                     if (newName === original) { cancel(); return; }
                     try {
@@ -227,7 +247,22 @@
                     if (e.key === 'Enter') { e.preventDefault(); save(); }
                     if (e.key === 'Escape') { cancel(); }
                 });
-                span.addEventListener('blur', function () { save(); });
+                span.addEventListener('blur', function () {
+                    setTimeout(function () {
+                        if (!document.activeElement || !document.activeElement.classList.contains('prayer-edit-input')) {
+                            hideEditTooltip();
+                        }
+                    }, 150);
+                    save();
+                });
+
+                span.focus();
+                showEditTooltip();
+                var range = document.createRange();
+                range.selectNodeContents(span);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
             });
         });
 
@@ -246,18 +281,17 @@
                 span.textContent = original;
                 span.className = 'prayer-edit-input';
                 td.appendChild(span);
-                span.focus();
-                var range = document.createRange();
-                range.selectNodeContents(span);
-                var sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
+
+                var cancelled = false;
 
                 function cancel() {
+                    cancelled = true;
+                    hideEditTooltip();
                     td.textContent = original;
                 }
 
                 async function save() {
+                    if (cancelled) return;
                     var newText = span.textContent.trim();
                     if (newText === original) { cancel(); return; }
                     try {
@@ -275,38 +309,25 @@
                     if (e.key === 'Enter') { e.preventDefault(); save(); }
                     if (e.key === 'Escape') { cancel(); }
                 });
-                span.addEventListener('blur', function () { save(); });
+                span.addEventListener('blur', function () {
+                    setTimeout(function () {
+                        if (!document.activeElement || !document.activeElement.classList.contains('prayer-edit-input')) {
+                            hideEditTooltip();
+                        }
+                    }, 150);
+                    save();
+                });
+
+                span.focus();
+                showEditTooltip();
+                var range = document.createRange();
+                range.selectNodeContents(span);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
             });
         });
 
-        document.querySelectorAll('.btn-cancel-swap').forEach(function (btn) {
-            btn.addEventListener('click', async function () {
-                var date = this.dataset.date;
-                var fullLabel = this.dataset.fullLabel;
-                var partnerLabel = this.dataset.partnerLabel || '';
-                var msg = fullLabel + (partnerLabel ? ' ↔ ' + partnerLabel : '') + '\n\n이 스왑을 취소하시겠습니까?';
-                if (!confirm(msg)) return;
-                try {
-                    var res = await fetch('/api/representative-prayer/swap', {
-                        method: 'DELETE',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({date: date})
-                    });
-                    if (res.ok) {
-                        window.location.reload();
-                        return;
-                    }
-                    var errMsg = '취소에 실패했습니다.';
-                    try {
-                        var j = await res.json();
-                        if (j && j.message) errMsg = j.message;
-                    } catch (ignored) { }
-                    alert(errMsg);
-                } catch (err) {
-                    alert('요청 중 오류가 발생했습니다.');
-                }
-            });
-        });
     })();
 </script>
 </body>

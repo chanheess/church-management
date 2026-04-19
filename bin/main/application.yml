@@ -1,6 +1,8 @@
 spring:
   application:
     name: weekly-bulletin
+  main:
+    headless: false
 
 bulletin:
   excel:
@@ -10,9 +12,9 @@ bulletin:
   illustration:
     folder: ${BULLETIN_ILLUSTRATIONS_PATH:}
   text:
-    path: ${BULLETIN_TEXT_PATH:}
+    path: ${BULLETIN_TEXT_PATH:${user.home}/.church-management/text-config.properties}
   representative-prayer:
-    path: ${BULLETIN_REPRESENTATIVE_PRAYER_PATH:}
+    path: ${BULLETIN_REPRESENTATIVE_PRAYER_PATH:${user.home}/.church-management/representative-prayer.json}
 
 server:
   port: 8082

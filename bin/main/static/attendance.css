@@ -1,3 +1,10 @@
+body{
+  margin: 0;
+  padding: 0;
+  background: #eaeaea;
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
 /* ===== 헤더 네비게이션 ===== */
 .header-nav {
   background: #ffffff;
@@ -15,7 +22,7 @@
 }
 
 .nav-tab {
-  padding: 16px 32px;
+  padding: 16px 28px;
   text-decoration: none;
   color: #666;
   font-weight: 500;
@@ -190,15 +197,6 @@
   line-height: 1;
 }
 
-body{
-  font-family: "Malgun Gothic", "맑은 고딕", Arial, sans-serif;
-  font-size: 11pt;
-  line-height: 1;
-  color: #000;
-  /* 주보 페이지와 동일한 화면 배경(weekly-bulletin.css 제거 후 유지) */
-  background: #eaeaea;
-}
-
  /* 10+22+24+40+14+14+56 = 180mm */
 
 /* ===============================
@@ -208,8 +206,8 @@ body{
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-right: 20px;
   justify-self: end;
+  padding-right: 16px;
   flex-wrap: nowrap;
   flex-shrink: 0;
   min-width: max-content; /* 그리드 열이 좁아져도 라벨이 세로로 쪼개지지 않게 */
@@ -314,6 +312,11 @@ body{
 }
 
 @media print{
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   /*
    * 헤더·스크립트·확장프로그램이 body에 붙인 형제 노드는 인쇄에서 제외.
    * (예: "설정에서 퀵메뉴를…" — 앱 코드가 아닌 확장/OS 도우미 UI가 미리보기에 찍히는 경우)
