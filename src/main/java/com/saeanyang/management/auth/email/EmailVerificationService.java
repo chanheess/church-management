@@ -98,7 +98,12 @@ public class EmailVerificationService {
             mailSender.send(message);
         } catch (MailException e) {
             if (properties.isLogCodeWhenMailFails()) {
-                log.warn("이메일 발송 실패. 개발용 인증 코드 user={} code={}", user.getUsername(), code);
+                log.warn(
+                    "이메일 발송 실패. 개발용 인증 코드 user={} code={} cause={}",
+                    user.getUsername(),
+                    code,
+                    e.getMessage()
+                );
             } else {
                 log.warn("이메일 발송 실패 user={}: {}", user.getUsername(), e.getMessage());
             }

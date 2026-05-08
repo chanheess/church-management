@@ -17,7 +17,7 @@ public class SignupIpAllowlistService {
     }
 
     public boolean isAllowed(HttpServletRequest request) {
-        String clientIp = resolveClientIp(request);
+        String clientIp = normalizeIp(resolveClientIp(request));
         return signupProperties.getAllowedNetworks().stream()
             .filter(network -> network != null && !network.isBlank())
             .anyMatch(network -> matches(clientIp, network.trim()));
@@ -29,6 +29,13 @@ public class SignupIpAllowlistService {
             return forwardedFor.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    private String normalizeIp(String ip) {
+        if ("0:0:0:0:0:0:0:1".equals(ip)) {
+            return "::1";
+        }
+        return ip;
     }
 
     private boolean matches(String clientIp, String network) {

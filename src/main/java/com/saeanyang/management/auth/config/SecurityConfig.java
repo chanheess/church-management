@@ -39,7 +39,11 @@ public class SecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form.successHandler(emailVerificationSuccessHandler))
+            .formLogin(form -> form
+                .loginPage("/login")
+                .successHandler(emailVerificationSuccessHandler)
+                .permitAll()
+            )
             .logout(Customizer.withDefaults())
             .addFilterAfter(emailVerificationRequiredFilter, UsernamePasswordAuthenticationFilter.class);
 

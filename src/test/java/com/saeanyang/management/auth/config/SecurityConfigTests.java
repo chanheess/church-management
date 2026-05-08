@@ -11,9 +11,12 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,7 +51,9 @@ class SecurityConfigTests {
     @Test
     void loginIsPublic() throws Exception {
         mockMvc.perform(get("/login"))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("로그인")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("회원가입")));
     }
 
     @Test
@@ -61,13 +66,29 @@ class SecurityConfigTests {
     }
 
     @Test
-    void signupIsForbiddenOutsideAllowedIp() throws Exception {
+    void signupPageShowsBlockedMessageOutsideAllowedIp() throws Exception {
         mockMvc.perform(get("/signup").header("X-Forwarded-For", "203.0.113.10"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("회원가입은 허용된 IP에서만 가능합니다.")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("203.0.113.10")));
+    }
+
+    @Test
+    void signupSubmitIsForbiddenOutsideAllowedIp() throws Exception {
+        mockMvc.perform(post("/signup")
+                .header("X-Forwarded-For", "203.0.113.10")
+                .param("username", "blocked-signup")
+                .param("email", "blocked-signup@example.com")
+                .param("password", "SafePass!2026")
+                .param("passwordConfirm", "SafePass!2026")
+                .with(csrf()))
             .andExpect(status().isForbidden());
     }
 
     @Test
     void signupRejectsWeakPassword() throws Exception {
+        userRepository.findByUsername("weak-password").ifPresent(userRepository::delete);
+
         mockMvc.perform(post("/signup")
                 .param("username", "weak-password")
                 .param("email", "weak-password@example.com")
@@ -78,7 +99,11 @@ class SecurityConfigTests {
                     request.setRemoteAddr("127.0.0.1");
                     return request;
                 }))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(model().attributeHasFieldErrors("signupRequest", "password"))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("비밀번호에는 대문자가 1자 이상 포함되어야 합니다.")));
+
+        assertThat(userRepository.existsByUsername("weak-password")).isFalse();
     }
 
     @Test
@@ -101,9 +126,8 @@ class SecurityConfigTests {
             .andExpect(redirectedUrl("/login?signup"));
 
         var user = userRepository.findByUsername("strong-password").orElseThrow();
-        org.assertj.core.api.Assertions.assertThat(user.getPasswordHash()).isNotEqualTo("SafePass!2026");
-        org.assertj.core.api.Assertions.assertThat(passwordEncoder.matches("SafePass!2026", user.getPasswordHash()))
-            .isTrue();
+        assertThat(user.getPasswordHash()).isNotEqualTo("SafePass!2026");
+        assertThat(passwordEncoder.matches("SafePass!2026", user.getPasswordHash())).isTrue();
     }
 
     @Test

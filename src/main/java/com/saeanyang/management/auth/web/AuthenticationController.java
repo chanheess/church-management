@@ -48,9 +48,17 @@ public class AuthenticationController {
         this.trustedDeviceService = trustedDeviceService;
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
     @GetMapping("/signup")
     public String signupForm(HttpServletRequest request, Model model) {
-        requireSignupIp(request);
+        if (!signupIpAllowlistService.isAllowed(request)) {
+            model.addAttribute("blockedIp", signupIpAllowlistService.resolveClientIp(request));
+            return "signup-blocked";
+        }
         if (!model.containsAttribute("signupRequest")) {
             model.addAttribute("signupRequest", new SignupRequest("", "", "", ""));
         }
