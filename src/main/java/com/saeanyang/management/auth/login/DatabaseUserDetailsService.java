@@ -21,12 +21,12 @@ public class DatabaseUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username.trim().toLowerCase())
-            .orElseThrow(() -> new UsernameNotFoundException("아이디를 찾을 수 없습니다."));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
+            .orElseThrow(() -> new UsernameNotFoundException("이메일 계정을 찾을 수 없습니다."));
 
         return org.springframework.security.core.userdetails.User
-            .withUsername(user.getUsername())
+            .withUsername(user.getEmail())
             .password(user.getPasswordHash())
             .authorities(List.of(new SimpleGrantedAuthority(user.getRole())))
             .disabled(!user.isEnabled())

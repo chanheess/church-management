@@ -77,7 +77,6 @@ class SecurityConfigTests {
     void signupSubmitIsForbiddenOutsideAllowedIp() throws Exception {
         mockMvc.perform(post("/signup")
                 .header("X-Forwarded-For", "203.0.113.10")
-                .param("username", "blocked-signup")
                 .param("email", "blocked-signup@example.com")
                 .param("password", "SafePass!2026")
                 .param("passwordConfirm", "SafePass!2026")
@@ -87,10 +86,9 @@ class SecurityConfigTests {
 
     @Test
     void signupRejectsWeakPassword() throws Exception {
-        userRepository.findByUsername("weak-password").ifPresent(userRepository::delete);
+        userRepository.findByEmail("weak-password@example.com").ifPresent(userRepository::delete);
 
         mockMvc.perform(post("/signup")
-                .param("username", "weak-password")
                 .param("email", "weak-password@example.com")
                 .param("password", "password123")
                 .param("passwordConfirm", "password123")
@@ -103,17 +101,16 @@ class SecurityConfigTests {
             .andExpect(model().attributeHasFieldErrors("signupRequest", "password"))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("비밀번호에는 대문자가 1자 이상 포함되어야 합니다.")));
 
-        assertThat(userRepository.existsByUsername("weak-password")).isFalse();
+        assertThat(userRepository.existsByEmail("weak-password@example.com")).isFalse();
     }
 
     @Test
     void signupStoresStrongPasswordAsHash() throws Exception {
         trustedDeviceRepository.deleteAll();
         emailVerificationCodeRepository.deleteAll();
-        userRepository.findByUsername("strong-password").ifPresent(userRepository::delete);
+        userRepository.findByEmail("strong-password@example.com").ifPresent(userRepository::delete);
 
         mockMvc.perform(post("/signup")
-                .param("username", "strong-password")
                 .param("email", "strong-password@example.com")
                 .param("password", "SafePass!2026")
                 .param("passwordConfirm", "SafePass!2026")
@@ -125,7 +122,7 @@ class SecurityConfigTests {
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/login?signup"));
 
-        var user = userRepository.findByUsername("strong-password").orElseThrow();
+        var user = userRepository.findByEmail("strong-password@example.com").orElseThrow();
         assertThat(user.getPasswordHash()).isNotEqualTo("SafePass!2026");
         assertThat(passwordEncoder.matches("SafePass!2026", user.getPasswordHash())).isTrue();
     }
@@ -138,11 +135,11 @@ class SecurityConfigTests {
     }
 
     @Test
-    void loginWithValidUsernameAndPasswordRequiresEmailVerificationForNewDevice() throws Exception {
-        createUser("login-test", "password123!", "login-test@example.com");
+    void loginWithValidEmailAndPasswordRequiresEmailVerificationForNewDevice() throws Exception {
+        createUser("login-test@example.com", "password123!");
 
         mockMvc.perform(post("/login")
-                .param("username", "login-test")
+                .param("email", "login-test@example.com")
                 .param("password", "password123!")
                 .with(csrf()))
             .andExpect(status().is3xxRedirection())
@@ -151,20 +148,20 @@ class SecurityConfigTests {
 
     @Test
     void loginWithInvalidPasswordReturnsToLoginWithError() throws Exception {
-        createUser("wrong-password", "password123!", "wrong-password@example.com");
+        createUser("wrong-password@example.com", "password123!");
 
         mockMvc.perform(post("/login")
-                .param("username", "wrong-password")
+                .param("email", "wrong-password@example.com")
                 .param("password", "bad-password")
                 .with(csrf()))
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/login?error"));
     }
 
-    private void createUser(String username, String rawPassword, String email) {
+    private void createUser(String email, String rawPassword) {
         trustedDeviceRepository.deleteAll();
         emailVerificationCodeRepository.deleteAll();
-        userRepository.findByUsername(username).ifPresent(userRepository::delete);
-        accountService.createAdmin(username, passwordEncoder.encode(rawPassword), email);
+        userRepository.findByEmail(email).ifPresent(userRepository::delete);
+        accountService.createAdmin(email, passwordEncoder.encode(rawPassword));
     }
 }

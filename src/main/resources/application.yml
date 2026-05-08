@@ -44,6 +44,8 @@ app:
     # APP_PII_KEY 환경변수/.env(로컬)·Compose secret(운영)으로 주입(.env·소스 커밋 금지).
     # 미설정 시 기동 중단(fail-fast) — 임시키로 기동하면 재시작 후 기존 암호문을 복호화할 수 없기 때문.
     pii-key: ${APP_PII_KEY:}
+  desktop:
+    enabled: true
 
 security:
   signup:
@@ -60,5 +62,5 @@ security:
     code-ttl-minutes: 10
     max-attempts: 5
     trusted-device-days: 30
-    log-code-when-mail-fails: true
+    log-code-when-mail-fails: ${SECURITY_EMAIL_VERIFICATION_LOG_CODE_WHEN_MAIL_FAILS:true}
     from: ${SECURITY_MAIL_FROM:no-reply@church-management.local}

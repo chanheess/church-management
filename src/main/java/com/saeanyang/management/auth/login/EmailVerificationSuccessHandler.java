@@ -37,20 +37,20 @@ public class EmailVerificationSuccessHandler extends SavedRequestAwareAuthentica
         HttpServletResponse response,
         Authentication authentication
     ) throws IOException, ServletException {
-        User user = accountService.findByUsername(authentication.getName())
+        User user = accountService.findByEmail(authentication.getName())
             .orElseThrow(() -> new IllegalStateException("로그인 사용자를 찾을 수 없습니다."));
 
         if (trustedDeviceService.isTrusted(user, request)) {
             request.getSession().removeAttribute(EmailVerificationSession.REQUIRED);
-            request.getSession().removeAttribute(EmailVerificationSession.USERNAME);
-            accountService.recordLoginSuccess(user.getUsername());
+            request.getSession().removeAttribute(EmailVerificationSession.EMAIL);
+            accountService.recordLoginSuccess(user.getEmail());
             super.onAuthenticationSuccess(request, response, authentication);
             return;
         }
 
         emailVerificationService.issueCode(user);
         request.getSession().setAttribute(EmailVerificationSession.REQUIRED, true);
-        request.getSession().setAttribute(EmailVerificationSession.USERNAME, user.getUsername());
+        request.getSession().setAttribute(EmailVerificationSession.EMAIL, user.getEmail());
         response.sendRedirect("/login/email-verification");
     }
 }

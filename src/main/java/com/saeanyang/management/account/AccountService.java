@@ -31,25 +31,21 @@ public class AccountService {
     }
 
     @Transactional
-    public User createAdmin(String username, String passwordHash, String email) {
-        String normalizedUsername = normalizeUsername(username);
+    public User createAdmin(String email, String passwordHash) {
         String normalizedEmail = normalizeEmail(email);
         requirePasswordHash(passwordHash);
 
-        if (userRepository.existsByUsername(normalizedUsername)) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
-        }
         if (userRepository.existsByEmail(normalizedEmail)) {
             throw new IllegalStateException("이미 존재하는 이메일입니다.");
         }
 
-        User user = new User(normalizedUsername, passwordHash.trim(), normalizedEmail);
+        User user = new User(passwordHash.trim(), normalizedEmail);
         return userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(normalizeUsername(username));
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(normalizeEmail(email));
     }
 
     @Transactional(readOnly = true)
@@ -58,45 +54,38 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(normalizeUsername(username));
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(normalizeEmail(email));
     }
 
     @Transactional
-    public void recordLoginSuccess(String username) {
-        User user = getByUsername(username);
+    public void recordLoginSuccess(String email) {
+        User user = getByEmail(email);
         user.recordLoginSuccess(Instant.now(clock));
     }
 
     @Transactional
-    public void recordLoginFailure(String username) {
-        User user = getByUsername(username);
+    public void recordLoginFailure(String email) {
+        User user = getByEmail(email);
         Instant lockUntil = Instant.now(clock).plus(DEFAULT_LOGIN_LOCK_DURATION);
         user.recordLoginFailure(DEFAULT_MAX_LOGIN_FAILURE_COUNT, lockUntil);
     }
 
     @Transactional
-    public void unlock(String username) {
-        User user = getByUsername(username);
+    public void unlock(String email) {
+        User user = getByEmail(email);
         user.unlock();
     }
 
     @Transactional
-    public void setEnabled(String username, boolean enabled) {
-        User user = getByUsername(username);
+    public void setEnabled(String email, boolean enabled) {
+        User user = getByEmail(email);
         user.setEnabled(enabled);
     }
 
-    private User getByUsername(String username) {
-        return userRepository.findByUsername(normalizeUsername(username))
-            .orElseThrow(() -> new IllegalArgumentException("아이디를 찾을 수 없습니다."));
-    }
-
-    private String normalizeUsername(String username) {
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("아이디가 필요합니다.");
-        }
-        return username.trim().toLowerCase(Locale.ROOT);
+    private User getByEmail(String email) {
+        return userRepository.findByEmail(normalizeEmail(email))
+            .orElseThrow(() -> new IllegalArgumentException("이메일 계정을 찾을 수 없습니다."));
     }
 
     private void requirePasswordHash(String passwordHash) {

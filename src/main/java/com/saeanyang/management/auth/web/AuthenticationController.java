@@ -60,7 +60,7 @@ public class AuthenticationController {
             return "signup-blocked";
         }
         if (!model.containsAttribute("signupRequest")) {
-            model.addAttribute("signupRequest", new SignupRequest("", "", "", ""));
+            model.addAttribute("signupRequest", new SignupRequest("", "", ""));
         }
         return "signup";
     }
@@ -77,7 +77,6 @@ public class AuthenticationController {
             bindingResult.rejectValue("passwordConfirm", "passwordConfirm.mismatch", "비밀번호가 일치하지 않습니다.");
         }
         for (String error : passwordPolicyService.validate(
-            signupRequest.username(),
             signupRequest.email(),
             signupRequest.password()
         )) {
@@ -89,9 +88,8 @@ public class AuthenticationController {
         }
 
         accountService.createAdmin(
-            signupRequest.username(),
-            passwordEncoder.encode(signupRequest.password()),
-            signupRequest.email()
+            signupRequest.email(),
+            passwordEncoder.encode(signupRequest.password())
         );
         return "redirect:/login?signup";
     }
@@ -112,12 +110,12 @@ public class AuthenticationController {
         String code,
         Model model
     ) {
-        Object username = request.getSession().getAttribute(EmailVerificationSession.USERNAME);
-        if (username == null) {
+        Object email = request.getSession().getAttribute(EmailVerificationSession.EMAIL);
+        if (email == null) {
             return "redirect:/login";
         }
 
-        User user = accountService.findByUsername(username.toString())
+        User user = accountService.findByEmail(email.toString())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
         if (!emailVerificationService.verify(user, code)) {
@@ -127,8 +125,8 @@ public class AuthenticationController {
 
         trustedDeviceService.trustCurrentDevice(user, request, response);
         request.getSession().removeAttribute(EmailVerificationSession.REQUIRED);
-        request.getSession().removeAttribute(EmailVerificationSession.USERNAME);
-        accountService.recordLoginSuccess(user.getUsername());
+        request.getSession().removeAttribute(EmailVerificationSession.EMAIL);
+        accountService.recordLoginSuccess(user.getEmail());
         return "redirect:/bulletin";
     }
 
@@ -139,7 +137,6 @@ public class AuthenticationController {
     }
 
     public record SignupRequest(
-        @NotBlank @Size(max = 100) String username,
         @NotBlank @Email @Size(max = 255) String email,
         @NotBlank @Size(max = 100) String password,
         @NotBlank @Size(max = 100) String passwordConfirm

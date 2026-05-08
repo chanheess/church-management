@@ -100,12 +100,12 @@ public class EmailVerificationService {
             if (properties.isLogCodeWhenMailFails()) {
                 log.warn(
                     "이메일 발송 실패. 개발용 인증 코드 user={} code={} cause={}",
-                    user.getUsername(),
+                    user.getEmail(),
                     code,
                     e.getMessage()
                 );
             } else {
-                log.warn("이메일 발송 실패 user={}: {}", user.getUsername(), e.getMessage());
+                log.warn("이메일 발송 실패 user={}: {}", user.getEmail(), e.getMessage());
             }
         }
     }

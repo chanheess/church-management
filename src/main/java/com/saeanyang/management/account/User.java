@@ -20,7 +20,6 @@ import java.util.UUID;
 @Table(
     name = "users",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_users_username", columnNames = "username"),
         @UniqueConstraint(name = "uk_users_email", columnNames = "email")
     },
     indexes = {
@@ -35,11 +34,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @NotBlank
-    @Size(max = 100)
-    @Column(nullable = false, length = 100)
-    private String username;
 
     @NotBlank
     @Size(max = 255)
@@ -75,8 +69,7 @@ public class User {
     protected User() {
     }
 
-    public User(String username, String passwordHash, String email) {
-        this.username = username;
+    public User(String passwordHash, String email) {
         this.passwordHash = passwordHash;
         this.email = email;
     }
@@ -97,14 +90,6 @@ public class User {
 
     public UUID getId() {
         return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPasswordHash() {

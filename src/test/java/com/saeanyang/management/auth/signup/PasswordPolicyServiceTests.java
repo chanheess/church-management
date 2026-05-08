@@ -10,13 +10,13 @@ class PasswordPolicyServiceTests {
 
     @Test
     void acceptsStrongPassword() {
-        assertThat(passwordPolicyService.validate("admin", "admin@example.com", "SafePass!2026"))
+        assertThat(passwordPolicyService.validate("admin@example.com", "SafePass!2026"))
             .isEmpty();
     }
 
     @Test
     void rejectsPasswordWithoutRequiredCharacterTypes() {
-        assertThat(passwordPolicyService.validate("admin", "admin@example.com", "lowercaseonly"))
+        assertThat(passwordPolicyService.validate("admin@example.com", "lowercaseonly"))
             .contains(
                 "비밀번호에는 대문자가 1자 이상 포함되어야 합니다.",
                 "비밀번호에는 숫자가 1자 이상 포함되어야 합니다.",
@@ -25,17 +25,14 @@ class PasswordPolicyServiceTests {
     }
 
     @Test
-    void rejectsPasswordContainingUsernameOrEmailLocalPart() {
-        assertThat(passwordPolicyService.validate("manager", "church@example.com", "ManagerChurch!2026"))
-            .contains(
-                "비밀번호에는 아이디를 포함할 수 없습니다.",
-                "비밀번호에는 이메일 주소 일부를 포함할 수 없습니다."
-            );
+    void rejectsPasswordContainingEmailLocalPart() {
+        assertThat(passwordPolicyService.validate("church@example.com", "SafeChurch!2026"))
+            .contains("비밀번호에는 이메일 주소 일부를 포함할 수 없습니다.");
     }
 
     @Test
     void rejectsShortAndCommonPassword() {
-        assertThat(passwordPolicyService.validate("admin", "admin@example.com", "admin123"))
+        assertThat(passwordPolicyService.validate("admin@example.com", "admin123"))
             .contains(
                 "비밀번호는 10자 이상이어야 합니다.",
                 "너무 흔한 비밀번호는 사용할 수 없습니다."

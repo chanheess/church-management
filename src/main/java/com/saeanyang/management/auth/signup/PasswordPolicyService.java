@@ -22,7 +22,7 @@ public class PasswordPolicyService {
         "church123"
     );
 
-    public List<String> validate(String username, String email, String password) {
+    public List<String> validate(String email, String password) {
         List<String> errors = new java.util.ArrayList<>();
         String value = password == null ? "" : password;
 
@@ -40,9 +40,6 @@ public class PasswordPolicyService {
         }
         if (value.chars().noneMatch(this::isSpecialCharacter)) {
             errors.add("비밀번호에는 특수문자가 1자 이상 포함되어야 합니다.");
-        }
-        if (containsIgnoreCase(value, username)) {
-            errors.add("비밀번호에는 아이디를 포함할 수 없습니다.");
         }
         if (containsEmailLocalPart(value, email)) {
             errors.add("비밀번호에는 이메일 주소 일부를 포함할 수 없습니다.");
