@@ -4,6 +4,7 @@ import com.saeanyang.management.account.AccountService;
 import com.saeanyang.management.account.User;
 import com.saeanyang.management.auth.email.EmailVerificationService;
 import com.saeanyang.management.auth.login.EmailVerificationSession;
+import com.saeanyang.management.auth.signup.PasswordPolicyService;
 import com.saeanyang.management.auth.signup.SignupIpAllowlistService;
 import com.saeanyang.management.auth.trusteddevice.TrustedDeviceService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ public class AuthenticationController {
 
     private final AccountService accountService;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordPolicyService passwordPolicyService;
     private final SignupIpAllowlistService signupIpAllowlistService;
     private final EmailVerificationService emailVerificationService;
     private final TrustedDeviceService trustedDeviceService;
@@ -33,12 +35,14 @@ public class AuthenticationController {
     public AuthenticationController(
         AccountService accountService,
         PasswordEncoder passwordEncoder,
+        PasswordPolicyService passwordPolicyService,
         SignupIpAllowlistService signupIpAllowlistService,
         EmailVerificationService emailVerificationService,
         TrustedDeviceService trustedDeviceService
     ) {
         this.accountService = accountService;
         this.passwordEncoder = passwordEncoder;
+        this.passwordPolicyService = passwordPolicyService;
         this.signupIpAllowlistService = signupIpAllowlistService;
         this.emailVerificationService = emailVerificationService;
         this.trustedDeviceService = trustedDeviceService;
@@ -63,6 +67,13 @@ public class AuthenticationController {
         requireSignupIp(request);
         if (!signupRequest.password().equals(signupRequest.passwordConfirm())) {
             bindingResult.rejectValue("passwordConfirm", "passwordConfirm.mismatch", "비밀번호가 일치하지 않습니다.");
+        }
+        for (String error : passwordPolicyService.validate(
+            signupRequest.username(),
+            signupRequest.email(),
+            signupRequest.password()
+        )) {
+            bindingResult.rejectValue("password", "password.weak", error);
         }
         if (bindingResult.hasErrors()) {
             model.addAttribute("signupRequest", signupRequest);
@@ -122,8 +133,8 @@ public class AuthenticationController {
     public record SignupRequest(
         @NotBlank @Size(max = 100) String username,
         @NotBlank @Email @Size(max = 255) String email,
-        @NotBlank @Size(min = 8, max = 100) String password,
-        @NotBlank @Size(min = 8, max = 100) String passwordConfirm
+        @NotBlank @Size(max = 100) String password,
+        @NotBlank @Size(max = 100) String passwordConfirm
     ) {
     }
 }
