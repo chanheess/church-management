@@ -1,4 +1,4 @@
-package com.saeanyang.management.security;
+package com.saeanyang.management.auth.login;
 
 import com.saeanyang.management.account.User;
 import com.saeanyang.management.account.UserRepository;

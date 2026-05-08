@@ -3,6 +3,17 @@ spring:
     name: weekly-bulletin
   main:
     headless: false
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:25}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:false}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:false}
 
 bulletin:
   excel:
@@ -25,3 +36,15 @@ app:
     # APP_PII_KEY 환경변수/.env(로컬)·Compose secret(운영)으로 주입(.env·소스 커밋 금지).
     # 미설정 시 기동 중단(fail-fast) — 임시키로 기동하면 재시작 후 기존 암호문을 복호화할 수 없기 때문.
     pii-key: ${APP_PII_KEY:}
+
+security:
+  signup:
+    allowed-networks:
+      - ${SECURITY_SIGNUP_ALLOWED_NETWORK:127.0.0.1/32}
+      - ::1
+  email-verification:
+    code-ttl-minutes: 10
+    max-attempts: 5
+    trusted-device-days: 30
+    log-code-when-mail-fails: true
+    from: ${SECURITY_MAIL_FROM:no-reply@church-management.local}

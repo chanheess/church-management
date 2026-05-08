@@ -20,7 +20,8 @@ import java.util.UUID;
 @Table(
     name = "users",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_users_username", columnNames = "username")
+        @UniqueConstraint(name = "uk_users_username", columnNames = "username"),
+        @UniqueConstraint(name = "uk_users_email", columnNames = "email")
     },
     indexes = {
         @Index(name = "idx_users_enabled", columnList = "enabled"),
@@ -44,6 +45,11 @@ public class User {
     @Size(max = 255)
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
+
+    @NotBlank
+    @Size(max = 255)
+    @Column(nullable = false, length = 255)
+    private String email;
 
     @Column(nullable = false, length = 30)
     private String role = ROLE_ADMIN;
@@ -69,9 +75,10 @@ public class User {
     protected User() {
     }
 
-    public User(String username, String passwordHash) {
+    public User(String username, String passwordHash, String email) {
         this.username = username;
         this.passwordHash = passwordHash;
+        this.email = email;
     }
 
     @PrePersist
@@ -106,6 +113,14 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getRole() {

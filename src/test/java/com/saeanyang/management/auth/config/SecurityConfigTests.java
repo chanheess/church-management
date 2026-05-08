@@ -1,4 +1,4 @@
-package com.saeanyang.management.security;
+package com.saeanyang.management.auth.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +27,21 @@ class SecurityConfigTests {
     void loginIsPublic() throws Exception {
         mockMvc.perform(get("/login"))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    void signupIsPublicFromAllowedIp() throws Exception {
+        mockMvc.perform(get("/signup").with(request -> {
+                request.setRemoteAddr("127.0.0.1");
+                return request;
+            }))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void signupIsForbiddenOutsideAllowedIp() throws Exception {
+        mockMvc.perform(get("/signup").header("X-Forwarded-For", "203.0.113.10"))
+            .andExpect(status().isForbidden());
     }
 
     @Test

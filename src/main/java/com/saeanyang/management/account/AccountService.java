@@ -31,15 +31,19 @@ public class AccountService {
     }
 
     @Transactional
-    public User createAdmin(String username, String passwordHash) {
+    public User createAdmin(String username, String passwordHash, String email) {
         String normalizedUsername = normalizeUsername(username);
+        String normalizedEmail = normalizeEmail(email);
         requirePasswordHash(passwordHash);
 
         if (userRepository.existsByUsername(normalizedUsername)) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         }
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            throw new IllegalStateException("이미 존재하는 이메일입니다.");
+        }
 
-        User user = new User(normalizedUsername, passwordHash.trim());
+        User user = new User(normalizedUsername, passwordHash.trim(), normalizedEmail);
         return userRepository.save(user);
     }
 
@@ -99,5 +103,12 @@ public class AccountService {
         if (passwordHash == null || passwordHash.trim().isEmpty()) {
             throw new IllegalArgumentException("비밀번호 해시가 필요합니다.");
         }
+    }
+
+    private String normalizeEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("이메일이 필요합니다.");
+        }
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 }
