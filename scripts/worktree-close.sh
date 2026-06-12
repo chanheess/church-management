@@ -1,12 +1,16 @@
 #!/bin/bash
-# Usage: ./scripts/worktree-close.sh <이슈번호>
+# Usage: ./scripts/worktree-close.sh <이슈번호> [--auto]
 # PR 머지 완료 후 워크트리와 로컬 브랜치를 정리합니다.
+# --auto: post-merge 훅 등 자동 실행 시 대화형 프롬프트를 건너뜁니다.
 
 set -e
 
 ISSUE_NUM=$1
+AUTO=false
+[ "${2:-}" = "--auto" ] && AUTO=true
+
 if [ -z "$ISSUE_NUM" ]; then
-  echo "사용법: ./scripts/worktree-close.sh <이슈번호>"
+  echo "사용법: ./scripts/worktree-close.sh <이슈번호> [--auto]"
   echo "  예: ./scripts/worktree-close.sh 12"
   exit 1
 fi
@@ -23,8 +27,8 @@ if ! git worktree list | grep -q "$WORKTREE_PATH"; then
   exit 1
 fi
 
-# PR이 머지됐는지 확인 (gh CLI 있는 경우)
-if command -v gh &>/dev/null; then
+# PR이 머지됐는지 확인 (gh CLI 있고, 자동 실행이 아닌 경우)
+if [ "$AUTO" = false ] && command -v gh &>/dev/null; then
   PR_STATE=$(gh pr view "$BRANCH" --json state -q '.state' 2>/dev/null || echo "UNKNOWN")
   if [ "$PR_STATE" = "OPEN" ]; then
     echo "⚠️  PR이 아직 열려 있습니다 (OPEN). 머지 후 닫으세요."

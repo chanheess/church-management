@@ -81,19 +81,32 @@ com.saeanyang.management
 ./scripts/setup-hooks.sh   # 훅 경로 설정 + 실행 권한 부여
 ```
 
+### 이슈 제목 규칙
+
+이슈 제목은 반드시 `[도메인] 작업 내용` 형식으로 작성합니다.
+
+```
+[bulletin] 주보 헤더 이미지 교체
+[attendance] 출석 합계 계산 오류 수정
+[workflow] 머지 후 워크트리 자동 닫기
+```
+
+도메인 목록: `bulletin` | `attendance` | `representative-prayer` | `config` | `workflow`
+
 ### 작업 흐름
 ```
 1. GitHub 이슈에 요구사항 작성 (.github/ISSUE_TEMPLATE/ 양식 사용)
+   → 제목 형식: [도메인] 작업 내용
 2. ./scripts/worktree-new.sh <이슈번호>   # 워크트리 생성
 3. docs/agent-journal/날짜-issue-N.md 작성 후 커밋
 4. 해당 디렉토리에서 소단위로 커밋
    → pre-commit 훅이 자동으로 컴파일 + 테스트 검증
 5. ./scripts/worktree-done.sh            # 브랜치 push + PR 준비
 6. 사람이 코드 리뷰 후 머지 (Claude는 main에 직접 머지하지 않음)
-7. ./scripts/worktree-close.sh <이슈번호> # 워크트리 반드시 닫기 (생략 불가)
+   → main에서 git pull 시 post-merge 훅이 워크트리 자동 닫기
 ```
 
-> 워크트리는 작업이 끝나면 반드시 닫아야 합니다. 닫지 않으면 4개 제한에 걸려 새 작업을 시작할 수 없습니다.
+> 워크트리는 PR 머지 후 `git pull` 시 자동으로 닫힙니다. 자동 닫기가 실패한 경우 `./scripts/worktree-close.sh <이슈번호>`로 수동 처리하세요.
 
 ### 워크트리 분리 기준
 다음 조건이 **모두** 충족될 때 워크트리를 분리하여 병렬 작업합니다:

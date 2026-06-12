@@ -1,0 +1,21 @@
+#!/bin/bash
+# main에서 git pull 후 머지된 feature/* 워크트리를 자동으로 닫는다.
+set -euo pipefail
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+[ "$CURRENT_BRANCH" = "main" ] || exit 0
+
+ROOT=$(git rev-parse --show-toplevel)
+PARENT=$(dirname "$ROOT")
+
+git fetch origin --quiet
+
+git worktree list --porcelain | grep "^branch refs/heads/feature/" | sed 's|^branch refs/heads/||' | while read -r BRANCH; do
+  ISSUE_NUM=$(echo "$BRANCH" | grep -o '[0-9]*$')
+  WORKTREE_PATH="$PARENT/$ISSUE_NUM"
+
+  if git merge-base --is-ancestor "origin/$BRANCH" origin/main 2>/dev/null; then
+    echo "▶ [post-merge] 머지 감지: $BRANCH → 워크트리 자동 정리"
+    "$ROOT/scripts/worktree-close.sh" "$ISSUE_NUM" --auto
+  fi
+done

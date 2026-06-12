@@ -1,7 +1,14 @@
 name: 기능 추가
 description: 새로운 기능 요청
+title: "[도메인] 작업 내용"
 labels: ["feature"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        **제목 규칙:** `[도메인] 작업 내용` 형식으로 작성하세요.
+        예) `[bulletin] 주보 헤더 이미지 교체`, `[workflow] 워크트리 자동 닫기`
+
   - type: dropdown
     id: domain
     attributes:
@@ -12,6 +19,7 @@ body:
         - attendance (출석)
         - representative-prayer (대표기도)
         - config (설정)
+        - workflow (워크플로우/인프라)
         - 기타
     validations:
       required: true
