@@ -1,0 +1,24 @@
+#!/bin/bash
+# feature 브랜치에서 커밋 시 [#N] 접두사를 자동으로 삽입합니다.
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+
+if [ "$COMMIT_SOURCE" = "merge" ] || [ "$COMMIT_SOURCE" = "squash" ]; then
+  exit 0
+fi
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+ISSUE_NUM=$(echo "$BRANCH" | grep -o '[0-9]*$')
+
+if [ -z "$ISSUE_NUM" ]; then
+  exit 0
+fi
+
+# 이미 [#N] 형식이 포함되어 있으면 건드리지 않음
+if grep -q "\[#$ISSUE_NUM\]" "$COMMIT_MSG_FILE"; then
+  exit 0
+fi
+
+ORIGINAL=$(cat "$COMMIT_MSG_FILE")
+echo "[#$ISSUE_NUM] $ORIGINAL" > "$COMMIT_MSG_FILE"

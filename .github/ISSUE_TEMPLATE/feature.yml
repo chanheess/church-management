@@ -1,0 +1,45 @@
+name: 기능 추가
+description: 새로운 기능 요청
+labels: ["feature"]
+body:
+  - type: dropdown
+    id: domain
+    attributes:
+      label: 도메인
+      description: 작업 대상 도메인 (워크트리 분리 기준)
+      options:
+        - bulletin (주보)
+        - attendance (출석)
+        - representative-prayer (대표기도)
+        - config (설정)
+        - 기타
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirement
+    attributes:
+      label: 요구사항
+      description: 무엇을 만들어야 하는지 구체적으로 작성하세요.
+      placeholder: |
+        - [ ] ~해야 한다
+        - [ ] ~이면 ~를 보여준다
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 완료 기준
+      description: 어떻게 되면 이 이슈가 완료된 것인지 서술합니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: 예상 수정 파일
+      description: 어떤 파일이 수정될 것으로 예상하나요? (워크트리 분리 판단에 사용)
+      placeholder: |
+        - src/main/java/...
+        - src/main/resources/templates/...

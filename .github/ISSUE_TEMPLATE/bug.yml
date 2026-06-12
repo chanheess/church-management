@@ -1,0 +1,43 @@
+name: 버그 수정
+description: 오동작하는 기능 보고
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: domain
+    attributes:
+      label: 도메인
+      options:
+        - bulletin (주보)
+        - attendance (출석)
+        - representative-prayer (대표기도)
+        - config (설정)
+        - 기타
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: 현재 동작
+      description: 어떤 문제가 발생하나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 동작
+      description: 어떻게 동작해야 하나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 재현 방법
+      placeholder: |
+        1. ~에서
+        2. ~을 하면
+        3. ~가 발생함
+    validations:
+      required: true
