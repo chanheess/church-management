@@ -22,5 +22,8 @@
         "command": "echo '\n⚠️  리뷰 필요: main 브랜치 머지 전 반드시 사람이 코드를 확인하세요. (./scripts/worktree-done.sh 실행 후 PR 리뷰)'"
       }
     ]
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }
