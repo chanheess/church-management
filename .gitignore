@@ -41,5 +41,5 @@ out/
 .env
 .vscode
 
-# Claude Code local settings
+# Claude Code (개인 로컬 설정 — 커밋하지 않음)
 .claude/settings.local.json
