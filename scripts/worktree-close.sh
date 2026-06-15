@@ -1,6 +1,6 @@
 #!/bin/bash
 # Usage: ./scripts/worktree-close.sh <이슈번호> [--auto]
-# PR 머지 완료 후 워크트리와 로컬 브랜치를 정리합니다.
+# PR 머지 완료 후 워크트리와 로컬·원격 브랜치를 정리합니다.
 # --auto: post-merge 훅 등 자동 실행 시 대화형 프롬프트를 건너뜁니다.
 
 set -e
@@ -45,6 +45,12 @@ git worktree remove "$WORKTREE_PATH" --force
 if git branch --list "$BRANCH" | grep -q "$BRANCH"; then
   echo "▶ 로컬 브랜치 삭제: $BRANCH"
   git branch -d "$BRANCH" 2>/dev/null || git branch -D "$BRANCH"
+fi
+
+# 원격 브랜치 삭제 (머지 완료 후 정리 — GitHub 자동 삭제가 꺼져 있어도 깔끔하게 닫는다)
+if git ls-remote --heads origin "$BRANCH" 2>/dev/null | grep -q "$BRANCH"; then
+  echo "▶ 원격 브랜치 삭제: origin/$BRANCH"
+  git push origin --delete "$BRANCH" 2>/dev/null || echo "  ⚠️ 원격 브랜치 삭제 실패 — 권한/네트워크 확인 후 수동 삭제하세요."
 fi
 
 echo ""
