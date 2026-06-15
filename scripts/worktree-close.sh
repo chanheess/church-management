@@ -37,24 +37,19 @@ if [ "$AUTO" = false ] && command -v gh &>/dev/null; then
   fi
 fi
 
-# 커밋 안 한 변경 보호: --force 로 삭제하기 전에 확인한다.
-FORCE=""
+# 커밋 안 한 변경 보호: 미커밋 변경이 있으면 닫지 않는다 (작업 손실 방지).
 if [ -n "$(git -C "$WORKTREE_PATH" status --porcelain 2>/dev/null)" ]; then
-  echo "⚠️  $WORKTREE_PATH 에 커밋 안 된 변경이 있습니다:"
+  echo "⚠️  $WORKTREE_PATH 에 커밋 안 된 변경이 있어 워크트리를 닫지 않습니다:"
   git -C "$WORKTREE_PATH" status --short
-  if [ "$AUTO" = true ]; then
-    echo "▶ [자동] 작업 손실 방지를 위해 이 워크트리는 닫지 않고 건너뜁니다."
-    echo "   (커밋 또는 stash 후 ./scripts/worktree-close.sh $ISSUE_NUM 로 수동 정리)"
-    exit 0
-  fi
-  echo "    강제로 닫으면 위 변경은 삭제됩니다. 계속하려면 Enter, 취소하려면 Ctrl+C"
-  read -r
-  FORCE="--force"
+  echo "   → 커밋 또는 stash 후 다시 실행하세요: ./scripts/worktree-close.sh $ISSUE_NUM"
+  echo "   (정말 버리려면 수동으로: git worktree remove \"$WORKTREE_PATH\" --force)"
+  [ "$AUTO" = true ] && exit 0   # 자동(post-merge): 이 워크트리만 건너뛰고 정상 종료
+  exit 1                          # 수동: 중단 (사용자가 직접 처리)
 fi
 
-# 워크트리 제거 (깨끗하면 --force 없이, 위에서 확인했으면 --force)
+# 여기 도달 = 워크트리가 깨끗함 → --force 불필요
 echo "▶ 워크트리 제거: $WORKTREE_PATH"
-git worktree remove "$WORKTREE_PATH" $FORCE
+git worktree remove "$WORKTREE_PATH"
 
 # 로컬 브랜치 삭제
 if git branch --list "$BRANCH" | grep -q "$BRANCH"; then
