@@ -4,6 +4,9 @@ set -euo pipefail
 ROOT=$(git rev-parse --show-toplevel)
 cd "$ROOT"
 
+echo "▶ [pre-commit] 시크릿 스캔..."
+"$ROOT/.githooks/secret-scan.sh" || { echo "✗ 시크릿 의심. 커밋 중단."; exit 1; }
+
 echo "▶ [pre-commit] 컴파일 체크..."
 ./gradlew -q compileJava || { echo "✗ 컴파일 실패. 커밋 중단."; exit 1; }
 
