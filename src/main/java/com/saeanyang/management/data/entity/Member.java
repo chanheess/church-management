@@ -56,8 +56,16 @@ public class Member {
    */
   private LocalDate birthDate;
 
-  /** 연락처. 개인정보(PII)라 문자열로 보관한다(서식·국가코드 보존, 추후 암호화 컨버터 여지). */
+  /** 연락처. 숫자만 허용한다(PII, 추후 암호화 컨버터 여지). 하이픈 등 서식은 매퍼에서 제거. */
   private String phone;
+
+  /** 연락처는 숫자만 허용한다. 숫자 외 문자가 있으면 {@link IllegalArgumentException}. (null·빈 값은 허용) */
+  public void setPhone(String phone) {
+    if (phone != null && !phone.isBlank() && !phone.matches("\\d+")) {
+      throw new IllegalArgumentException("연락처는 숫자만 입력할 수 있습니다: " + phone);
+    }
+    this.phone = phone;
+  }
 
   /** 상태. */
   private String status;
