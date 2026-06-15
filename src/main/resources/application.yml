@@ -18,3 +18,10 @@ bulletin:
 
 server:
   port: 8082
+
+app:
+  security:
+    # 개인정보(이름·생년월일·전화번호) 암호화 키 — base64 인코딩된 32바이트(AES-256).
+    # 운영에서는 반드시 APP_PII_KEY 환경변수/Compose secret으로 주입(.env·소스 커밋 금지).
+    # 미설정 시 임시 랜덤키로 기동(경고) — 재시작 후 기존 암호문 복호화 불가.
+    pii-key: ${APP_PII_KEY:}
