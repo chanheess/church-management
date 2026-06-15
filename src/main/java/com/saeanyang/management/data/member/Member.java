@@ -1,5 +1,8 @@
-package com.saeanyang.management.data.entity;
+package com.saeanyang.management.data.member;
 
+import com.saeanyang.management.data.member.enums.MemberStatus;
+import com.saeanyang.management.data.member.enums.Position;
+import com.saeanyang.management.data.member.enums.ProgressStatus;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;

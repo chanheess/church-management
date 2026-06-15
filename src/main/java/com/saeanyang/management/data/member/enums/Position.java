@@ -1,4 +1,4 @@
-package com.saeanyang.management.data.entity;
+package com.saeanyang.management.data.member.enums;
 
 import java.util.Arrays;
 import java.util.Optional;

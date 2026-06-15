@@ -1,13 +1,11 @@
-package com.saeanyang.management.data;
+package com.saeanyang.management.data.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.saeanyang.management.data.entity.Member;
-import com.saeanyang.management.data.entity.MemberStatus;
-import com.saeanyang.management.data.entity.Position;
-import com.saeanyang.management.data.entity.ProgressStatus;
-import com.saeanyang.management.data.repository.MemberRepository;
+import com.saeanyang.management.data.member.enums.MemberStatus;
+import com.saeanyang.management.data.member.enums.Position;
+import com.saeanyang.management.data.member.enums.ProgressStatus;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
