@@ -67,14 +67,17 @@ public class Member {
     this.phone = phone;
   }
 
-  /** 상태. */
-  private String status;
+  /** 상태. 정상(상태 없음)은 {@code null}, 예외 상태(해외/장결자/군대)만 값을 둔다. */
+  @Enumerated(EnumType.STRING)
+  private MemberStatus status;
 
-  /** 행삶 (행함이 있는 삶). */
-  private String action;
+  /** 행삶 (행함이 있는 삶). 진행 상태(미진행/진행중/완료), 미상은 null. */
+  @Enumerated(EnumType.STRING)
+  private ProgressStatus action;
 
-  /** 양육. */
-  private String training;
+  /** 양육. 진행 상태(미진행/진행중/완료), 미상은 null. */
+  @Enumerated(EnumType.STRING)
+  private ProgressStatus training;
 
   /** 직분 (간사/목자/리더/인턴/성도 — 다중). */
   @ElementCollection(fetch = FetchType.EAGER)

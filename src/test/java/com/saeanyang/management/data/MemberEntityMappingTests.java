@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.saeanyang.management.data.entity.Member;
+import com.saeanyang.management.data.entity.MemberStatus;
 import com.saeanyang.management.data.entity.Position;
+import com.saeanyang.management.data.entity.ProgressStatus;
 import com.saeanyang.management.data.repository.MemberRepository;
 import java.time.LocalDate;
 import java.util.List;
@@ -27,9 +29,9 @@ class MemberEntityMappingTests {
     member.setCellName("홍길동셀");
     member.setBirthDate(LocalDate.of(1996, 10, 13));
     member.setPhone("01012345678");
-    member.setStatus("재적");
-    member.setAction("O");
-    member.setTraining("진행중");
+    member.setStatus(MemberStatus.MILITARY);
+    member.setAction(ProgressStatus.DONE);
+    member.setTraining(ProgressStatus.IN_PROGRESS);
     member.getPositions().add(Position.LEADER);
     member.getPositions().add(Position.SHEPHERD);
 
@@ -41,18 +43,40 @@ class MemberEntityMappingTests {
     assertThat(loaded.getName()).isEqualTo("홍길동");
     assertThat(loaded.getBirthDate()).isEqualTo(LocalDate.of(1996, 10, 13));
     assertThat(loaded.getPhone()).isEqualTo("01012345678");
-    assertThat(loaded.getAction()).isEqualTo("O");
-    assertThat(loaded.getTraining()).isEqualTo("진행중");
+    assertThat(loaded.getStatus()).isEqualTo(MemberStatus.MILITARY);
+    assertThat(loaded.getAction()).isEqualTo(ProgressStatus.DONE);
+    assertThat(loaded.getTraining()).isEqualTo(ProgressStatus.IN_PROGRESS);
     assertThat(loaded.getPositions())
         .containsExactlyInAnyOrder(Position.LEADER, Position.SHEPHERD);
   }
 
   @Test
   void position_resolves_from_korean_label() {
-    assertThat(Position.fromLabel("간사")).isEqualTo(Position.STAFF);
-    assertThat(Position.fromLabel("성도")).isEqualTo(Position.MEMBER);
-    assertThat(Position.fromLabel("없는직분")).isEqualTo(Position.MEMBER);
-    assertThat(Position.fromLabel(null)).isEqualTo(Position.MEMBER);
+    assertThat(Position.fromLabel("간사")).contains(Position.STAFF);
+    assertThat(Position.fromLabel("인턴")).contains(Position.INTERN);
+    // 성도(무직분)·미상·null 은 직분 없음 → 빈 Optional
+    assertThat(Position.fromLabel("성도")).isEmpty();
+    assertThat(Position.fromLabel("없는직분")).isEmpty();
+    assertThat(Position.fromLabel(null)).isEmpty();
+  }
+
+  @Test
+  void status_resolves_from_korean_label() {
+    assertThat(MemberStatus.fromLabel("해외")).contains(MemberStatus.OVERSEAS);
+    assertThat(MemberStatus.fromLabel("장결자")).contains(MemberStatus.LONG_ABSENT);
+    assertThat(MemberStatus.fromLabel("군대")).contains(MemberStatus.MILITARY);
+    // 정상(상태 없음)·미상·null 은 빈 Optional → status는 null
+    assertThat(MemberStatus.fromLabel("정상")).isEmpty();
+    assertThat(MemberStatus.fromLabel(null)).isEmpty();
+  }
+
+  @Test
+  void progress_status_resolves_from_korean_label() {
+    assertThat(ProgressStatus.fromLabel("미진행")).contains(ProgressStatus.NOT_STARTED);
+    assertThat(ProgressStatus.fromLabel("진행중")).contains(ProgressStatus.IN_PROGRESS);
+    assertThat(ProgressStatus.fromLabel("완료")).contains(ProgressStatus.DONE);
+    assertThat(ProgressStatus.fromLabel("")).isEmpty();
+    assertThat(ProgressStatus.fromLabel(null)).isEmpty();
   }
 
   @Test
