@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
-/** PII 필드(이름·전화·생년월일)가 DB에는 암호문으로 저장되고, 조회 시 평문으로 복호화되는지 검증한다. */
+/** 전화·생년월일은 DB에 암호문으로 저장되고 조회 시 복호화되며, 이름은 평문임을 검증한다. */
 @DataJpaTest
 class MemberEncryptionTests {
 
@@ -46,7 +46,8 @@ class MemberEncryptionTests {
     String rawPhone = (String) raw[1];
     String rawBirth = (String) raw[2];
 
-    assertThat(rawName).isNotEqualTo("홍길동");
+    // 이름은 공개 정보라 평문, 전화·생년월일은 암호문
+    assertThat(rawName).isEqualTo("홍길동");
     assertThat(rawPhone).isNotEqualTo("01012345678");
     assertThat(rawBirth).doesNotContain("1996");
 

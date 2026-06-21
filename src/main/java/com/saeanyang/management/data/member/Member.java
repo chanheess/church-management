@@ -46,9 +46,8 @@ public class Member {
   @Column(nullable = false)
   private Integer rosterYear;
 
-  /** 이름. PII — 저장 시 암호화. */
+  /** 이름. 주보에 공개되는 정보이고 검색·정렬이 잦아 평문으로 둔다(암호화 제외). 접근통제로 보호. */
   @Column(nullable = false)
-  @Convert(converter = EncryptedStringConverter.class)
   private String name;
 
   /** 목장. */
