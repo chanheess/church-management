@@ -3,6 +3,8 @@ package com.saeanyang.management;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.awt.*;
 import java.net.URI;
+import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,8 +18,12 @@ public class ChurchManagementApplication {
   private static final String APP_URL = "http://localhost:8082/bulletin";
 
   public static void main(String[] args) {
-    // AWT가 초기화되기 전에 반드시 설정해야 트레이/파일다이얼로그가 동작한다
-    System.setProperty("java.awt.headless", "false");
+    if (isServerProfile(args)) {
+      System.setProperty("java.awt.headless", "true");
+    } else {
+      // AWT가 초기화되기 전에 반드시 설정해야 트레이/파일다이얼로그가 동작한다
+      System.setProperty("java.awt.headless", "false");
+    }
 
     // macOS 독(Dock)에서 앱 이름 표시 (다른 OS에서는 무시됨)
     if (System.getProperty("os.name", "").toLowerCase().contains("mac")) {
@@ -34,8 +40,12 @@ public class ChurchManagementApplication {
 
   /** 서버 시작 완료 후 브라우저 열기 + 트레이 아이콘 등록 */
   @Bean
-  public ApplicationRunner appStartedRunner() {
+  public ApplicationRunner appStartedRunner(
+      @Value("${app.desktop.enabled:true}") boolean desktopEnabled) {
     return args -> {
+      if (!desktopEnabled) {
+        return;
+      }
       openBrowser(APP_URL);
       setupSystemTray();
     };
@@ -109,5 +119,19 @@ public class ChurchManagementApplication {
     g2.fillOval(1, 1, size - 2, size - 2);
     g2.dispose();
     return img;
+  }
+
+  private static boolean isServerProfile(String[] args) {
+    String activeProfiles = System.getenv("SPRING_PROFILES_ACTIVE");
+    if (activeProfiles != null
+        && Arrays.stream(activeProfiles.split(",")).map(String::trim).anyMatch("server"::equals)) {
+      return true;
+    }
+
+    return Arrays.stream(args)
+        .anyMatch(
+            arg ->
+                arg.contains("spring.profiles.active=server")
+                    || arg.contains("SPRING_PROFILES_ACTIVE=server"));
   }
 }

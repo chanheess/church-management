@@ -1,0 +1,25 @@
+server:
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        secure: true
+        http-only: true
+        same-site: strict
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/church_management}
+    username: ${SPRING_DATASOURCE_USERNAME:church}
+    password: ${SPRING_DATASOURCE_PASSWORD:church_dev_password}
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+app:
+  desktop:
+    enabled: false
