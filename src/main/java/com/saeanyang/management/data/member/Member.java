@@ -3,8 +3,11 @@ package com.saeanyang.management.data.member;
 import com.saeanyang.management.data.member.enums.MemberStatus;
 import com.saeanyang.management.data.member.enums.Position;
 import com.saeanyang.management.data.member.enums.ProgressStatus;
+import com.saeanyang.management.security.crypto.EncryptedLocalDateConverter;
+import com.saeanyang.management.security.crypto.EncryptedStringConverter;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
@@ -43,7 +46,7 @@ public class Member {
   @Column(nullable = false)
   private Integer rosterYear;
 
-  /** 이름. */
+  /** 이름. 주보에 공개되는 정보이고 검색·정렬이 잦아 평문으로 둔다(암호화 제외). 접근통제로 보호. */
   @Column(nullable = false)
   private String name;
 
@@ -56,10 +59,14 @@ public class Member {
   /**
    * 생년월일. 엑셀 값(예: {@code 19961013})을 파싱해 채운다. 연도가 비어 있으면 매퍼가
    * 현재 연도로 채운다. (파싱 규칙은 엑셀→엔티티 매퍼(#21~#23) 책임)
+   *
+   * <p>PII — 저장 시 암호화.
    */
+  @Convert(converter = EncryptedLocalDateConverter.class)
   private LocalDate birthDate;
 
-  /** 연락처. 숫자만 허용한다(PII, 추후 암호화 컨버터 여지). 하이픈 등 서식은 매퍼에서 제거. */
+  /** 연락처. 숫자만 허용한다(PII — 저장 시 암호화). 하이픈 등 서식은 매퍼에서 제거. */
+  @Convert(converter = EncryptedStringConverter.class)
   private String phone;
 
   /** 연락처는 숫자만 허용한다. 숫자 외 문자가 있으면 {@link IllegalArgumentException}. (null·빈 값은 허용) */

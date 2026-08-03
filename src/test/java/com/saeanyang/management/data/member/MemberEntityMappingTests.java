@@ -6,8 +6,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.saeanyang.management.data.member.enums.MemberStatus;
 import com.saeanyang.management.data.member.enums.Position;
 import com.saeanyang.management.data.member.enums.ProgressStatus;
+import com.saeanyang.management.security.crypto.AesGcmCipher;
+import com.saeanyang.management.security.crypto.PiiCipherHolder;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -17,6 +21,14 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 class MemberEntityMappingTests {
 
   @Autowired private MemberRepository memberRepository;
+
+  @BeforeAll
+  static void initCipher() {
+    // Member의 @Convert(PII 암호화)가 동작하려면 슬라이스 테스트에서 키를 직접 주입한다.
+    byte[] key = new byte[32];
+    new SecureRandom().nextBytes(key);
+    PiiCipherHolder.set(new AesGcmCipher(key));
+  }
 
   @Test
   void member_round_trips_with_enum_positions_and_birthdate() {
