@@ -1,5 +1,6 @@
 package com.saeanyang.management.auth.config;
 
+import com.saeanyang.management.account.User;
 import com.saeanyang.management.auth.email.EmailVerificationProperties;
 import com.saeanyang.management.auth.login.EmailVerificationRequiredFilter;
 import com.saeanyang.management.auth.login.EmailVerificationSuccessHandler;
@@ -7,6 +8,7 @@ import com.saeanyang.management.auth.signup.SignupProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -24,6 +26,7 @@ public class SecurityConfig {
     ) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(HttpMethod.POST, "/api/excel/sync").hasAuthority(User.ROLE_ADMIN)
                 .requestMatchers(
                     "/login",
                     "/signup",

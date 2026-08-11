@@ -1,7 +1,15 @@
 package com.saeanyang.management.service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.HexFormat;
 import org.apache.poi.ss.usermodel.Workbook;
 
 /** 활성 엑셀 원본과 원본 식별용 메타데이터를 제공한다. */
@@ -14,4 +22,23 @@ public interface ExcelDataSource {
   Metadata getMetadata() throws IOException;
 
   record Metadata(String path, String version, String hash, Instant modifiedAt) {}
+}
+
+final class ExcelSourceFiles {
+
+  private ExcelSourceFiles() {}
+
+  static String sha256(Path path) throws IOException {
+    MessageDigest digest;
+    try {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException("SHA-256을 사용할 수 없습니다.", e);
+    }
+
+    try (InputStream input = new DigestInputStream(Files.newInputStream(path), digest)) {
+      input.transferTo(OutputStream.nullOutputStream());
+    }
+    return HexFormat.of().formatHex(digest.digest());
+  }
 }
