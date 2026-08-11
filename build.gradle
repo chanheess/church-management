@@ -32,6 +32,7 @@ dependencies {
 	implementation 'org.apache.poi:poi-ooxml:5.2.5'
 	implementation 'org.projectlombok:lombok:1.18.30'
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+	implementation 'com.google.auth:google-auth-library-oauth2-http:1.46.0'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.postgresql:postgresql'

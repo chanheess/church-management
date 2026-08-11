@@ -35,6 +35,15 @@ bulletin:
   representative-prayer:
     path: ${BULLETIN_REPRESENTATIVE_PRAYER_PATH:${user.home}/.church-management/representative-prayer.json}
 
+excel:
+  # local(기본) 또는 google-drive. Drive 모드는 서비스계정에 대상 파일 읽기 권한을 공유해야 한다.
+  source: ${EXCEL_SOURCE:local}
+  google-drive:
+    file-id: ${GOOGLE_DRIVE_FILE_ID:}
+    credentials-path: ${GOOGLE_DRIVE_CREDENTIALS_PATH:}
+    cache-path: ${GOOGLE_DRIVE_CACHE_PATH:${user.home}/.church-management/active.xlsx}
+    poll-interval: ${GOOGLE_DRIVE_POLL_INTERVAL:PT5M}
+
 server:
   port: 8082
 

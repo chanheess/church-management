@@ -2,6 +2,8 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <title>청년부 주보</title>
     <link rel="stylesheet" th:href="@{/weekly-bulletin.css}" />
 </head>
@@ -493,6 +495,8 @@
                 </div>
                 <div class="settings-btn-row">
                     <button class="save-settings-btn" type="button" onclick="savePathsConfig()">저장 후 새로고침</button>
+                    <button class="save-settings-btn" type="button" th:if="${googleDriveEnabled}"
+                            onclick="syncGoogleDrive()">Drive 지금 동기화</button>
                     <button class="reset-btn" type="button" onclick="closeSettingsPanel()">취소</button>
                 </div>
             </div>
@@ -800,6 +804,25 @@
         .catch(err => {
             console.error('경로 저장 실패:', err);
             alert('저장에 실패했습니다.');
+        });
+    }
+
+    function syncGoogleDrive() {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+        fetch('/api/excel/sync', {
+            method: 'POST',
+            headers: { [csrfHeader]: csrfToken }
+        })
+        .then(async response => {
+            if (!response.ok) throw new Error(await response.text());
+            const result = await response.json();
+            alert(result.updated ? 'Drive 엑셀을 갱신했습니다.' : '이미 최신 Drive 엑셀입니다.');
+            if (result.updated) location.reload();
+        })
+        .catch(err => {
+            console.error('Drive 동기화 실패:', err);
+            alert('Drive 동기화에 실패했습니다. 서버 로그를 확인해 주세요.');
         });
     }
 

@@ -49,6 +49,9 @@ public class BulletinController {
   @Value("${bulletin.illustration.folder}")
   private String illustrationFolder;
 
+  @Value("${excel.source:local}")
+  private String excelSource;
+
   public BulletinController(
       ExcelReaderService excelReaderService,
       ExcelDataSource excelDataSource,
@@ -126,6 +129,7 @@ public class BulletinController {
     model.addAttribute("bulletin", bulletinData);
     model.addAttribute("textConfig", textConfig);
     model.addAttribute("selectedDate", targetSunday.toString());
+    model.addAttribute("googleDriveEnabled", "google-drive".equals(excelSource));
 
     try {
       if (!excelDataSource.getMetadata().path().isBlank()) {
