@@ -3,6 +3,7 @@ package com.saeanyang.management.controller;
 import com.saeanyang.management.model.BulletinData;
 import com.saeanyang.management.model.CellGroup;
 import com.saeanyang.management.model.EditableTextConfig;
+import com.saeanyang.management.service.ExcelDataSource;
 import com.saeanyang.management.service.ExcelReaderService;
 import com.saeanyang.management.service.RepresentativePrayerService;
 import com.saeanyang.management.service.TextConfigService;
@@ -17,6 +18,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -37,11 +39,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class BulletinController {
 
   private final ExcelReaderService excelReaderService;
+  private final ExcelDataSource excelDataSource;
   private final TextConfigService textConfigService;
   private final RepresentativePrayerService representativePrayerService;
-
-  @Value("${bulletin.excel.path}")
-  private String excelFilePath;
 
   @Value("${bulletin.logo.path}")
   private String logoFilePath;
@@ -51,9 +51,11 @@ public class BulletinController {
 
   public BulletinController(
       ExcelReaderService excelReaderService,
+      ExcelDataSource excelDataSource,
       TextConfigService textConfigService,
       RepresentativePrayerService representativePrayerService) {
     this.excelReaderService = excelReaderService;
+    this.excelDataSource = excelDataSource;
     this.textConfigService = textConfigService;
     this.representativePrayerService = representativePrayerService;
   }
@@ -66,9 +68,9 @@ public class BulletinController {
 
   @GetMapping("/api/config/paths")
   @ResponseBody
-  public PathsConfig getPathsConfig() {
+  public PathsConfig getPathsConfig() throws IOException {
     return new PathsConfig(
-        textConfigService.getPathConfig("excelPath", excelFilePath),
+        excelDataSource.getMetadata().path(),
         textConfigService.getPathConfig("logoPath", logoFilePath),
         textConfigService.getPathConfig("illustrationFolder", illustrationFolder));
   }
@@ -94,10 +96,6 @@ public class BulletinController {
 
   /** 텍스트 단일 항목 업데이트용 요청 바디 */
   public record TextUpdateRequest(String key, String value) {}
-
-  private String effectiveExcelPath() {
-    return textConfigService.getPathConfig("excelPath", excelFilePath);
-  }
 
   private String effectiveLogoPath() {
     return textConfigService.getPathConfig("logoPath", logoFilePath);
@@ -130,9 +128,10 @@ public class BulletinController {
     model.addAttribute("selectedDate", targetSunday.toString());
 
     try {
-      String excelPath = effectiveExcelPath();
-      if (excelPath != null && !excelPath.isBlank()) {
-        bulletinData = excelReaderService.readBulletinData(excelPath, targetSunday);
+      if (!excelDataSource.getMetadata().path().isBlank()) {
+        try (Workbook workbook = excelDataSource.getActiveWorkbook()) {
+          bulletinData = excelReaderService.readBulletinData(workbook, targetSunday);
+        }
         bulletinData.setHeadPastor(textConfig.getHeadPastor());
         bulletinData.setDirector(textConfig.getDirector());
         bulletinData.setAdvisors(textConfig.getAdvisors());
@@ -181,8 +180,10 @@ public class BulletinController {
       @RequestParam(value = "month", required = false) String month, Model model) {
     try {
       YearMonth selectedMonth = parseAttendanceMonth(month);
-      List<CellGroup> cellGroups =
-          excelReaderService.readAttendanceData(effectiveExcelPath(), selectedMonth);
+      List<CellGroup> cellGroups;
+      try (Workbook workbook = excelDataSource.getActiveWorkbook()) {
+        cellGroups = excelReaderService.readAttendanceData(workbook, selectedMonth);
+      }
       model.addAttribute("cellGroups", cellGroups);
       model.addAttribute("selectedMonthInput", selectedMonth.toString()); // yyyy-MM
     } catch (IOException e) {

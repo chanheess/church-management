@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.SerializationFeature;
@@ -40,11 +41,9 @@ public class RepresentativePrayerService {
   private static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
 
   private final ExcelReaderService excelReaderService;
+  private final ExcelDataSource excelDataSource;
   private final TextConfigService textConfigService;
   private final JsonMapper objectMapper;
-
-  @Value("${bulletin.excel.path:}")
-  private String excelFilePath;
 
   @Value("${bulletin.text.path:}")
   private String textConfigPath;
@@ -53,8 +52,11 @@ public class RepresentativePrayerService {
   private String prayerConfigPath;
 
   public RepresentativePrayerService(
-      ExcelReaderService excelReaderService, TextConfigService textConfigService) {
+      ExcelReaderService excelReaderService,
+      ExcelDataSource excelDataSource,
+      TextConfigService textConfigService) {
     this.excelReaderService = excelReaderService;
+    this.excelDataSource = excelDataSource;
     this.textConfigService = textConfigService;
     this.objectMapper =
         JsonMapper.builder().findAndAddModules().enable(SerializationFeature.INDENT_OUTPUT).build();
@@ -428,11 +430,12 @@ public class RepresentativePrayerService {
   }
 
   private List<Person> readPeopleForYear(int year) throws IOException {
-    String effectiveExcelPath = textConfigService.getPathConfig("excelPath", excelFilePath);
-    if (effectiveExcelPath == null || effectiveExcelPath.isBlank()) {
+    if (excelDataSource.getMetadata().path().isBlank()) {
       return List.of();
     }
-    return excelReaderService.readRosterPeople(effectiveExcelPath, year);
+    try (Workbook workbook = excelDataSource.getActiveWorkbook()) {
+      return excelReaderService.readRosterPeople(workbook, year);
+    }
   }
 
   private RepresentativePrayerConfig loadAndPruneConfig() throws IOException {

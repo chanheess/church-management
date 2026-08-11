@@ -33,7 +33,7 @@ gradlew.bat packagePortableApp
 
 **스택:** Java 17, Spring Boot 4.0.0, Thymeleaf, Apache POI, Gradle
 
-**데이터 흐름:** Excel 파일 (`.env`에서 경로 설정) → `ExcelReaderService` → Spring MVC 컨트롤러 → Thymeleaf 템플릿 → 브라우저 UI
+**데이터 흐름:** Excel 파일 (`.env` 또는 화면에서 경로 설정) → `ExcelDataSource` → `ExcelReaderService` → Spring MVC 컨트롤러 → Thymeleaf 템플릿 → 브라우저 UI
 
 **영속성:** DB 없음. 설정은 `~/.church-management/` 아래 두 개의 로컬 파일에 저장:
 - `text-config.properties` — 편집 가능한 텍스트 (목사 이름, 공지사항 등)
@@ -42,6 +42,8 @@ gradlew.bat packagePortableApp
 **진입점:** `ChurchManagementApplication` — Spring Boot 시작, 시스템 트레이 아이콘 등록, `/bulletin`으로 브라우저 자동 실행
 
 **주요 서비스:**
+- `ExcelDataSource` — 활성 엑셀 Workbook과 경로·버전·SHA-256·수정 시각 메타데이터를 제공하는 입력원 경계
+- `LocalFileExcelSource` — 기존 로컬 경로 설정을 사용하는 기본 `ExcelDataSource` 구현체
 - `ExcelReaderService` — 연도별 명단 시트 (예: `26년명단`) 파싱. 성도 정보, 셀 그룹, 생일, 출석 데이터 처리
 - `RepresentativePrayerService` — 연간 대표기도 순번 생성, 교체 요청 및 이름 수정 처리
 - `TextConfigService` — 편집 가능한 텍스트 설정을 홈 디렉토리에서 로드/저장
