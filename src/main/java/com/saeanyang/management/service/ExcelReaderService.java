@@ -5,8 +5,10 @@ import com.saeanyang.management.model.BulletinData;
 import com.saeanyang.management.model.CellGroup;
 import com.saeanyang.management.model.Person;
 import com.saeanyang.management.model.TeamMember;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -14,7 +16,6 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,11 +23,26 @@ public class ExcelReaderService {
 
   /** 명단 시트에서 사람 목록만 읽는다 (대표기도 순서 등에 사용). */
   public List<Person> readRosterPeople(String filePath, int year) throws IOException {
-    try (FileInputStream fis = new FileInputStream(filePath);
-        Workbook workbook = new XSSFWorkbook(fis)) {
-      Sheet sheet = findRosterSheet(workbook, year);
-      return readPeopleFromExcel(sheet);
+    try (InputStream inputStream = Files.newInputStream(Path.of(filePath))) {
+      return readRosterPeople(inputStream, year);
     }
+  }
+
+  /**
+   * 입력 스트림에서 명단을 읽는다. 이 메서드는 전달받은 스트림을 직접 닫지 않으며, 생성한 Workbook만 닫는다.
+   */
+  public List<Person> readRosterPeople(InputStream inputStream, int year) throws IOException {
+    Objects.requireNonNull(inputStream, "inputStream");
+    try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+      return readRosterPeople(workbook, year);
+    }
+  }
+
+  /** 전달받은 Workbook에서 명단을 읽는다. Workbook의 종료 책임은 호출자에게 있다. */
+  public List<Person> readRosterPeople(Workbook workbook, int year) {
+    Objects.requireNonNull(workbook, "workbook");
+    Sheet sheet = findRosterSheet(workbook, year);
+    return readPeopleFromExcel(sheet);
   }
 
   public BulletinData readBulletinData(String filePath) throws IOException {
@@ -34,47 +50,71 @@ public class ExcelReaderService {
   }
 
   public BulletinData readBulletinData(String filePath, LocalDate targetSunday) throws IOException {
+    try (InputStream inputStream = Files.newInputStream(Path.of(filePath))) {
+      return readBulletinData(inputStream, targetSunday);
+    }
+  }
+
+  public BulletinData readBulletinData(InputStream inputStream) throws IOException {
+    return readBulletinData(inputStream, getCurrentWeekSunday());
+  }
+
+  /**
+   * 입력 스트림에서 주보 데이터를 읽는다. 이 메서드는 전달받은 스트림을 직접 닫지 않으며, 생성한 Workbook만 닫는다.
+   */
+  public BulletinData readBulletinData(InputStream inputStream, LocalDate targetSunday)
+      throws IOException {
+    Objects.requireNonNull(inputStream, "inputStream");
+    try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+      return readBulletinData(workbook, targetSunday);
+    }
+  }
+
+  public BulletinData readBulletinData(Workbook workbook) {
+    return readBulletinData(workbook, getCurrentWeekSunday());
+  }
+
+  /** 전달받은 Workbook에서 주보 데이터를 읽는다. Workbook의 종료 책임은 호출자에게 있다. */
+  public BulletinData readBulletinData(Workbook workbook, LocalDate targetSunday) {
+    Objects.requireNonNull(workbook, "workbook");
+    Objects.requireNonNull(targetSunday, "targetSunday");
     BulletinData bulletinData = new BulletinData();
 
-    try (FileInputStream fis = new FileInputStream(filePath);
-        Workbook workbook = new XSSFWorkbook(fis)) {
-
-      // 시트 목록 출력
-      System.out.println("===== 엑셀 시트 목록 =====");
-      for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-        System.out.println("시트 " + i + ": " + workbook.getSheetName(i));
-      }
-
-      LocalDate sunday = targetSunday;
-      Sheet sheet = findRosterSheet(workbook, sunday.getYear());
-
-      // 하드코딩된 값 설정 (엑셀에 없는 정보)
-      bulletinData.setHeadPastor("김한욱 목사");
-      bulletinData.setDirector("고은옥 사모");
-      bulletinData.setAdvisors("김기현 장로, 황윤식 장로");
-
-      // 엑셀에서 사람 데이터 읽기 (헤더 다음 행부터)
-      List<Person> people = readPeopleFromExcel(sheet);
-
-      // 목장별로 데이터 정리
-      List<TeamMember> teams = organizeByGroup(people);
-      bulletinData.setTeams(teams);
-
-      // 새청년 담당 및 찬양팀 리더 (하드코딩)
-      bulletinData.setNewYouthLeader("임유빈, 신영찬");
-      bulletinData.setWorshipLeader("임유빈 간사");
-
-      // 이번 주(오늘을 포함해 다음 일요일까지)를 기준으로 하는 주일 날짜 및 연도 계산
-      bulletinData.setDate(sunday.toString());
-      bulletinData.setYear(String.valueOf(sunday.getYear()));
-
-      // 헌금위원 월 및 날짜 계산
-      bulletinData.setOfferingMonth(sunday.getMonthValue() + "월");
-      bulletinData.setOfferingDates(calculateSundaysInMonth(sunday));
-
-      // 이번 주 생일자 계산 (일요일~토요일, 상태값이 없는 사람만)
-      bulletinData.setBirthdayMembers(getWeekBirthdays(people, sunday));
+    // 시트 목록 출력
+    System.out.println("===== 엑셀 시트 목록 =====");
+    for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+      System.out.println("시트 " + i + ": " + workbook.getSheetName(i));
     }
+
+    LocalDate sunday = targetSunday;
+    Sheet sheet = findRosterSheet(workbook, sunday.getYear());
+
+    // 하드코딩된 값 설정 (엑셀에 없는 정보)
+    bulletinData.setHeadPastor("김한욱 목사");
+    bulletinData.setDirector("고은옥 사모");
+    bulletinData.setAdvisors("김기현 장로, 황윤식 장로");
+
+    // 엑셀에서 사람 데이터 읽기 (헤더 다음 행부터)
+    List<Person> people = readPeopleFromExcel(sheet);
+
+    // 목장별로 데이터 정리
+    List<TeamMember> teams = organizeByGroup(people);
+    bulletinData.setTeams(teams);
+
+    // 새청년 담당 및 찬양팀 리더 (하드코딩)
+    bulletinData.setNewYouthLeader("임유빈, 신영찬");
+    bulletinData.setWorshipLeader("임유빈 간사");
+
+    // 이번 주(오늘을 포함해 다음 일요일까지)를 기준으로 하는 주일 날짜 및 연도 계산
+    bulletinData.setDate(sunday.toString());
+    bulletinData.setYear(String.valueOf(sunday.getYear()));
+
+    // 헌금위원 월 및 날짜 계산
+    bulletinData.setOfferingMonth(sunday.getMonthValue() + "월");
+    bulletinData.setOfferingDates(calculateSundaysInMonth(sunday));
+
+    // 이번 주 생일자 계산 (일요일~토요일, 상태값이 없는 사람만)
+    bulletinData.setBirthdayMembers(getWeekBirthdays(people, sunday));
 
     return bulletinData;
   }
@@ -519,115 +559,139 @@ public class ExcelReaderService {
 
   public List<CellGroup> readAttendanceData(String filePath, YearMonth selectedMonth)
       throws IOException {
+    try (InputStream inputStream = Files.newInputStream(Path.of(filePath))) {
+      return readAttendanceData(inputStream, selectedMonth);
+    }
+  }
+
+  public List<CellGroup> readAttendanceData(InputStream inputStream) throws IOException {
+    return readAttendanceData(inputStream, YearMonth.now());
+  }
+
+  /**
+   * 입력 스트림에서 출석 데이터를 읽는다. 이 메서드는 전달받은 스트림을 직접 닫지 않으며, 생성한 Workbook만 닫는다.
+   */
+  public List<CellGroup> readAttendanceData(InputStream inputStream, YearMonth selectedMonth)
+      throws IOException {
+    Objects.requireNonNull(inputStream, "inputStream");
+    try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+      return readAttendanceData(workbook, selectedMonth);
+    }
+  }
+
+  public List<CellGroup> readAttendanceData(Workbook workbook) {
+    return readAttendanceData(workbook, YearMonth.now());
+  }
+
+  /** 전달받은 Workbook에서 출석 데이터를 읽는다. Workbook의 종료 책임은 호출자에게 있다. */
+  public List<CellGroup> readAttendanceData(Workbook workbook, YearMonth selectedMonth) {
+    Objects.requireNonNull(workbook, "workbook");
     List<CellGroup> cellGroups = new ArrayList<>();
 
-    try (FileInputStream fis = new FileInputStream(filePath);
-        Workbook workbook = new XSSFWorkbook(fis)) {
-      YearMonth targetMonth = selectedMonth == null ? YearMonth.now() : selectedMonth;
-      Sheet sheet = findRosterSheet(workbook, targetMonth.getYear());
+    YearMonth targetMonth = selectedMonth == null ? YearMonth.now() : selectedMonth;
+    Sheet sheet = findRosterSheet(workbook, targetMonth.getYear());
 
-      // 헤더 행 찾기
-      Row headerRow = sheet.getRow(0);
-      if (headerRow == null) {
-        return cellGroups;
+    // 헤더 행 찾기
+    Row headerRow = sheet.getRow(0);
+    if (headerRow == null) {
+      return cellGroups;
+    }
+
+    // 컬럼 인덱스 찾기
+    int nameCol = -1,
+        birthdayCol = -1,
+        phoneCol = -1,
+        actionCol = -1,
+        trainingCol = -1,
+        attendanceCol = -1,
+        cellCol = -1,
+        statusCol = -1,
+        positionCol = -1;
+
+    int lastCol = headerRow.getLastCellNum();
+    for (int i = 0; i < lastCol; i++) {
+      String header = getCellValue(headerRow, i).trim();
+      if (header.contains("이름")) nameCol = i;
+      if (header.contains("생일") || header.contains("생년월일")) birthdayCol = i;
+      if (header.contains("연락처") || header.contains("핸드폰") || header.contains("전화")) phoneCol = i;
+      if (header.contains("행삶")) actionCol = i;
+      if (header.contains("양육")) trainingCol = i;
+      if (header.contains("출석") || header.contains("12월")) attendanceCol = i;
+      if (header.contains("셀")) cellCol = i;
+      if (header.contains("상태")) statusCol = i;
+      if (header.contains("직분")) positionCol = i;
+    }
+
+    if (nameCol == -1 || cellCol == -1) {
+      return cellGroups;
+    }
+
+    // 선택 월 계산 (기본: 현재 월)
+    LocalDate targetDate = targetMonth.atDay(1);
+    String currentMonth = targetMonth.getMonthValue() + "월 출석현황";
+
+    // 해당 월의 모든 일요일 날짜 계산
+    List<String> sundayDates = calculateSundaysInMonth(targetDate);
+
+    // 셀별로 데이터 그룹화
+    Map<String, List<AttendanceMember>> cellMap = new LinkedHashMap<>();
+
+    for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+      Row row = sheet.getRow(i);
+      if (row == null) continue;
+
+      String name = getCellValue(row, nameCol);
+      if (name == null || name.trim().isEmpty()) continue;
+
+      // 상태가 있는 사람은 제외
+      String status = statusCol >= 0 ? getCellValue(row, statusCol) : "";
+      if (status != null && !status.trim().isEmpty()) {
+        continue;
       }
 
-      // 컬럼 인덱스 찾기
-      int nameCol = -1,
-          birthdayCol = -1,
-          phoneCol = -1,
-          actionCol = -1,
-          trainingCol = -1,
-          attendanceCol = -1,
-          cellCol = -1,
-          statusCol = -1,
-          positionCol = -1;
+      String cell = cellCol >= 0 ? getCellValue(row, cellCol) : "";
+      String birthday = birthdayCol >= 0 ? getBirthdayValue(row, birthdayCol) : "";
+      String phone = phoneCol >= 0 ? getCellValue(row, phoneCol) : "";
+      String action = actionCol >= 0 ? getCellValue(row, actionCol) : "";
+      String training = trainingCol >= 0 ? getCellValue(row, trainingCol) : "";
+      String attendance = attendanceCol >= 0 ? getCellValue(row, attendanceCol) : "";
+      String position = positionCol >= 0 ? getCellValue(row, positionCol) : "";
 
-      int lastCol = headerRow.getLastCellNum();
-      for (int i = 0; i < lastCol; i++) {
-        String header = getCellValue(headerRow, i).trim();
-        if (header.contains("이름")) nameCol = i;
-        if (header.contains("생일") || header.contains("생년월일")) birthdayCol = i;
-        if (header.contains("연락처") || header.contains("핸드폰") || header.contains("전화")) phoneCol = i;
-        if (header.contains("행삶")) actionCol = i;
-        if (header.contains("양육")) trainingCol = i;
-        if (header.contains("출석") || header.contains("12월")) attendanceCol = i;
-        if (header.contains("셀")) cellCol = i;
-        if (header.contains("상태")) statusCol = i;
-        if (header.contains("직분")) positionCol = i;
+      AttendanceMember member = new AttendanceMember();
+      member.setName(name.trim());
+      member.setBirthday(birthday.trim());
+      member.setPhone(phone.trim());
+      member.setAction(action.trim());
+      member.setTraining(training.trim());
+      member.setAttendance(attendance.trim());
+      member.setPosition(position.trim());
+
+      String cellKey = cell.trim().isEmpty() ? "미지정" : cell.trim();
+      cellMap.computeIfAbsent(cellKey, k -> new ArrayList<>()).add(member);
+    }
+
+    // CellGroup으로 변환 (미지정 제외)
+    for (Map.Entry<String, List<AttendanceMember>> entry : cellMap.entrySet()) {
+      // "미지정" 셀은 제외
+      if ("미지정".equals(entry.getKey())) {
+        continue;
       }
 
-      if (nameCol == -1 || cellCol == -1) {
-        return cellGroups;
-      }
+      // 직분 순서대로 정렬
+      List<AttendanceMember> members = entry.getValue();
+      members.sort(
+          (m1, m2) -> {
+            int priority1 = getPositionPriority(m1.getPosition());
+            int priority2 = getPositionPriority(m2.getPosition());
+            return Integer.compare(priority1, priority2);
+          });
 
-      // 선택 월 계산 (기본: 현재 월)
-      LocalDate targetDate = targetMonth.atDay(1);
-      String currentMonth = targetMonth.getMonthValue() + "월 출석현황";
-
-      // 해당 월의 모든 일요일 날짜 계산
-      List<String> sundayDates = calculateSundaysInMonth(targetDate);
-
-      // 셀별로 데이터 그룹화
-      Map<String, List<AttendanceMember>> cellMap = new LinkedHashMap<>();
-
-      for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-        Row row = sheet.getRow(i);
-        if (row == null) continue;
-
-        String name = getCellValue(row, nameCol);
-        if (name == null || name.trim().isEmpty()) continue;
-
-        // 상태가 있는 사람은 제외
-        String status = statusCol >= 0 ? getCellValue(row, statusCol) : "";
-        if (status != null && !status.trim().isEmpty()) {
-          continue;
-        }
-
-        String cell = cellCol >= 0 ? getCellValue(row, cellCol) : "";
-        String birthday = birthdayCol >= 0 ? getBirthdayValue(row, birthdayCol) : "";
-        String phone = phoneCol >= 0 ? getCellValue(row, phoneCol) : "";
-        String action = actionCol >= 0 ? getCellValue(row, actionCol) : "";
-        String training = trainingCol >= 0 ? getCellValue(row, trainingCol) : "";
-        String attendance = attendanceCol >= 0 ? getCellValue(row, attendanceCol) : "";
-        String position = positionCol >= 0 ? getCellValue(row, positionCol) : "";
-
-        AttendanceMember member = new AttendanceMember();
-        member.setName(name.trim());
-        member.setBirthday(birthday.trim());
-        member.setPhone(phone.trim());
-        member.setAction(action.trim());
-        member.setTraining(training.trim());
-        member.setAttendance(attendance.trim());
-        member.setPosition(position.trim());
-
-        String cellKey = cell.trim().isEmpty() ? "미지정" : cell.trim();
-        cellMap.computeIfAbsent(cellKey, k -> new ArrayList<>()).add(member);
-      }
-
-      // CellGroup으로 변환 (미지정 제외)
-      for (Map.Entry<String, List<AttendanceMember>> entry : cellMap.entrySet()) {
-        // "미지정" 셀은 제외
-        if ("미지정".equals(entry.getKey())) {
-          continue;
-        }
-
-        // 직분 순서대로 정렬
-        List<AttendanceMember> members = entry.getValue();
-        members.sort(
-            (m1, m2) -> {
-              int priority1 = getPositionPriority(m1.getPosition());
-              int priority2 = getPositionPriority(m2.getPosition());
-              return Integer.compare(priority1, priority2);
-            });
-
-        CellGroup group = new CellGroup();
-        group.setCellName(entry.getKey());
-        group.setAttendanceMonth(currentMonth);
-        group.setMembers(members);
-        group.setSundayDates(sundayDates);
-        cellGroups.add(group);
-      }
+      CellGroup group = new CellGroup();
+      group.setCellName(entry.getKey());
+      group.setAttendanceMonth(currentMonth);
+      group.setMembers(members);
+      group.setSundayDates(sundayDates);
+      cellGroups.add(group);
     }
 
     return cellGroups;
